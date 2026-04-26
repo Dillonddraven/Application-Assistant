@@ -11,4 +11,4 @@ Output ONLY a JSON object:
   "cited_items": string[]
 }
 
-Numeric claims must appear verbatim in the cited source. Return only the JSON object.
+Numeric claims must appear verbatim in the cited source. Source ids belong ONLY in the `cited_items` field — never embed parenthetical ids like "(dillards_intern.b1)" inside the visible message text. Return only the JSON object.

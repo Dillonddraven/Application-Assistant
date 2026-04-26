@@ -6,10 +6,25 @@ prompts never reference these placeholders so the LLM can't talk about them.
 """
 from __future__ import annotations
 
+import re
 from datetime import date
 from typing import Any
 
 from .profile_loader import Profile, Secrets
+
+# LLMs occasionally leak parenthetical source-id citations into prose
+# ("...summaries (dillards_intern.b1)..."). Scrub them at render time so
+# user-facing documents stay clean. Pattern: a parenthesized snake_case dotted
+# id, optionally preceded by whitespace.
+_SOURCE_ID_LEAK_RE = re.compile(r"\s*\(\s*[a-z][a-z0-9_]*(?:\.[a-z0-9_]+)+\s*\)")
+
+
+def _scrub_source_ids(text: str) -> str:
+    cleaned = _SOURCE_ID_LEAK_RE.sub("", text)
+    # Collapse any double spaces left behind, and tidy " ." or " ," seams.
+    cleaned = re.sub(r" {2,}", " ", cleaned)
+    cleaned = re.sub(r"\s+([.,;:!?])", r"\1", cleaned)
+    return cleaned
 
 
 def substitute_pii(text: str, secrets: Secrets) -> str:
@@ -37,7 +52,7 @@ def render_resume(*, profile: Profile, tailored: dict[str, Any], secrets: Secret
         lines.append(contact)
     lines.append("")
 
-    summary = tailored.get("summary") or ""
+    summary = _scrub_source_ids(tailored.get("summary") or "")
     if summary:
         lines += ["## Summary", summary, ""]
 
@@ -75,7 +90,7 @@ def render_resume(*, profile: Profile, tailored: dict[str, Any], secrets: Secret
                 meta_bits.append(location)
             lines.append(" • ".join(meta_bits))
             for txt in bullets_by_exp.get(exp.get("id"), []):
-                lines.append(f"- {txt}")
+                lines.append(f"- {_scrub_source_ids(txt)}")
             lines.append("")
 
     edu = p.get("education") or []
@@ -135,7 +150,7 @@ def render_cover_letter(
     lines.append(salutation)
     lines.append("")
     for para in tailored.get("cover_letter_paragraphs") or []:
-        lines.append(para.get("text", ""))
+        lines.append(_scrub_source_ids(para.get("text", "")))
         lines.append("")
     name = profile.data.get("identity", {}).get("full_name", "")
     lines.append("Sincerely,")
@@ -154,7 +169,7 @@ def render_application_answers(*, tailored: dict[str, Any]) -> str:
     lines: list[str] = ["# Application Answers", ""]
     for a in items:
         q = a.get("question", "")
-        ans = a.get("answer", "")
+        ans = _scrub_source_ids(a.get("answer", ""))
         lines.append(f"### {q}")
         lines.append(ans)
         lines.append("")
@@ -163,9 +178,9 @@ def render_application_answers(*, tailored: dict[str, Any]) -> str:
 
 def render_email(*, subject: str, body_paragraphs: list[dict[str, Any]], signature_name: str, secrets: Secrets) -> str:
     pm = secrets.placeholder_map()
-    lines = [f"**Subject:** {subject}", ""]
+    lines = [f"**Subject:** {_scrub_source_ids(subject)}", ""]
     for p in body_paragraphs:
-        lines.append(p.get("text", ""))
+        lines.append(_scrub_source_ids(p.get("text", "")))
         lines.append("")
     lines.append(signature_name)
     sig_bits = [pm.get("{{email}}", ""), pm.get("{{phone}}", "")]
@@ -173,6 +188,10 @@ def render_email(*, subject: str, body_paragraphs: list[dict[str, Any]], signatu
     if sig:
         lines.append(sig)
     return "\n".join(lines).rstrip() + "\n"
+
+
+def render_linkedin_dm(text: str) -> str:
+    return _scrub_source_ids(text).rstrip() + "\n"
 
 
 def render_match_report(analyzed: dict[str, Any], packet: dict[str, Any]) -> str:

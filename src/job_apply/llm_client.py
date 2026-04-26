@@ -1,17 +1,15 @@
 """Thin OpenAI SDK wrapper with the model policy baked in.
 
-Per Draven's directive (memory: Model Policy 2026-04-15):
-  - default daily driver: gpt-5.2-mini
-  - cheap deterministic / extraction: gpt-4.1-mini
-  - reserve gpt-5.4 for hard reasoning, opt-in only via tier="deep"
+Tiers map to real OpenAI model IDs:
+  - "extract"  -> gpt-4.1-mini   (job_analyzer; cheap deterministic JSON extraction)
+  - "tailor"   -> gpt-5-mini     (resume_tailor, email_writer; daily driver)
+  - "deep"     -> gpt-5          (--deep opt-in for tough fits)
 
-We expose three task tiers:
-  - "extract"  -> gpt-4.1-mini    (job_analyzer)
-  - "tailor"   -> gpt-5.2-mini    (resume_tailor, email_writer)
-  - "deep"     -> gpt-5.4         (--deep retry)
-
-Model names can be overridden via env so the policy can be tuned without code
-changes if OpenAI renames a SKU.
+Note: Draven's broader system memory uses Hermes-internal aliases like
+"gpt-5.2-mini" / "gpt-5.4" — those names are translated by the Hermes router
+to real SKUs and are NOT valid OpenAI model IDs. This tool talks to OpenAI
+directly, so we use the real names. Override per-tier via JOB_APPLY_MODEL_*
+env vars if OpenAI renames a SKU.
 """
 from __future__ import annotations
 
@@ -26,8 +24,8 @@ Tier = Literal["extract", "tailor", "deep"]
 
 DEFAULT_MODELS: dict[Tier, str] = {
     "extract": "gpt-4.1-mini",
-    "tailor": "gpt-5.2-mini",
-    "deep": "gpt-5.4",
+    "tailor": "gpt-5-mini",
+    "deep": "gpt-5",
 }
 
 ENV_OVERRIDES: dict[Tier, str] = {
@@ -89,8 +87,10 @@ class LLMClient:
                 {"role": "system", "content": system},
                 {"role": "user", "content": user},
             ],
-            "temperature": temperature,
         }
+        # gpt-5 family rejects custom temperature; only the default (1) is allowed.
+        if not model.startswith("gpt-5"):
+            kwargs["temperature"] = temperature
         if json_mode:
             kwargs["response_format"] = {"type": "json_object"}
         resp = self._client.chat.completions.create(**kwargs)

@@ -90,7 +90,7 @@ def run_tailor(
         signature_name=profile.full_name,
         secrets=secrets,
     )
-    dm_md = (emails["linkedin_dm"].get("text") or "") + "\n"
+    dm_md = render.render_linkedin_dm(emails["linkedin_dm"].get("text") or "")
 
     packet: dict[str, Any] = {
         "job_id": job_id,

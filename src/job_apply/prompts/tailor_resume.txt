@@ -27,7 +27,8 @@ Output ONLY a single JSON object matching this schema exactly:
 }
 
 Hard rules:
-- Cite "experience.<id>.<bullet_id>" for every resume bullet. The id MUST match an existing profile bullet. Inventing an id = the system blocks your output.
+- Cite "experience.<id>.<bullet_id>" for every resume bullet via the `source_id` field ONLY. NEVER embed a parenthetical id like "(dillards_intern.b1)" inside any user-visible `text`, `summary`, or `answer` field. Citations belong in JSON fields, not in prose.
+- The id MUST match an existing profile bullet. Inventing an id = the system blocks your output.
 - Do not include phone numbers, email addresses, street addresses, dates of birth, or LinkedIn/GitHub URLs anywhere in the output. The user will add those at export time.
 - Tone: concise, specific, plainspoken. Avoid: "passionate", "synergy", "rockstar", "ninja", "proven track record", "results-driven".
 - Do not pad with adjectives. If you can't say it specifically, leave it out.
