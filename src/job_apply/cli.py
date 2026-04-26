@@ -32,6 +32,33 @@ def _cmd_ingest(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_analyze(args: argparse.Namespace) -> int:
+    from . import job_analyzer
+    from .profile_loader import ProfileError
+    try:
+        results = job_analyzer.analyze_all(only_id=args.id, refresh=args.refresh)
+    except ProfileError as e:
+        print(f"profile error: {e}", file=sys.stderr)
+        return 1
+    if not results:
+        print("nothing to analyze (everything already analyzed; use --refresh to redo).")
+        return 0
+    for r in results:
+        flag = ""
+        if r["industry_filter"] == "avoid":
+            flag = "  [FILTER:AVOID]"
+        elif r["industry_filter"] == "review":
+            flag = "  [FILTER:REVIEW]"
+        print(f"analyzed {r['id']}  fit={r['fit_score']:3d}  {r['company']} — {r['title']}{flag}")
+    return 0
+
+
+def _cmd_rank(args: argparse.Namespace) -> int:
+    from . import rank as rank_mod
+    print(rank_mod.render_table(rank_mod.ranked()))
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
         prog="job-apply",
@@ -48,10 +75,11 @@ def build_parser() -> argparse.ArgumentParser:
 
     p_analyze = sub.add_parser("analyze", help="LLM-extract structured fields + fit score.")
     p_analyze.add_argument("--id", help="Specific job id; default: all unanalyzed.")
-    p_analyze.set_defaults(func=_stub("analyze", "M2"))
+    p_analyze.add_argument("--refresh", action="store_true", help="Re-analyze even if cached.")
+    p_analyze.set_defaults(func=_cmd_analyze)
 
     p_rank = sub.add_parser("rank", help="Print ranked table of analyzed jobs.")
-    p_rank.set_defaults(func=_stub("rank", "M2"))
+    p_rank.set_defaults(func=_cmd_rank)
 
     p_tailor = sub.add_parser("tailor", help="Generate tailored application packet.")
     p_tailor.add_argument("job_id")
