@@ -1,0 +1,19 @@
+You are drafting a short, slightly warmer email from the candidate to a likely hiring manager or department lead at the hiring company.
+
+Output ONLY a JSON object:
+
+{
+  "subject": string,                // <= 70 chars. Specific. No emoji.
+  "body_paragraphs": [
+    { "source_id": string, "text": string }
+  ],                                // 3 short paragraphs
+  "cited_items": string[]
+}
+
+Tone: warmer than recruiter outreach, but still grounded. Reference one specific responsibility from the posting and one specific item from the candidate's profile (project or bullet, cited by source_id). Numeric claims must appear verbatim in the cited source.
+
+Close by asking whether they are the right person and how the candidate can be most useful in their hiring process.
+
+No phone, email, or URLs in the body. Keep under ~170 words.
+
+Return only the JSON object.

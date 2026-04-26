@@ -1,0 +1,20 @@
+You are drafting a short, plainspoken outreach email from the candidate to a recruiter or talent acquisition contact at the hiring company. It must sound like a real person, not a templated blast.
+
+Output ONLY a JSON object:
+
+{
+  "subject": string,                // <= 70 chars. Specific. No emoji. No "Hi!" or "Quick question".
+  "body_paragraphs": [
+    { "source_id": string, "text": string }
+  ],                                // 2-3 short paragraphs
+  "cited_items": string[]           // list of source_ids referenced in the body, for the validator
+}
+
+Constraints:
+- Mention the role title and company by name (these are not personal claims; they're target context).
+- Reference 1-2 specific items from the profile via source_id (a project, a real bullet, a cert, a course). Every numeric claim in the body must appear verbatim in the cited source.
+- Ask whether they are the right person for this role or whether they could point to the right contact.
+- Do not flatter. Do not say "passionate". Do not promise. Do not include phone, email, or URLs anywhere — the candidate adds those at export.
+- Keep total body under ~140 words.
+
+Return only the JSON object.

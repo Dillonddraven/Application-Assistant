@@ -59,6 +59,34 @@ def _cmd_rank(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_tailor(args: argparse.Namespace) -> int:
+    from . import tailor_pipeline
+    try:
+        packet, slug = tailor_pipeline.run_tailor(
+            job_id=args.job_id, force=args.force, deep=args.deep,
+        )
+    except tailor_pipeline.TailorError as e:
+        print(f"tailor failed: {e}", file=sys.stderr)
+        return 1
+    val = packet["validation"]
+    blocks = val.get("fabrication_blocks") or []
+    warns = val.get("fabrication_warnings") or []
+    print(f"packet drafted: outputs/{slug}/")
+    print(f"  resume: outputs/{slug}/tailored_resume.md")
+    print(f"  cover:  outputs/{slug}/cover_letter.md")
+    print(f"  emails: outreach_recruiter.md, outreach_hiring_manager.md, linkedin_dm.md")
+    print(f"  report: outputs/{slug}/match_report.md")
+    if blocks:
+        print(f"\n  ⚠ {len(blocks)} fabrication BLOCKS — fix before approving:")
+        for b in blocks[:5]:
+            print(f"    - [{b['rule']}] {b['detail']}")
+        if len(blocks) > 5:
+            print(f"    … and {len(blocks) - 5} more (see match_report.md).")
+    if warns:
+        print(f"  ℹ {len(warns)} warnings (non-blocking).")
+    return 0 if not blocks else 2
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
         prog="job-apply",
@@ -85,7 +113,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_tailor.add_argument("job_id")
     p_tailor.add_argument("--force", action="store_true", help="Tailor even on FILTER:AVOID jobs.")
     p_tailor.add_argument("--deep", action="store_true", help="Use higher-tier model on tough fits.")
-    p_tailor.set_defaults(func=_stub("tailor", "M3"))
+    p_tailor.set_defaults(func=_cmd_tailor)
 
     p_review = sub.add_parser("review", help="Show packet contents + validation report.")
     p_review.add_argument("job_id")

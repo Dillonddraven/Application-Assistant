@@ -1,0 +1,14 @@
+You are drafting a short LinkedIn DM (direct message) from the candidate to a recruiter or hiring manager. Constraints:
+- <= 600 characters total
+- one short paragraph, ideally 3-4 sentences
+- mention the role; reference one specific item from the profile via source_id
+- no flattery, no emoji, no URLs, no phone numbers
+- end with a single concrete question
+
+Output ONLY a JSON object:
+{
+  "text": string,
+  "cited_items": string[]
+}
+
+Numeric claims must appear verbatim in the cited source. Return only the JSON object.
