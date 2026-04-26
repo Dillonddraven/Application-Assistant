@@ -58,4 +58,14 @@ tests/     fixtures/   test_*.py
 
 ## Status
 
-M0 (bootstrap) complete. M1–M4 in progress. See plan in `~/.claude/plans/`.
+Thin slice (M0–M4) complete; 78 tests passing.
+
+- M0 — repo + sample profile + CLI skeleton
+- M1 — profile loader, ingest, state, LLM client
+- M2 — analyzer + fit scoring + industry filter + rank
+- M3 — tailor pipeline + 3 email variants + fabrication validator + render
+- M4 — review/approve/skip/queue + PII leak guard
+
+Deferred to M5+ (post-MVP): contact research helpers, composite `run`, DOCX/PDF
+rendering, cautious Playwright form-fill, optional Streamlit UI. See plan in
+`~/.claude/plans/steady-whistling-pascal.md`.

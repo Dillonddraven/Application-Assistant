@@ -87,6 +87,45 @@ def _cmd_tailor(args: argparse.Namespace) -> int:
     return 0 if not blocks else 2
 
 
+def _cmd_review(args: argparse.Namespace) -> int:
+    from . import approval_queue
+    try:
+        print(approval_queue.review(args.job_id))
+    except approval_queue.ApprovalError as e:
+        print(f"review failed: {e}", file=sys.stderr)
+        return 1
+    return 0
+
+
+def _cmd_approve(args: argparse.Namespace) -> int:
+    from . import approval_queue
+    try:
+        pkt = approval_queue.approve(args.job_id)
+    except approval_queue.ApprovalError as e:
+        print(f"approve refused: {e}", file=sys.stderr)
+        return 2
+    print(f"approved: {pkt['slug']}  (status={pkt['status']})  [no message sent — manual upload/send]")
+    return 0
+
+
+def _cmd_skip(args: argparse.Namespace) -> int:
+    from . import approval_queue
+    try:
+        pkt = approval_queue.skip(args.job_id)
+    except approval_queue.ApprovalError as e:
+        print(f"skip failed: {e}", file=sys.stderr)
+        return 1
+    print(f"skipped: {pkt['slug']}")
+    return 0
+
+
+def _cmd_queue(args: argparse.Namespace) -> int:
+    from . import approval_queue
+    rows = approval_queue.queue(args.status)
+    print(approval_queue.render_queue_table(rows))
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
         prog="job-apply",
@@ -116,20 +155,20 @@ def build_parser() -> argparse.ArgumentParser:
     p_tailor.set_defaults(func=_cmd_tailor)
 
     p_review = sub.add_parser("review", help="Show packet contents + validation report.")
-    p_review.add_argument("job_id")
-    p_review.set_defaults(func=_stub("review", "M4"))
+    p_review.add_argument("job_id", help="Packet slug or 12-char job id.")
+    p_review.set_defaults(func=_cmd_review)
 
     p_approve = sub.add_parser("approve", help="Mark packet approved (no send).")
-    p_approve.add_argument("job_id")
-    p_approve.set_defaults(func=_stub("approve", "M4"))
+    p_approve.add_argument("job_id", help="Packet slug or 12-char job id.")
+    p_approve.set_defaults(func=_cmd_approve)
 
     p_skip = sub.add_parser("skip", help="Mark packet skipped.")
-    p_skip.add_argument("job_id")
-    p_skip.set_defaults(func=_stub("skip", "M4"))
+    p_skip.add_argument("job_id", help="Packet slug or 12-char job id.")
+    p_skip.set_defaults(func=_cmd_skip)
 
     p_queue = sub.add_parser("queue", help="List packets by status.")
     p_queue.add_argument("--status", choices=["draft", "approved", "skipped", "all"], default="all")
-    p_queue.set_defaults(func=_stub("queue", "M4"))
+    p_queue.set_defaults(func=_cmd_queue)
 
     return p
 
