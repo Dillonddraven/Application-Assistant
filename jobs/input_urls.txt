@@ -1,0 +1,2 @@
+# One job-posting URL per line. Lines starting with `#` are ignored.
+# Use `job-apply ingest <url>` for individual postings, or feed this file to a batch script.

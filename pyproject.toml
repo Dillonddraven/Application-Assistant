@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "job-apply-assistant"
+version = "0.1.0"
+description = "Local-first job application assistant: tailored, approval-gated, no-fabrication."
+requires-python = ">=3.11"
+dependencies = [
+  "httpx>=0.27",
+  "trafilatura>=1.12",
+  "pyyaml>=6.0",
+  "openai>=1.50",
+  "rich>=13.7",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[project.scripts]
+job-apply = "job_apply.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+job_apply = ["prompts/*.txt"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

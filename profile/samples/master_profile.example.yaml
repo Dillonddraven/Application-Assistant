@@ -1,0 +1,116 @@
+# Master profile — career facts that ARE sent to the LLM for tailoring.
+# DO NOT put phone, street address, DOB, or personal email here. Those go in secrets.yaml.
+# Every "id" field is a stable source identifier referenced by tailored output.
+
+identity:
+  full_name: "Draven <LastName>"        # ← edit
+  pronouns: "he/him"                     # optional
+  citizenship: "US Citizen"
+  work_auth: "Authorized to work in the US, no sponsorship required"
+
+education:
+  - id: bs_cis
+    school: "<your school>"              # ← edit
+    degree: "BA, Computer Information Systems"
+    status: in_progress                  # used by fabrication validator
+    start: "2022-08"
+    expected_end: "2026-05"              # ← edit
+    gpa: null
+    honors: []
+
+  - id: ms_cyber
+    school: "<your school>"              # ← edit
+    degree: "MS, Cybersecurity"
+    status: in_progress
+    start: "2025-01"                     # ← edit
+    expected_end: "2026-12"              # ← edit
+    gpa: null
+    honors: []
+
+certifications:
+  - id: comptia_network_plus
+    name: "CompTIA Network+"
+    issued: "<YYYY-MM>"                  # ← edit
+    expires: null
+    credential_id: null
+
+  - id: comptia_security_plus
+    name: "CompTIA Security+"
+    issued: "<YYYY-MM>"                  # ← edit
+    expires: null
+    credential_id: null
+
+experience:
+  - id: dillards_intern
+    company: "Dillard's"
+    title: "IT / Information Security Intern"
+    role_type: internship                # used by fabrication validator
+    location: "<city, state>"            # ← edit
+    start: "<YYYY-MM>"                   # ← edit
+    end: "<YYYY-MM>"                     # ← edit
+    summary: |
+      Internship on Dillard's IT / Information Security team. Edit this paragraph
+      to describe what you actually did at a high level — keep it factual.
+    bullets:
+      - id: dillards_intern.b1
+        text: "<Replace with a real bullet describing one thing you did, factually.>"
+        skills_demonstrated: []
+        metrics_present: []              # only populate if a number is in `text` verbatim
+      - id: dillards_intern.b2
+        text: "<Another factual bullet.>"
+        skills_demonstrated: []
+        metrics_present: []
+
+projects: []                              # add school/personal projects with id, name, description, skills, metrics_present
+
+skills:
+  technical: []                           # e.g. ["Python", "Linux", "SQL", "Bash"]
+  security: []                            # e.g. ["SIEM basics", "vulnerability scanning", "incident response basics"]
+  cloud: []                               # e.g. ["AWS", "Azure"]
+  soft: []                                # e.g. ["written communication", "incident triage"]
+
+preferences:
+  target_roles:
+    - "Security Analyst"
+    - "SOC Analyst"
+    - "Information Security Analyst"
+    - "IT Analyst"
+    - "Cloud Security Analyst"
+    - "Cybersecurity Engineer"
+    - "Security Operations"
+    - "IT Support / Security Engineering"
+    - "Automation Engineer"
+    - "AI Agent Engineer"
+  locations: []                           # e.g. ["Tulsa, OK", "Lawton, OK", "Remote"]
+  remote_ok: true
+  hybrid_ok: true
+  onsite_ok: true
+  salary_min: null                        # number or null
+  salary_target: null
+  industries_avoid:
+    - military
+    - defense
+  visa_sponsorship_needed: false
+
+reusable_answers:
+  why_security: |
+    Edit this. A 2–3 sentence honest answer about why security/IT.
+  authorized_to_work: "Yes — US citizen, no sponsorship required."
+  willing_to_relocate: "Open to relocation for the right role."
+  years_of_experience: "Internship + coursework; finishing BA CIS and MS Cybersecurity."
+
+writing_style:
+  tone: "concise, specific, plainspoken; not corporate-jargony"
+  forbidden_phrases:
+    - "passionate"
+    - "synergy"
+    - "rockstar"
+    - "ninja"
+    - "proven track record"
+    - "results-driven"
+  voice_examples: []
+
+# Global numeric whitelist. Leave empty unless a number is genuinely true and
+# you want it usable in tailored output even though it isn't in a specific
+# bullet's text. Example: ["50+ servers", "3 years"]. Empty = strict.
+metrics_allowed: []

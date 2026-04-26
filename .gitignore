@@ -1,0 +1,26 @@
+# Real data — keep local only
+profile/master_profile.yaml
+profile/secrets.yaml
+jobs/raw_posts/
+jobs/analyzed/
+outputs/
+
+# Env / secrets
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+build/
+dist/
+
+# Tooling caches
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# OS
+.DS_Store
