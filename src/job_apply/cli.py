@@ -18,6 +18,20 @@ def _stub(name: str, milestone: str):
     return handler
 
 
+def _cmd_ingest(args: argparse.Namespace) -> int:
+    from . import job_ingest
+    try:
+        result = job_ingest.ingest(args.source, refresh=args.refresh)
+    except job_ingest.IngestError as e:
+        print(f"ingest failed: {e}", file=sys.stderr)
+        return 1
+    rec = result.record
+    state_word = "cached" if result.cached else "saved"
+    src = rec.source_url or rec.source_kind
+    print(f"{state_word} job_id={rec.job_id}  source={src}  text={rec.raw_text_path}")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
         prog="job-apply",
@@ -30,7 +44,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_ingest = sub.add_parser("ingest", help="Fetch or load a job posting (URL or file).")
     p_ingest.add_argument("source", help="URL or path to a .txt/.md job posting.")
     p_ingest.add_argument("--refresh", action="store_true", help="Re-fetch even if cached.")
-    p_ingest.set_defaults(func=_stub("ingest", "M1"))
+    p_ingest.set_defaults(func=_cmd_ingest)
 
     p_analyze = sub.add_parser("analyze", help="LLM-extract structured fields + fit score.")
     p_analyze.add_argument("--id", help="Specific job id; default: all unanalyzed.")
