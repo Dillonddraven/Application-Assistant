@@ -9,9 +9,9 @@ from .llm_client import LLMClient
 from .profile_loader import Profile
 
 PROMPT_VERSIONS = {
-    "recruiter": "write_email_recruiter@v1",
-    "hiring_manager": "write_email_hiring_manager@v1",
-    "linkedin_dm": "write_linkedin_dm@v1",
+    "recruiter": "write_email_recruiter@v2",
+    "hiring_manager": "write_email_hiring_manager@v2",
+    "linkedin_dm": "write_linkedin_dm@v2",
 }
 
 

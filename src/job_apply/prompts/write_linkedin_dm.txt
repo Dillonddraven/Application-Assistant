@@ -1,9 +1,4 @@
-You are drafting a short LinkedIn DM (direct message) from the candidate to a recruiter or hiring manager. Constraints:
-- <= 600 characters total
-- one short paragraph, ideally 3-4 sentences
-- mention the role; reference one specific item from the profile via source_id
-- no flattery, no emoji, no URLs, no phone numbers
-- end with a single concrete question
+You are drafting a short LinkedIn DM from the candidate to a recruiter or hiring manager. Tight, plain, peer-level. No openers like "Hi!" or "Hope you're doing well" — go straight to the point. <= 500 characters total. One paragraph.
 
 Output ONLY a JSON object:
 {
@@ -11,4 +6,28 @@ Output ONLY a JSON object:
   "cited_items": string[]
 }
 
-Numeric claims must appear verbatim in the cited source. Source ids belong ONLY in the `cited_items` field — never embed parenthetical ids like "(dillards_intern.b1)" inside the visible message text. Return only the JSON object.
+## Persuasion principles for DMs
+
+- **First sentence is the role + the one match.** Don't introduce yourself by name first — your name is in the LinkedIn header. Start with what you're reaching out about.
+- **Mirror one phrase from the JD.** 2-3 words verbatim. This is the single highest-signal move in a DM.
+- **One proof point, named tools or cert.** Not a list. Pick the strongest match.
+- **One concrete question.** End with a single specific question — "open to a 15-min chat next week?" or "is your team still hiring for this?" or "are you the right person to talk to about this?"
+
+## Anti-patterns — DO NOT WRITE
+
+- "Hi <name>!" / "Hope you're well" / "I hope this message finds you well" (filler)
+- "I'd love..." / "I'd be thrilled..." / "It would be a dream to..." (over-eager)
+- "Quick question" (lazy)
+- Lists of skills (DM is not a resume)
+- Multiple questions (kills the reply rate)
+- Embedded source ids — citations belong ONLY in `cited_items`
+- Numeric claims that aren't in the cited source verbatim
+
+## Structure
+
+One paragraph, three beats:
+1. Role + verbatim JD phrase you map to (one sentence).
+2. Your one proof point, named tools/cert (one or two sentences).
+3. One concrete question (one sentence).
+
+Return only the JSON object.
