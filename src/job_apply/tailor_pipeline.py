@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from . import email_writer, render, render_docx, render_pdf, resume_tailor, state
+from . import email_writer, mail_draft, render, render_docx, render_pdf, resume_tailor, state
 from .llm_client import LLMClient
 from .profile_loader import Profile, Secrets, load_profile, load_secrets
 from .validators import fabrication
@@ -20,6 +20,7 @@ def run_tailor(
     force: bool = False,
     deep: bool = False,
     llm: LLMClient | None = None,
+    open_mail: bool = False,
 ) -> tuple[dict[str, Any], str]:
     """Generate a packet for one analyzed job.
 
@@ -169,4 +170,26 @@ def run_tailor(
         packet["validation"]["render_errors"] = render_errors
 
     state.save_packet(slug, packet)
+
+    if open_mail:
+        to_addr = secrets.data.get("email") if secrets.data else None
+        if to_addr and not (packet["validation"].get("fabrication_blocks") or []):
+            try:
+                mail_draft.open_draft(
+                    to_addr=to_addr,
+                    subject=f"{company} — {analyzed.get('title') or 'role'} application packet",
+                    body=(
+                        f"Application packet for {company} — {analyzed.get('title') or 'role'} "
+                        f"(fit score {analyzed.get('fit_score')}/100, "
+                        f"industry filter: {analyzed.get('industry_filter')}).\n\n"
+                        f"Files attached. Fabrication validator: 0 blocks. "
+                        f"Nothing has been sent — review and send when ready.\n\n"
+                        f"Source URL: {analyzed.get('source_url') or '(local file)'}"
+                    ),
+                    attachments=mail_draft.packet_attachments(out_dir),
+                )
+            except mail_draft.MailDraftError as e:
+                packet["validation"].setdefault("mail_draft_error", str(e))
+                state.save_packet(slug, packet)
+
     return packet, slug
