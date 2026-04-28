@@ -4,6 +4,7 @@ profile/secrets.yaml
 jobs/raw_posts/
 jobs/analyzed/
 outputs/
+applications.xlsx
 
 # Env / secrets
 .env

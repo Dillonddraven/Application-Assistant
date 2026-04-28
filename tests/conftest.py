@@ -47,4 +47,11 @@ def workspace(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     monkeypatch.setattr(pl, "PROFILE_PATH", profile_dir / "master_profile.yaml")
     monkeypatch.setattr(pl, "SECRETS_PATH", profile_dir / "secrets.yaml")
 
+    # Tracker XLSX path is also captured at import time.
+    try:
+        from job_apply import tracker as tr
+        monkeypatch.setattr(tr, "TRACKER_PATH", tmp_path / "applications.xlsx")
+    except ImportError:
+        pass
+
     return tmp_path

@@ -83,7 +83,7 @@ def review(slug_or_id: str) -> str:
     return "\n".join(lines)
 
 
-def approve(slug_or_id: str) -> dict[str, Any]:
+def approve(slug_or_id: str, *, log_to_tracker: bool = True) -> dict[str, Any]:
     slug, pkt = _resolve(slug_or_id)
     blocks = (pkt.get("validation") or {}).get("fabrication_blocks") or []
     if blocks:
@@ -94,6 +94,17 @@ def approve(slug_or_id: str) -> dict[str, Any]:
     pkt["status"] = "approved"
     pkt.setdefault("approval_log", []).append({"ts": state.now_iso(), "action": "approve"})
     state.save_packet(slug, pkt)
+    if log_to_tracker:
+        try:
+            from . import tracker
+            analyzed = state.load_analyzed(pkt.get("job_id"))
+            tracker.upsert(packet=pkt, analyzed=analyzed, status="waiting")
+        except Exception as e:
+            # Don't fail approval if tracker write fails — surface a warning instead.
+            pkt.setdefault("approval_log", []).append({
+                "ts": state.now_iso(), "action": "tracker_warning", "detail": str(e),
+            })
+            state.save_packet(slug, pkt)
     return pkt
 
 

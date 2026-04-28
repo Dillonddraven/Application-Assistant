@@ -126,6 +126,50 @@ def _cmd_queue(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_track_list(args: argparse.Namespace) -> int:
+    from . import tracker
+    rows = tracker.list_rows(status=args.status if args.status != "all" else None)
+    print(tracker.render_table(rows))
+    return 0
+
+
+def _cmd_track_status(args: argparse.Namespace) -> int:
+    from . import tracker
+    try:
+        row = tracker.set_status(
+            ident=args.ident, new_status=args.new_status, notes=args.notes or "",
+        )
+    except tracker.TrackerError as e:
+        print(f"track-status failed: {e}", file=sys.stderr)
+        return 1
+    print(f"{row['slug']} -> {row['status']}  (next_followup: {row.get('next_followup_date') or '—'})")
+    return 0
+
+
+def _cmd_track_followup(args: argparse.Namespace) -> int:
+    from . import tracker
+    rows = tracker.due_followups()
+    if not rows:
+        print("(no follow-ups due)")
+        return 0
+    print(f"{len(rows)} follow-up(s) due:")
+    print(tracker.render_table(rows))
+    return 0
+
+
+def _cmd_track_add(args: argparse.Namespace) -> int:
+    from . import approval_queue, state, tracker
+    try:
+        slug, packet = approval_queue._resolve(args.ident)
+    except approval_queue.ApprovalError as e:
+        print(f"track-add failed: {e}", file=sys.stderr)
+        return 1
+    analyzed = state.load_analyzed(packet.get("job_id"))
+    row = tracker.upsert(packet=packet, analyzed=analyzed, status=args.status)
+    print(f"tracked: {row['slug']}  status={row['status']}  applied_date={row['applied_date']}")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
         prog="job-apply",
@@ -169,6 +213,27 @@ def build_parser() -> argparse.ArgumentParser:
     p_queue = sub.add_parser("queue", help="List packets by status.")
     p_queue.add_argument("--status", choices=["draft", "approved", "skipped", "all"], default="all")
     p_queue.set_defaults(func=_cmd_queue)
+
+    p_tl = sub.add_parser("track-list", help="List tracked applications.")
+    p_tl.add_argument("--status", default="all",
+                      help="all | waiting | interview_pending | interview_completed | rejected | offer | accepted | withdrawn")
+    p_tl.set_defaults(func=_cmd_track_list)
+
+    p_ts = sub.add_parser("track-status", help="Update an application's status.")
+    p_ts.add_argument("ident", help="Packet slug or 12-char job id.")
+    p_ts.add_argument("new_status",
+                      choices=["waiting", "interview_pending", "interview_completed",
+                               "rejected", "offer", "accepted", "withdrawn"])
+    p_ts.add_argument("--notes", default="")
+    p_ts.set_defaults(func=_cmd_track_status)
+
+    p_tf = sub.add_parser("track-followup", help="Show applications with follow-ups due today or earlier.")
+    p_tf.set_defaults(func=_cmd_track_followup)
+
+    p_ta = sub.add_parser("track-add", help="Manually add an application to the tracker.")
+    p_ta.add_argument("ident", help="Packet slug or 12-char job id.")
+    p_ta.add_argument("--status", default="waiting")
+    p_ta.set_defaults(func=_cmd_track_add)
 
     return p
 
