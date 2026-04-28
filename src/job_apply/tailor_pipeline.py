@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from . import email_writer, render, resume_tailor, state
+from . import email_writer, render, render_docx, render_pdf, resume_tailor, state
 from .llm_client import LLMClient
 from .profile_loader import Profile, Secrets, load_profile, load_secrets
 from .validators import fabrication
@@ -104,6 +104,10 @@ def run_tailor(
             "outreach_hiring_manager_md": "outreach_hiring_manager.md",
             "linkedin_dm_md": "linkedin_dm.md",
             "match_report_md": "match_report.md",
+            "tailored_resume_pdf": "tailored_resume.pdf",
+            "cover_letter_pdf": "cover_letter.pdf",
+            "tailored_resume_docx": "tailored_resume.docx",
+            "cover_letter_docx": "cover_letter.docx",
         },
         "emails": emails,
         "validation": {
@@ -131,5 +135,38 @@ def run_tailor(
     (out_dir / "outreach_hiring_manager.md").write_text(hm_email_md)
     (out_dir / "linkedin_dm.md").write_text(dm_md)
     (out_dir / "match_report.md").write_text(render.render_match_report(analyzed, packet))
+
+    # PDF + DOCX renders. PDF is best-effort (Chromium may be missing); we log
+    # the failure into validation but never block the rest of the packet.
+    company = analyzed.get("company") or "Hiring Team"
+    today = state.now_iso()[:10]
+    render_errors: list[str] = []
+    try:
+        render_pdf.render_resume_pdf(
+            profile=profile, tailored=tailored, secrets=secrets,
+            out_path=out_dir / "tailored_resume.pdf",
+        )
+        render_pdf.render_cover_letter_pdf(
+            profile=profile, tailored=tailored, secrets=secrets,
+            out_path=out_dir / "cover_letter.pdf",
+            company=company, date_iso=today,
+        )
+    except render_pdf.PDFRenderError as e:
+        render_errors.append(f"pdf: {e}")
+    try:
+        render_docx.render_resume_docx(
+            profile=profile, tailored=tailored, secrets=secrets,
+            out_path=out_dir / "tailored_resume.docx",
+        )
+        render_docx.render_cover_letter_docx(
+            profile=profile, tailored=tailored, secrets=secrets,
+            out_path=out_dir / "cover_letter.docx",
+            company=company, date_iso=today,
+        )
+    except Exception as e:  # docx is pure-python; failures are unexpected
+        render_errors.append(f"docx: {e}")
+    if render_errors:
+        packet["validation"]["render_errors"] = render_errors
+
     state.save_packet(slug, packet)
     return packet, slug

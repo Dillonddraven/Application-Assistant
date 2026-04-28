@@ -13,6 +13,9 @@ dependencies = [
   "pyyaml>=6.0",
   "openai>=1.50",
   "rich>=13.7",
+  "playwright>=1.45",
+  "python-docx>=1.1",
+  "openpyxl>=3.1",
 ]
 
 [project.optional-dependencies]
@@ -25,7 +28,7 @@ job-apply = "job_apply.cli:main"
 where = ["src"]
 
 [tool.setuptools.package-data]
-job_apply = ["prompts/*.txt"]
+job_apply = ["prompts/*.txt", "templates/*.css"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

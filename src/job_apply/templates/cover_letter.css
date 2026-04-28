@@ -1,0 +1,63 @@
+@page {
+  size: letter;
+  margin: 0.85in 0.85in;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter",
+               "Helvetica Neue", Arial, sans-serif;
+  font-size: 11pt;
+  line-height: 1.5;
+  color: #1d1f24;
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+.return-address {
+  font-size: 10pt;
+  color: #5b6068;
+  margin: 0 0 8pt 0;
+  line-height: 1.4;
+}
+
+.return-address div {
+  margin: 0;
+}
+
+.date {
+  font-size: 10pt;
+  color: #1d1f24;
+  margin: 0 0 18pt 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.recipient {
+  margin: 0 0 16pt 0;
+}
+
+.salutation {
+  margin: 0 0 12pt 0;
+  font-weight: 500;
+}
+
+p.body {
+  margin: 0 0 11pt 0;
+  text-align: left;
+  hyphens: none;
+}
+
+.signoff {
+  margin: 18pt 0 0 0;
+}
+
+.signature-name {
+  margin: 4pt 0 0 0;
+  font-weight: 600;
+  color: #1a3a5c;
+}
+
+.signature-contact {
+  font-size: 10pt;
+  color: #5b6068;
+  margin: 1pt 0 0 0;
+}

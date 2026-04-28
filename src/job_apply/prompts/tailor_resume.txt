@@ -23,8 +23,13 @@ Output ONLY a single JSON object matching this schema exactly:
       "source_id": string,          // "reusable_answers.<key>", "experience.<id>", or "general"
       "answer": string
     }
-  ]                                 // 0-5 entries
+  ]                                 // 3-5 entries; for entry-level / junior / associate roles ALWAYS include one preparation/fit question (e.g. "How has your education and project work prepared you for this entry-level role?" or "Why are you a good fit for this position?") and answer it from reusable_answers.how_coursework_prepared_me or reusable_answers.why_entry_level_fit when present
 }
+
+Application-answer voice:
+- Assertive without overclaiming. Use "I built X", "I designed Y", "I evaluated Z" — not "I helped with", "I supported", "I assisted". Active voice, decisive verbs.
+- Lead with what you did, then what it produced. Specific over generic.
+- No hedging adjectives ("kind of", "somewhat", "a bit"). No filler ("Honestly,", "I'd say").
 
 Hard rules:
 - Cite "experience.<id>.<bullet_id>" for every resume bullet via the `source_id` field ONLY. NEVER embed a parenthetical id like "(dillards_intern.b1)" inside any user-visible `text`, `summary`, or `answer` field. Citations belong in JSON fields, not in prose.

@@ -1,0 +1,158 @@
+@page {
+  size: letter;
+  margin: 0.6in 0.7in;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter",
+               "Helvetica Neue", Arial, sans-serif;
+  font-size: 10.5pt;
+  line-height: 1.42;
+  color: #1d1f24;
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+.name {
+  font-size: 22pt;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: #1a3a5c;
+  margin: 0;
+  line-height: 1.05;
+}
+
+.contact {
+  font-size: 9.5pt;
+  color: #5b6068;
+  margin: 5pt 0 16pt 0;
+  letter-spacing: 0.01em;
+}
+
+.contact a {
+  color: #5b6068;
+  text-decoration: none;
+}
+
+h2 {
+  font-size: 9.5pt;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+  color: #1a3a5c;
+  margin: 14pt 0 5pt 0;
+  padding-bottom: 2pt;
+  border-bottom: 1px solid #1a3a5c;
+}
+
+h3 {
+  font-size: 11pt;
+  font-weight: 600;
+  color: #1d1f24;
+  margin: 9pt 0 1pt 0;
+}
+
+.role-meta {
+  font-size: 9.5pt;
+  color: #5b6068;
+  margin: 0 0 4pt 0;
+  display: flex;
+  justify-content: space-between;
+}
+
+.role-meta .right {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  margin-left: 12pt;
+}
+
+.summary {
+  margin: 0 0 4pt 0;
+}
+
+ul {
+  margin: 2pt 0 6pt 13pt;
+  padding: 0;
+}
+
+ul li {
+  margin-bottom: 2pt;
+  padding-left: 2pt;
+}
+
+ul.bullets {
+  list-style: none;
+  margin-left: 0;
+}
+
+ul.bullets li {
+  position: relative;
+  padding-left: 12pt;
+  margin-bottom: 3pt;
+}
+
+ul.bullets li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 6.5pt;
+  width: 4pt;
+  height: 1px;
+  background: #1a3a5c;
+}
+
+.skills-list {
+  margin: 3pt 0 0 0;
+  padding: 0;
+  list-style: none;
+  columns: 2;
+  column-gap: 24pt;
+}
+
+.skills-list li {
+  break-inside: avoid;
+  padding-left: 10pt;
+  margin-bottom: 2pt;
+  position: relative;
+  font-size: 10pt;
+}
+
+.skills-list li::before {
+  content: "·";
+  position: absolute;
+  left: 2pt;
+  color: #1a3a5c;
+  font-weight: 700;
+}
+
+.education-row,
+.cert-row {
+  margin-bottom: 2pt;
+  display: flex;
+  justify-content: space-between;
+}
+
+.education-row .left,
+.cert-row .left {
+  flex: 1;
+}
+
+.education-row .right,
+.cert-row .right {
+  font-variant-numeric: tabular-nums;
+  color: #5b6068;
+  white-space: nowrap;
+  margin-left: 12pt;
+}
+
+.education-row .degree {
+  font-weight: 600;
+}
+
+.education-row .school {
+  color: #5b6068;
+}
