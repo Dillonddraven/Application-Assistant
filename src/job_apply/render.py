@@ -248,6 +248,10 @@ def render_match_report(analyzed: dict[str, Any], packet: dict[str, Any]) -> str
     lines.append(f"- Job ID: `{analyzed.get('id')}`")
     if analyzed.get("source_url"):
         lines.append(f"- Source: {analyzed['source_url']}")
+    sc = analyzed.get("source_confidence")
+    if sc:
+        reason = analyzed.get("source_confidence_reason") or ""
+        lines.append(f"- Source confidence: **{sc}** — {reason}")
     lines.append(f"- Location: {analyzed.get('location') or '—'}  ({analyzed.get('remote_mode')})")
     lines.append(f"- Industry filter: **{analyzed.get('industry_filter')}** (tags: {', '.join(analyzed.get('industry_tags') or []) or '—'})")
     lines.append(f"- **Fit score: {analyzed.get('fit_score')}**")

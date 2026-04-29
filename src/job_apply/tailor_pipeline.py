@@ -1,6 +1,7 @@
 """Orchestrate the tailor flow: tailor resume → emails → validate → render → save packet."""
 from __future__ import annotations
 
+import uuid
 from typing import Any
 
 from . import (email_writer, jd_analysis, mail_draft, qa_pass, render,
@@ -87,7 +88,11 @@ def run_tailor(
 
     slug = state.packet_slug(analyzed.get("company") or "company", analyzed.get("title") or "role")
     out_dir = state.packet_dir(slug)
+    employer_dir = out_dir / "employer"
+    internal_dir = out_dir / "internal"
     out_dir.mkdir(parents=True, exist_ok=True)
+    employer_dir.mkdir(parents=True, exist_ok=True)
+    internal_dir.mkdir(parents=True, exist_ok=True)
 
     # Render markdown views (substitution happens here, locally only).
     known_ids = render.collect_known_ids(profile.data)
@@ -116,19 +121,26 @@ def run_tailor(
     packet: dict[str, Any] = {
         "job_id": job_id,
         "slug": slug,
+        "run_id": uuid.uuid4().hex[:8],
         "tailored": tailored,
         "rendered": {
-            "tailored_resume_md": "tailored_resume.md",
-            "cover_letter_md": "cover_letter.md",
-            "application_answers_md": "application_answers.md",
-            "outreach_recruiter_md": "outreach_recruiter.md",
-            "outreach_hiring_manager_md": "outreach_hiring_manager.md",
-            "linkedin_dm_md": "linkedin_dm.md",
-            "match_report_md": "match_report.md",
-            "tailored_resume_pdf": "tailored_resume.pdf",
-            "cover_letter_pdf": "cover_letter.pdf",
-            "tailored_resume_docx": "tailored_resume.docx",
-            "cover_letter_docx": "cover_letter.docx",
+            # Employer-facing artifacts (PDF + DOCX, polished, employer email attachments).
+            "employer": {
+                "tailored_resume_pdf": "employer/tailored_resume.pdf",
+                "tailored_resume_docx": "employer/tailored_resume.docx",
+                "cover_letter_pdf": "employer/cover_letter.pdf",
+                "cover_letter_docx": "employer/cover_letter.docx",
+            },
+            # Internal review artifacts (markdown views + report). Never sent to employer.
+            "internal": {
+                "tailored_resume_md": "internal/tailored_resume.md",
+                "cover_letter_md": "internal/cover_letter.md",
+                "application_answers_md": "internal/application_answers.md",
+                "outreach_recruiter_md": "internal/outreach_recruiter.md",
+                "outreach_hiring_manager_md": "internal/outreach_hiring_manager.md",
+                "linkedin_dm_md": "internal/linkedin_dm.md",
+                "match_report_md": "internal/match_report.md",
+            },
         },
         "emails": emails,
         "validation": {
@@ -148,14 +160,14 @@ def run_tailor(
         packet["validation"]["schema_ok"] = False
         packet["validation"]["schema_errors"] = schema_errs
 
-    # Write all the markdown views (match_report deferred until after QA so
-    # the QA section is included).
-    (out_dir / "tailored_resume.md").write_text(resume_md)
-    (out_dir / "cover_letter.md").write_text(cover_md)
-    (out_dir / "application_answers.md").write_text(answers_md)
-    (out_dir / "outreach_recruiter.md").write_text(rec_email_md)
-    (out_dir / "outreach_hiring_manager.md").write_text(hm_email_md)
-    (out_dir / "linkedin_dm.md").write_text(dm_md)
+    # Write all the markdown views into internal/ (match_report deferred until
+    # after the QA pass below so the QA section is included).
+    (internal_dir / "tailored_resume.md").write_text(resume_md)
+    (internal_dir / "cover_letter.md").write_text(cover_md)
+    (internal_dir / "application_answers.md").write_text(answers_md)
+    (internal_dir / "outreach_recruiter.md").write_text(rec_email_md)
+    (internal_dir / "outreach_hiring_manager.md").write_text(hm_email_md)
+    (internal_dir / "linkedin_dm.md").write_text(dm_md)
 
     # PDF + DOCX renders. PDF is best-effort (Chromium may be missing); we log
     # the failure into validation but never block the rest of the packet.
@@ -165,11 +177,11 @@ def run_tailor(
     try:
         render_pdf.render_resume_pdf(
             profile=profile, tailored=tailored, secrets=secrets,
-            out_path=out_dir / "tailored_resume.pdf",
+            out_path=employer_dir / "tailored_resume.pdf",
         )
         render_pdf.render_cover_letter_pdf(
             profile=profile, tailored=tailored, secrets=secrets,
-            out_path=out_dir / "cover_letter.pdf",
+            out_path=employer_dir / "cover_letter.pdf",
             company=company, date_iso=today,
         )
     except render_pdf.PDFRenderError as e:
@@ -177,11 +189,11 @@ def run_tailor(
     try:
         render_docx.render_resume_docx(
             profile=profile, tailored=tailored, secrets=secrets,
-            out_path=out_dir / "tailored_resume.docx",
+            out_path=employer_dir / "tailored_resume.docx",
         )
         render_docx.render_cover_letter_docx(
             profile=profile, tailored=tailored, secrets=secrets,
-            out_path=out_dir / "cover_letter.docx",
+            out_path=employer_dir / "cover_letter.docx",
             company=company, date_iso=today,
         )
     except Exception as e:  # docx is pure-python; failures are unexpected
@@ -199,8 +211,10 @@ def run_tailor(
             "outreach_hiring_manager": hm_email_md,
             "linkedin_dm": dm_md,
         }
+        forbidden = (profile.data.get("writing_style") or {}).get("forbidden_phrases") or []
         qa = qa_pass.qa_check(
             rendered_views=rendered_views, jd_analysis=jd, llm=client,
+            forbidden_phrases=forbidden,
         )
         packet["validation"]["qa"] = qa
         packet["jd_analysis"] = jd
@@ -210,7 +224,7 @@ def run_tailor(
         packet["validation"]["qa_error"] = str(e)
 
     # Now write match_report (after QA so it includes the QA section).
-    (out_dir / "match_report.md").write_text(render.render_match_report(analyzed, packet))
+    (internal_dir / "match_report.md").write_text(render.render_match_report(analyzed, packet))
 
     state.save_packet(slug, packet)
 

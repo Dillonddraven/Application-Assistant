@@ -73,10 +73,19 @@ def _cmd_tailor(args: argparse.Namespace) -> int:
     blocks = val.get("fabrication_blocks") or []
     warns = val.get("fabrication_warnings") or []
     print(f"packet drafted: outputs/{slug}/")
-    print(f"  resume: outputs/{slug}/tailored_resume.md")
-    print(f"  cover:  outputs/{slug}/cover_letter.md")
-    print(f"  emails: outreach_recruiter.md, outreach_hiring_manager.md, linkedin_dm.md")
-    print(f"  report: outputs/{slug}/match_report.md")
+    print(f"  employer: outputs/{slug}/employer/  (resume.pdf, resume.docx, cover.pdf, cover.docx)")
+    print(f"  internal: outputs/{slug}/internal/  (markdown views, match_report.md)")
+    from . import state as _state
+    analyzed = _state.load_analyzed(packet["job_id"])
+    if analyzed:
+        sc = analyzed.get("source_confidence")
+        if sc == "low":
+            reason = analyzed.get("source_confidence_reason") or ""
+            print(f"  ⚠ source confidence: LOW — {reason}")
+            print(f"     Consider applying via the company's direct careers page if you can find it.")
+        elif sc == "medium":
+            reason = analyzed.get("source_confidence_reason") or ""
+            print(f"  ℹ source confidence: medium — {reason}")
     if blocks:
         print(f"\n  ⚠ {len(blocks)} fabrication BLOCKS — fix before approving:")
         for b in blocks[:5]:
@@ -178,6 +187,51 @@ def _cmd_track_add(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_send_outreach(args: argparse.Namespace) -> int:
+    """Open a Mail.app draft addressed to a recruiter or hiring manager,
+    using one of the generated outreach variants and ONLY employer/ attachments."""
+    from . import approval_queue, mail_draft, state
+    try:
+        slug, packet = approval_queue._resolve(args.ident)
+    except approval_queue.ApprovalError as e:
+        print(f"send-outreach failed: {e}", file=sys.stderr)
+        return 1
+    emails = packet.get("emails") or {}
+    variant = emails.get(args.variant)
+    if not variant:
+        print(f"send-outreach: no `{args.variant}` email found in packet (re-run tailor).",
+              file=sys.stderr)
+        return 1
+    subject = variant.get("subject") or ""
+    body_paragraphs = variant.get("body_paragraphs") or []
+    body_text = "\n\n".join(
+        p.get("text", "") for p in body_paragraphs if isinstance(p, dict)
+    ).strip()
+    if not body_text:
+        print("send-outreach: empty body — packet's variant has no paragraphs.",
+              file=sys.stderr)
+        return 1
+    out_dir = state.packet_dir(slug)
+    attachments = mail_draft.packet_attachments(out_dir, mode="employer")
+    if not attachments:
+        print(f"send-outreach: no employer-facing attachments found in {out_dir / 'employer'}",
+              file=sys.stderr)
+        return 1
+    try:
+        mail_draft.open_draft(
+            to_addr=args.to,
+            subject=subject,
+            body=body_text,
+            attachments=attachments,
+        )
+    except mail_draft.MailDraftError as e:
+        print(f"send-outreach failed: {e}", file=sys.stderr)
+        return 1
+    print(f"draft opened to {args.to}  variant={args.variant}  attachments={len(attachments)}")
+    print("(NOT sent. Review in Mail and click Send when ready.)")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
         prog="job-apply",
@@ -244,6 +298,19 @@ def build_parser() -> argparse.ArgumentParser:
     p_ta.add_argument("ident", help="Packet slug or 12-char job id.")
     p_ta.add_argument("--status", default="waiting")
     p_ta.set_defaults(func=_cmd_track_add)
+
+    p_so = sub.add_parser(
+        "send-outreach",
+        help="Open Mail.app draft to a recruiter / hiring manager with only employer-facing attachments.",
+    )
+    p_so.add_argument("ident", help="Packet slug or 12-char job id.")
+    p_so.add_argument("--to", required=True, help="Recipient email address.")
+    p_so.add_argument(
+        "--variant", default="recruiter",
+        choices=["recruiter", "hiring_manager"],
+        help="Which outreach variant to use as the email body.",
+    )
+    p_so.set_defaults(func=_cmd_send_outreach)
 
     return p
 

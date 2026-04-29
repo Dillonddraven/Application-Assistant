@@ -1,20 +1,54 @@
-"""Stage 3 of the multi-pass pipeline: LLM-driven QA pass on a generated packet.
+"""Stage 3 of the multi-pass pipeline: QA pass on a generated packet.
+
+Combines LLM-driven detection (broad coverage, catches subtle issues) with a
+deterministic forbidden-phrase scan (100% reliable for known-bad phrases the
+candidate has flagged in writing_style.forbidden_phrases). Both feed the same
+issues list.
 
 Returns a structured list of issues (category, severity, where, snippet,
-fix_suggestion) plus an overall polish grade. The pass runs ON the rendered
-text views (resume, cover letter, application answers, three outreach
-variants), with the JD_ANALYSIS as context so the LLM can flag evidence_gap
-violations.
+fix_suggestion) plus an overall polish grade.
 """
 from __future__ import annotations
 
 import json
+import re
 from importlib.resources import files
 from typing import Any
 
 from .llm_client import LLMClient
 
 PROMPT_VERSION = "qa_check@v1"
+
+
+def _scan_forbidden_phrases(rendered_views: dict[str, str],
+                            forbidden: list[str]) -> list[dict[str, Any]]:
+    """Greps for explicit forbidden phrases (from writing_style.forbidden_phrases).
+    Each hit becomes a high-severity generic_phrase issue. Case-insensitive
+    word-boundary match.
+    """
+    issues: list[dict[str, Any]] = []
+    if not forbidden:
+        return issues
+    for label, text in rendered_views.items():
+        if not isinstance(text, str):
+            continue
+        for phrase in forbidden:
+            if not isinstance(phrase, str) or not phrase.strip():
+                continue
+            pattern = re.compile(rf"\b{re.escape(phrase.strip())}\b", re.IGNORECASE)
+            for m in pattern.finditer(text):
+                issues.append({
+                    "category": "generic_phrase",
+                    "severity": "high",
+                    "where": label,
+                    "snippet": phrase,
+                    "fix_suggestion": (
+                        f"You marked {phrase!r} as forbidden in writing_style.forbidden_phrases. "
+                        f"Replace with concrete language."
+                    ),
+                })
+                break  # one hit per phrase per view is enough
+    return issues
 
 
 def _prompt() -> str:
@@ -26,6 +60,7 @@ def qa_check(
     rendered_views: dict[str, str],
     jd_analysis: dict[str, Any] | None,
     llm: LLMClient | None = None,
+    forbidden_phrases: list[str] | None = None,
 ) -> dict[str, Any]:
     """Run a QA pass on the rendered packet views.
 
@@ -60,9 +95,19 @@ def qa_check(
     obj = resp.as_json()
     if not isinstance(obj, dict):
         raise RuntimeError(f"qa_check returned non-object: {type(obj).__name__}")
+
+    llm_issues = [i for i in (obj.get("issues") or []) if isinstance(i, dict)]
+    deterministic_issues = _scan_forbidden_phrases(rendered_views, forbidden_phrases or [])
+    issues = deterministic_issues + llm_issues
+
+    overall_polish = str(obj.get("overall_polish") or "ready")
+    # If our deterministic scan caught any high-severity hits, downgrade overall.
+    if deterministic_issues and overall_polish == "ready":
+        overall_polish = "needs_work"
+
     return {
-        "issues": [i for i in (obj.get("issues") or []) if isinstance(i, dict)],
-        "overall_polish": str(obj.get("overall_polish") or "ready"),
+        "issues": issues,
+        "overall_polish": overall_polish,
         "prompt_version": PROMPT_VERSION,
         "model": resp.model,
     }

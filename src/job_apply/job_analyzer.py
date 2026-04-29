@@ -23,6 +23,67 @@ PROMPT_VERSION = "analyze_job@v1"
 
 _ANALYZE_PROMPT = files("job_apply.prompts").joinpath("analyze_job.txt").read_text()
 
+# Job board / ATS confidence: where the URL came from is a reasonable proxy
+# for how reliable the listing is. Direct ATS boards (Greenhouse, Lever, etc.)
+# tend to be authoritative employer postings. LinkedIn / Indeed are mid-tier
+# (real but mediated). Aggregators that re-syndicate (OptNation, Glassdoor)
+# are low-confidence — apply directly via the company's careers page if you can.
+_SOURCE_CONFIDENCE_HIGH = [
+    "greenhouse.io", "boards.greenhouse.io",
+    "lever.co", "jobs.lever.co",
+    "ashbyhq.com", "jobs.ashbyhq.com",
+    "workable.com", "apply.workable.com",
+    "myworkdayjobs.com", "myworkday.com",
+    "smartrecruiters.com",
+    "icims.com",
+    "successfactors.com",
+    "bamboohr.com",
+    "personio.com",
+    "rippling.com/jobs",
+    "jobvite.com",
+]
+
+_SOURCE_CONFIDENCE_MEDIUM = [
+    "linkedin.com/jobs",
+    "indeed.com",
+    "monster.com",
+    "dice.com",
+    "builtin.com",
+    "stackoverflow.com/jobs",
+    "weworkremotely.com",
+]
+
+_SOURCE_CONFIDENCE_LOW = [
+    "optnation.com",
+    "glassdoor.com",
+    "ziprecruiter.com",
+    "wellfound.com",
+    "angel.co",
+    "simplyhired.com",
+    "talent.com",
+    "joblist.com",
+    "neuvoo.com",
+    "utm_campaign=google_jobs_apply",
+    "google_jobs_apply",
+]
+
+
+def score_source_confidence(url: str | None) -> tuple[str, str]:
+    """Return (confidence, reason). Confidence is 'high' | 'medium' | 'low'."""
+    if not url:
+        return "medium", "no source URL (pasted text or local file)"
+    u = url.lower()
+    for pattern in _SOURCE_CONFIDENCE_HIGH:
+        if pattern in u:
+            return "high", f"direct ATS board ({pattern})"
+    for pattern in _SOURCE_CONFIDENCE_LOW:
+        if pattern in u:
+            return "low", f"aggregator / re-syndicator ({pattern}); apply via the company's direct careers page if possible"
+    for pattern in _SOURCE_CONFIDENCE_MEDIUM:
+        if pattern in u:
+            return "medium", f"job-board listing ({pattern})"
+    return "medium", "unrecognized source — treat cautiously"
+
 
 def _profile_summary_for_llm(profile: Profile) -> str:
     """Produce a compact summary the analyzer can use to populate missing_quals."""
@@ -243,9 +304,13 @@ def analyze_job(
         industries_avoid=profile.industries_avoid,
     )
 
+    source_confidence, source_confidence_reason = score_source_confidence(source_url)
+
     merged: dict[str, Any] = {
         "id": job_id,
         "source_url": source_url,
+        "source_confidence": source_confidence,
+        "source_confidence_reason": source_confidence_reason,
         "fetched_at": fetched_at,
         "raw_text_path": raw_text_path,
         "company": fields.get("company") or "",

@@ -102,3 +102,57 @@ def test_render_qa_summary_grouped_by_severity():
     assert "MEDIUM (1)" in out
     assert "needs_work" in out
     assert "Reframe as internship-level" in out
+
+
+def test_forbidden_phrase_scan_deterministic():
+    fake = FakeQALLM(CANNED_QA_CLEAN)
+    rendered = {
+        "tailored_resume": "Results-driven analyst with passion for security.",
+        "cover_letter": "I want to be a rockstar engineer.",
+        "linkedin_dm": "Quick note about the role.",
+    }
+    forbidden = ["passion", "rockstar", "results-driven"]
+    result = qa_pass.qa_check(
+        rendered_views=rendered, jd_analysis=None, llm=fake,
+        forbidden_phrases=forbidden,
+    )
+    # Three phrases each appear once -> 3 deterministic high-severity issues
+    cats = [(i["category"], i["severity"], i["snippet"]) for i in result["issues"]]
+    high_issues = [c for c in cats if c[1] == "high"]
+    assert len(high_issues) == 3
+    # Polish should downgrade from "ready" to "needs_work" because of high hits
+    assert result["overall_polish"] == "needs_work"
+
+
+def test_forbidden_phrase_scan_case_insensitive():
+    fake = FakeQALLM(CANNED_QA_CLEAN)
+    rendered = {"resume": "I am Passionate about security."}
+    result = qa_pass.qa_check(
+        rendered_views=rendered, jd_analysis=None, llm=fake,
+        forbidden_phrases=["passionate"],
+    )
+    high_issues = [i for i in result["issues"] if i["severity"] == "high"]
+    assert len(high_issues) == 1
+
+
+def test_forbidden_phrase_scan_word_boundary():
+    """'pass' should NOT match 'passionate' — word boundaries are real."""
+    fake = FakeQALLM(CANNED_QA_CLEAN)
+    rendered = {"resume": "I am passionate about security."}
+    result = qa_pass.qa_check(
+        rendered_views=rendered, jd_analysis=None, llm=fake,
+        forbidden_phrases=["pass"],
+    )
+    deterministic_high = [i for i in result["issues"]
+                          if i["severity"] == "high" and i["snippet"] == "pass"]
+    assert deterministic_high == []
+
+
+def test_forbidden_phrase_scan_skips_when_no_list():
+    fake = FakeQALLM(CANNED_QA_CLEAN)
+    rendered = {"resume": "Results-driven rockstar with synergy."}
+    result = qa_pass.qa_check(
+        rendered_views=rendered, jd_analysis=None, llm=fake,
+    )
+    # No forbidden_phrases passed; no deterministic adds.
+    assert result["overall_polish"] == "ready"

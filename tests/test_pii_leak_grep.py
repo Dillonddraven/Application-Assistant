@@ -211,8 +211,8 @@ def test_secrets_DO_appear_in_rendered_md(populated: Path):
     (If they don't, we're not actually substituting and the user's resume is
     missing contact info.)"""
     _, slug = tailor_pipeline.run_tailor(job_id="abc123def456", llm=FakeLLM())
-    resume = (cfg.OUTPUTS_DIR / slug / "tailored_resume.md").read_text()
+    resume = (cfg.OUTPUTS_DIR / slug / "internal" / "tailored_resume.md").read_text()
     assert "leak-canary-email@example.test" in resume
     assert "+1-555-867-5309" in resume
-    cover = (cfg.OUTPUTS_DIR / slug / "cover_letter.md").read_text()
+    cover = (cfg.OUTPUTS_DIR / slug / "internal" / "cover_letter.md").read_text()
     assert "742 Evergreen Terrace" in cover

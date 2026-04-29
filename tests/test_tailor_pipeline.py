@@ -186,12 +186,22 @@ def test_clean_tailor_writes_packet_and_files(populated: Path):
     packet, slug = tailor_pipeline.run_tailor(job_id="abc123def456", llm=fake)
     out = populated / "outputs" / slug
     assert (out / "packet.json").exists()
+    # run_id present (8-char hex)
+    assert packet.get("run_id") and len(packet["run_id"]) == 8
+    # internal/ holds markdown views and the report
     for fname in (
         "tailored_resume.md", "cover_letter.md", "application_answers.md",
         "outreach_recruiter.md", "outreach_hiring_manager.md",
         "linkedin_dm.md", "match_report.md",
     ):
-        assert (out / fname).exists(), f"missing render: {fname}"
+        assert (out / "internal" / fname).exists(), f"missing internal render: {fname}"
+    # employer/ holds the polished PDF + DOCX (note PDF requires Chromium; it might
+    # be missing in some environments — only assert if produced)
+    for fname in ("tailored_resume.pdf", "cover_letter.pdf",
+                  "tailored_resume.docx", "cover_letter.docx"):
+        # docx is pure-python, always produced
+        if fname.endswith(".docx"):
+            assert (out / "employer" / fname).exists(), f"missing employer render: {fname}"
     assert packet["validation"]["fabrication_blocks"] == [], packet["validation"]
     assert packet["status"] == "draft"
     assert packet["job_id"] == "abc123def456"
@@ -212,8 +222,8 @@ def test_pii_substituted_into_resume_only_at_render(populated: Path):
     fake = FakeLLM(CLEAN_TAILORED, CLEAN_EMAILS)
     packet, slug = tailor_pipeline.run_tailor(job_id="abc123def456", llm=fake)
     out = populated / "outputs" / slug
-    resume = (out / "tailored_resume.md").read_text()
-    cover = (out / "cover_letter.md").read_text()
+    resume = (out / "internal" / "tailored_resume.md").read_text()
+    cover = (out / "internal" / "cover_letter.md").read_text()
     assert "test@example.com" in resume
     assert "+1-555-555-1234" in resume
     assert "1 Main St" in cover

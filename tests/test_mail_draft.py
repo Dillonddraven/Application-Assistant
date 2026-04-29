@@ -91,14 +91,101 @@ def test_quotes_and_newlines_escaped(monkeypatch: pytest.MonkeyPatch, tmp_path: 
     assert "Line 1\\nLine" in s
 
 
-def test_packet_attachments_lists_existing_files(tmp_path: Path):
+def test_packet_attachments_legacy_layout_still_works(tmp_path: Path):
+    """Pre-split packets had everything at the top of out_dir — keep working."""
     out = tmp_path / "out"
     out.mkdir()
     (out / "tailored_resume.pdf").write_bytes(b"x")
     (out / "linkedin_dm.md").write_text("x")
-    # Don't create cover_letter.pdf etc.
     paths = mail_draft.packet_attachments(out)
     names = [p.name for p in paths]
     assert "tailored_resume.pdf" in names
     assert "linkedin_dm.md" in names
     assert "cover_letter.pdf" not in names
+
+
+def test_packet_attachments_employer_mode_only_includes_pdf_docx(tmp_path: Path):
+    out = tmp_path / "out"
+    (out / "employer").mkdir(parents=True)
+    (out / "internal").mkdir(parents=True)
+    (out / "employer" / "tailored_resume.pdf").write_bytes(b"x")
+    (out / "employer" / "tailored_resume.docx").write_bytes(b"x")
+    (out / "employer" / "cover_letter.pdf").write_bytes(b"x")
+    (out / "employer" / "cover_letter.docx").write_bytes(b"x")
+    (out / "internal" / "outreach_recruiter.md").write_text("x")
+    (out / "internal" / "linkedin_dm.md").write_text("x")
+    (out / "internal" / "match_report.md").write_text("x")
+
+    employer_paths = mail_draft.packet_attachments(out, mode="employer")
+    employer_names = [p.name for p in employer_paths]
+    # Only PDF + DOCX; no markdown leaks
+    assert sorted(employer_names) == sorted([
+        "tailored_resume.pdf", "tailored_resume.docx",
+        "cover_letter.pdf", "cover_letter.docx",
+    ])
+    assert not any(n.endswith(".md") for n in employer_names)
+    assert not any("match_report" in n for n in employer_names)
+    assert not any("packet.json" in n for n in employer_names)
+
+
+def test_packet_attachments_review_mode_includes_internal(tmp_path: Path):
+    out = tmp_path / "out"
+    (out / "employer").mkdir(parents=True)
+    (out / "internal").mkdir(parents=True)
+    (out / "employer" / "tailored_resume.pdf").write_bytes(b"x")
+    (out / "internal" / "match_report.md").write_text("x")
+    review_paths = mail_draft.packet_attachments(out, mode="review")
+    names = [p.name for p in review_paths]
+    assert "tailored_resume.pdf" in names
+    assert "match_report.md" in names
+
+
+def test_packet_attachments_unknown_mode_raises(tmp_path: Path):
+    with pytest.raises(ValueError, match="unknown mode"):
+        mail_draft.packet_attachments(tmp_path, mode="weird")
+
+
+def test_open_draft_invalid_email_raises(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
+    files = _make_files(tmp_path, ["a.pdf"])
+    with pytest.raises(mail_draft.MailDraftError, match="doesn't look like an email"):
+        mail_draft.open_draft(
+            to_addr="not-an-email", subject="Subj", body="Body",
+            attachments=files,
+        )
+
+
+def test_open_draft_empty_subject_raises(tmp_path: Path):
+    files = _make_files(tmp_path, ["a.pdf"])
+    with pytest.raises(mail_draft.MailDraftError, match="subject is empty"):
+        mail_draft.open_draft(
+            to_addr="me@example.com", subject="  ", body="Body",
+            attachments=files,
+        )
+
+
+def test_open_draft_empty_body_raises(tmp_path: Path):
+    files = _make_files(tmp_path, ["a.pdf"])
+    with pytest.raises(mail_draft.MailDraftError, match="body is empty"):
+        mail_draft.open_draft(
+            to_addr="me@example.com", subject="Subj", body="  ",
+            attachments=files,
+        )
+
+
+def test_open_draft_total_attachment_size_cap(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
+    big = tmp_path / "huge.bin"
+    big.write_bytes(b"\0" * (21 * 1024 * 1024))  # 21 MB > 20 MB cap
+    with pytest.raises(mail_draft.MailDraftError, match="exceeds.*MB cap"):
+        mail_draft.open_draft(
+            to_addr="me@example.com", subject="Subj", body="Body",
+            attachments=[big],
+        )
+
+
+def test_open_draft_too_many_attachments(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
+    files = _make_files(tmp_path, [f"f{i}.txt" for i in range(30)])
+    with pytest.raises(mail_draft.MailDraftError, match="too many attachments"):
+        mail_draft.open_draft(
+            to_addr="me@example.com", subject="Subj", body="Body",
+            attachments=files,
+        )
