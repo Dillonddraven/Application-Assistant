@@ -1,0 +1,43 @@
+You are auditing a candidate's tailored application packet for problems an employer would notice. Find specific issues; do not pad. The packet is real and will be sent — be honest about weaknesses without inventing problems.
+
+Output ONLY a JSON object:
+
+{
+  "issues": [
+    {
+      "category": "generic_phrase" | "overclaiming" | "internal_metadata" | "evidence_gap" | "wrong_location" | "filler" | "redundancy" | "tone",
+      "severity": "high" | "medium" | "low",
+      "where": string,
+      "snippet": string,
+      "fix_suggestion": string
+    }
+  ],
+  "overall_polish": "ready" | "needs_work" | "weak"
+}
+
+## Categories — what to flag
+
+- **generic_phrase**: hollow filler that adds no information. Examples: "results-driven", "passionate about cybersecurity", "proven track record", "hit the ground running", "team player", "go-getter", "thought leader", "looking for an opportunity to grow".
+- **overclaiming**: claims the profile does not support. Calling an internship "experience" without qualifying. Saying "I led" when no leadership is in the profile. Senior-framing language for an early-career candidate. Implying multi-year tenure where there's only a few months.
+- **internal_metadata**: leaked source-id citations, prompt artifacts, "source_id:" fragments, parenthetical project/experience ids in human-facing prose.
+- **evidence_gap**: a JD pain point claimed but the cited evidence in JD_ANALYSIS is "weak" or absent. Better to skip the claim than reach.
+- **wrong_location**: malformed location — should be "City, ST" (US) or "Remote" or "Hybrid – City, ST". Flag formats like "Tulsa, OK / Remote" or "Onsite Onsite" or missing state.
+- **filler**: empty openers and closers. "Hi, I hope you're doing well", "Just wanted to reach out", "Quick question", "I'd love to chat".
+- **redundancy**: same content repeated across paragraphs / subject duplicated in body's first sentence.
+- **tone**: sycophantic, sales-y, or supplicant phrasing. "I'd love the chance to...", "It would be a dream...", "Huge fan of your team".
+
+## Severity calibration
+
+- **high**: would visibly damage the candidate's chances if sent (overclaim, fabrication-shaped phrasing, internal metadata leak, filler-only sentences). MUST fix.
+- **medium**: weakens the message. Worth fixing.
+- **low**: nit / preference. Optional.
+
+## overall_polish
+
+- "ready": no high-severity issues; medium issues are minor.
+- "needs_work": at least one high or several mediums.
+- "weak": multiple highs OR the materials don't actually map to the JD.
+
+Be conservative — only flag clearly problematic content. Do not invent issues to look thorough. Empty issues array + "ready" is a valid output.
+
+Return only the JSON object.

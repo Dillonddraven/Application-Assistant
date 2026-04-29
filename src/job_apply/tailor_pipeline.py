@@ -3,7 +3,8 @@ from __future__ import annotations
 
 from typing import Any
 
-from . import email_writer, mail_draft, render, render_docx, render_pdf, resume_tailor, state
+from . import (email_writer, jd_analysis, mail_draft, qa_pass, render,
+               render_docx, render_pdf, resume_tailor, state)
 from .llm_client import LLMClient
 from .profile_loader import Profile, Secrets, load_profile, load_secrets
 from .validators import fabrication
@@ -46,10 +47,26 @@ def run_tailor(
     job_text = rec.text
 
     client = llm or LLMClient()
+
+    # Stage 1: extract JD pain points + map to candidate evidence (cheap pre-pass).
+    try:
+        jd = jd_analysis.analyze_jd(
+            profile=profile, analyzed=analyzed, job_text=job_text, llm=client,
+        )
+    except Exception as e:
+        # If the analysis fails, downstream still works in fallback mode (no JD context).
+        jd = {"pain_points": [], "evidence_map": [], "missing_evidence": [],
+              "error": str(e), "prompt_version": "extract_jd_analysis@v1", "model": ""}
+
+    # Stage 2: generation passes (resume + cover + answers in one tailor call;
+    # three outreach variants in separate calls). All on the deep tier.
     tailored, tailor_model = resume_tailor.tailor(
         profile=profile, analyzed=analyzed, job_text=job_text, llm=client, deep=deep,
+        jd_analysis=jd,
     )
-    emails = email_writer.write_all(profile=profile, analyzed=analyzed, llm=client)
+    emails = email_writer.write_all(
+        profile=profile, analyzed=analyzed, llm=client, jd_analysis=jd,
+    )
 
     # Fabrication validation runs on UNSUBSTITUTED text (placeholders still as templates).
     segs = fabrication.extract_segments_from_packet({"tailored": tailored})
@@ -131,14 +148,14 @@ def run_tailor(
         packet["validation"]["schema_ok"] = False
         packet["validation"]["schema_errors"] = schema_errs
 
-    # Write all the markdown views.
+    # Write all the markdown views (match_report deferred until after QA so
+    # the QA section is included).
     (out_dir / "tailored_resume.md").write_text(resume_md)
     (out_dir / "cover_letter.md").write_text(cover_md)
     (out_dir / "application_answers.md").write_text(answers_md)
     (out_dir / "outreach_recruiter.md").write_text(rec_email_md)
     (out_dir / "outreach_hiring_manager.md").write_text(hm_email_md)
     (out_dir / "linkedin_dm.md").write_text(dm_md)
-    (out_dir / "match_report.md").write_text(render.render_match_report(analyzed, packet))
 
     # PDF + DOCX renders. PDF is best-effort (Chromium may be missing); we log
     # the failure into validation but never block the rest of the packet.
@@ -171,6 +188,29 @@ def run_tailor(
         render_errors.append(f"docx: {e}")
     if render_errors:
         packet["validation"]["render_errors"] = render_errors
+
+    # Stage 3: LLM-driven QA pass on the rendered views.
+    try:
+        rendered_views = {
+            "tailored_resume": resume_md,
+            "cover_letter": cover_md,
+            "application_answers": answers_md,
+            "outreach_recruiter": rec_email_md,
+            "outreach_hiring_manager": hm_email_md,
+            "linkedin_dm": dm_md,
+        }
+        qa = qa_pass.qa_check(
+            rendered_views=rendered_views, jd_analysis=jd, llm=client,
+        )
+        packet["validation"]["qa"] = qa
+        packet["jd_analysis"] = jd
+        packet["prompt_versions"]["jd_analysis"] = jd.get("prompt_version", "")
+        packet["prompt_versions"]["qa_check"] = qa.get("prompt_version", "")
+    except Exception as e:
+        packet["validation"]["qa_error"] = str(e)
+
+    # Now write match_report (after QA so it includes the QA section).
+    (out_dir / "match_report.md").write_text(render.render_match_report(analyzed, packet))
 
     state.save_packet(slug, packet)
 

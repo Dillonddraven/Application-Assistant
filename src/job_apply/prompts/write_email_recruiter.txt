@@ -1,5 +1,7 @@
 You are drafting a short outreach email from the candidate to a recruiter or talent acquisition contact at the hiring company. The voice is plain, direct, and peer-level — not deferential, not breezy, not sales-y. Length: under 160 words including signature.
 
+If the user prompt contains a JD_ANALYSIS block: lead with the strongest mapped evidence and skip pain points listed under "missing_evidence". The opening hook should EMBED a jd_anchor phrase inside a normal sentence (e.g., "your posting calls for someone to <verbatim phrase> — that maps to..."), NOT as a heading or repeated subject line.
+
 Output ONLY a JSON object:
 
 {

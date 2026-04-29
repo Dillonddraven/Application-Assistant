@@ -19,26 +19,36 @@ def _prompt(name: str) -> str:
     return files("job_apply.prompts").joinpath(f"{name}.txt").read_text()
 
 
-def _user_prompt(profile: Profile, analyzed: dict[str, Any]) -> str:
-    return (
-        "PROFILE (the only source of truth):\n"
-        + json.dumps(profile.data, indent=2, default=str)
-        + "\n\nJOB POSTING:\n"
-        + json.dumps(
+def _user_prompt(profile: Profile, analyzed: dict[str, Any],
+                 jd_analysis: dict[str, Any] | None = None) -> str:
+    parts = [
+        "PROFILE (the only source of truth):",
+        json.dumps(profile.data, indent=2, default=str),
+        "",
+        "JOB POSTING:",
+        json.dumps(
             {k: analyzed.get(k) for k in (
                 "company", "title", "location", "remote_mode",
                 "required_skills", "preferred_skills", "responsibilities",
             )},
             indent=2,
-        )
-    )
+        ),
+    ]
+    if jd_analysis:
+        from .jd_analysis import render_for_prompt
+        rendered = render_for_prompt(jd_analysis)
+        if rendered:
+            parts.append("")
+            parts.append(rendered)
+    return "\n".join(parts)
 
 
-def _generate(name: str, profile: Profile, analyzed: dict[str, Any], llm: LLMClient) -> dict[str, Any]:
+def _generate(name: str, profile: Profile, analyzed: dict[str, Any],
+              llm: LLMClient, jd_analysis: dict[str, Any] | None) -> dict[str, Any]:
     resp = llm.complete(
-        tier="tailor",
+        tier="deep",          # outreach gets the strongest reasoning model per directive
         system=_prompt(name),
-        user=_user_prompt(profile, analyzed),
+        user=_user_prompt(profile, analyzed, jd_analysis),
         json_mode=True,
         temperature=0.6,
     )
@@ -51,10 +61,11 @@ def _generate(name: str, profile: Profile, analyzed: dict[str, Any], llm: LLMCli
 
 def write_all(
     *, profile: Profile, analyzed: dict[str, Any], llm: LLMClient | None = None,
+    jd_analysis: dict[str, Any] | None = None,
 ) -> dict[str, dict[str, Any]]:
     client = llm or LLMClient()
     return {
-        "recruiter": _generate("write_email_recruiter", profile, analyzed, client),
-        "hiring_manager": _generate("write_email_hiring_manager", profile, analyzed, client),
-        "linkedin_dm": _generate("write_linkedin_dm", profile, analyzed, client),
+        "recruiter": _generate("write_email_recruiter", profile, analyzed, client, jd_analysis),
+        "hiring_manager": _generate("write_email_hiring_manager", profile, analyzed, client, jd_analysis),
+        "linkedin_dm": _generate("write_linkedin_dm", profile, analyzed, client, jd_analysis),
     }

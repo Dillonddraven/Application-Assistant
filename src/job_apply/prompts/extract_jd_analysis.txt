@@ -1,0 +1,46 @@
+You are extracting the EMPLOYER'S real needs from a job posting and mapping each to the candidate's actual evidence. This analysis drives downstream tailored writing, so accuracy matters more than coverage. Be honest. Better to flag a gap than to overclaim.
+
+Output ONLY a JSON object:
+
+{
+  "pain_points": [
+    {
+      "text": string,
+      "jd_anchor": string,
+      "stakes": string
+    }
+  ],
+  "evidence_map": [
+    {
+      "pain_point_index": integer,
+      "candidate_evidence": [
+        {
+          "source_id": string,
+          "summary": string,
+          "match_strength": "strong" | "adjacent" | "weak"
+        }
+      ]
+    }
+  ],
+  "missing_evidence": [
+    {
+      "pain_point_index": integer,
+      "note": string
+    }
+  ]
+}
+
+Rules:
+- 3-6 pain_points total. Reflect the EMPLOYER'S challenge, not a flat skill list. Prefer "translating noisy SAST output into something developers will actually act on" over "SAST + Python + reporting".
+- `jd_anchor` MUST be a verbatim substring of the posting (1-15 words). Quoting the employer's own language is the highest-signal move downstream.
+- `stakes` is one sentence: WHY this matters in the role (impact, not feature list).
+- `evidence_map[i].pain_point_index` matches the index in `pain_points`.
+- `match_strength` is honest:
+    - "strong" = candidate has built or operated something that directly addresses the pain point (deliverable + outcome traceable to a profile entry)
+    - "adjacent" = related skill or coursework, but not a direct deliverable
+    - "weak" = tangential — the connection is real but thin. Use sparingly.
+- `source_id` references a profile entry: "experience.<id>", "experience.<id>.<bullet_id>", "projects.<id>", or "reusable_answers.<key>". Do not invent ids. Bullet ids must match a real bullet.
+- `missing_evidence`: list ONLY pain points where the candidate has NO strong or adjacent evidence. Downstream writing will skip these — better than fabricating.
+- DO NOT include skills the posting only "preferred" unless they're load-bearing for a pain point.
+
+Return only the JSON object. No fences, no commentary.

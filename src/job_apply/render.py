@@ -281,4 +281,52 @@ def render_match_report(analyzed: dict[str, Any], packet: dict[str, Any]) -> str
         lines.append("- Warnings:")
         for w in warns:
             lines.append(f"  - [{w.get('rule')}] {w.get('detail')}")
+
+    qa = val.get("qa") or {}
+    qa_issues = qa.get("issues") or []
+    if qa or qa_issues:
+        lines += ["", "## QA pass"]
+        polish = qa.get("overall_polish", "ready")
+        lines.append(f"- Overall polish: **{polish}**")
+        if not qa_issues:
+            lines.append("- No issues flagged.")
+        else:
+            by_sev = {"high": [], "medium": [], "low": []}
+            for i in qa_issues:
+                by_sev.setdefault(i.get("severity", "low"), []).append(i)
+            for sev in ("high", "medium", "low"):
+                items = by_sev.get(sev) or []
+                if not items:
+                    continue
+                lines.append(f"- {sev.upper()} ({len(items)}):")
+                for issue in items:
+                    cat = issue.get("category", "?")
+                    where = issue.get("where", "")
+                    snip = (issue.get("snippet") or "").strip()
+                    fix = issue.get("fix_suggestion") or ""
+                    lines.append(f"  - [{cat}] {where}")
+                    if snip:
+                        lines.append(f"      \"{snip}\"")
+                    if fix:
+                        lines.append(f"      fix: {fix}")
+
+    jd = packet.get("jd_analysis") or {}
+    if jd.get("pain_points"):
+        lines += ["", "## JD analysis (used for tailoring)"]
+        for i, pp in enumerate(jd.get("pain_points") or []):
+            lines.append(f"- **{pp.get('text', '')}**")
+            if pp.get("jd_anchor"):
+                lines.append(f"  - anchor: \"{pp['jd_anchor']}\"")
+            ev = next((em for em in jd.get("evidence_map") or []
+                       if em.get("pain_point_index") == i), None)
+            if ev and ev.get("candidate_evidence"):
+                for e in ev["candidate_evidence"]:
+                    lines.append(
+                        f"  - evidence ({e.get('match_strength')}): "
+                        f"{e.get('source_id')} — {e.get('summary')}"
+                    )
+        if jd.get("missing_evidence"):
+            lines.append("- **Pain points without evidence:**")
+            for m in jd["missing_evidence"]:
+                lines.append(f"  - [{m.get('pain_point_index', '?')}] {m.get('note', '')}")
     return "\n".join(lines).rstrip() + "\n"

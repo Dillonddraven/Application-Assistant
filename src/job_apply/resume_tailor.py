@@ -23,26 +23,39 @@ def tailor(
     job_text: str,
     llm: LLMClient | None = None,
     deep: bool = False,
+    jd_analysis: dict[str, Any] | None = None,
 ) -> tuple[dict[str, Any], str]:
     """Returns (tailored_dict, model_used)."""
     client = llm or LLMClient()
-    user = (
-        "PROFILE (the only source of truth — do not introduce facts beyond this):\n"
-        + json.dumps(profile.data, indent=2, default=str)
-        + "\n\nJOB POSTING (target):\n"
-        + json.dumps(
+    parts = [
+        "PROFILE (the only source of truth — do not introduce facts beyond this):",
+        json.dumps(profile.data, indent=2, default=str),
+        "",
+        "JOB POSTING (target):",
+        json.dumps(
             {k: analyzed.get(k) for k in (
                 "company", "title", "location", "remote_mode",
                 "required_skills", "preferred_skills", "responsibilities",
                 "required_certifications", "min_years_experience",
             )},
             indent=2,
-        )
-        + "\n\nFULL POSTING TEXT (for context only):\n"
-        + job_text
-    )
+        ),
+    ]
+    if jd_analysis:
+        from .jd_analysis import render_for_prompt
+        rendered = render_for_prompt(jd_analysis)
+        if rendered:
+            parts.append("")
+            parts.append(rendered)
+    parts.append("")
+    parts.append("FULL POSTING TEXT (for context only):")
+    parts.append(job_text)
+    user = "\n".join(parts)
     resp = client.complete(
-        tier="deep" if deep else "tailor",
+        # Use deep tier by default — cover letter + application answers come out
+        # of this call and the user explicitly requested the strongest reasoning
+        # model for those. Resume bullets benefit too.
+        tier="deep",
         system=_prompt(),
         user=user,
         json_mode=True,

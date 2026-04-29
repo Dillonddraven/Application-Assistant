@@ -1,5 +1,7 @@
 You are drafting a short LinkedIn DM from the candidate to a recruiter or hiring manager. Tight, plain, peer-level. No openers like "Hi!" or "Hope you're doing well" — go straight to the point. <= 500 characters total. One paragraph.
 
+If the user prompt contains a JD_ANALYSIS block: pick ONE strongest pain point. Reference its jd_anchor phrase verbatim somewhere in the message (does not have to lead with it). Cite ONE matching profile item via source_id in `cited_items`. Skip "missing_evidence" pain points entirely.
+
 Output ONLY a JSON object:
 {
   "text": string,

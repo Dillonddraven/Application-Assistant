@@ -85,6 +85,13 @@ def _cmd_tailor(args: argparse.Namespace) -> int:
             print(f"    … and {len(blocks) - 5} more (see match_report.md).")
     if warns:
         print(f"  ℹ {len(warns)} warnings (non-blocking).")
+    qa = val.get("qa") or {}
+    qa_issues = qa.get("issues") or []
+    if qa:
+        polish = qa.get("overall_polish", "ready")
+        print(f"  QA polish: {polish} ({len(qa_issues)} issue(s))")
+        for issue in [i for i in qa_issues if i.get("severity") == "high"][:3]:
+            print(f"    - [HIGH/{issue.get('category')}] {issue.get('where', '')}: {issue.get('fix_suggestion', '')}")
     return 0 if not blocks else 2
 
 
