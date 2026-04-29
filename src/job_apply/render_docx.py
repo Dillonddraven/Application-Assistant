@@ -18,7 +18,7 @@ from docx.oxml import OxmlElement
 from docx.shared import Inches, Pt, RGBColor
 
 from .profile_loader import Profile, Secrets
-from .render import _scrub_source_ids
+from .render import _scrub_source_ids, collect_known_ids
 
 
 NAVY = RGBColor(0x1A, 0x3A, 0x5C)
@@ -101,6 +101,7 @@ def _contact_line_text(secrets: Secrets) -> str:
 
 def render_resume_docx(*, profile: Profile, tailored: dict[str, Any],
                        secrets: Secrets, out_path: Path) -> Path:
+    known = collect_known_ids(profile.data)
     doc = Document()
     for section in doc.sections:
         section.top_margin = Inches(0.6)
@@ -124,7 +125,7 @@ def render_resume_docx(*, profile: Profile, tailored: dict[str, Any],
         r = p.add_run(contact)
         _set_run(r, size_pt=9.5, color=GREY)
 
-    summary = _scrub_source_ids(tailored.get("summary") or "").strip()
+    summary = _scrub_source_ids(tailored.get("summary") or "", known).strip()
     if summary:
         _section_header(doc, "Summary")
         p = doc.add_paragraph()
@@ -161,7 +162,7 @@ def render_resume_docx(*, profile: Profile, tailored: dict[str, Any],
         if len(bits) >= 2 and bits[0] == "experience":
             exp_id = bits[1]
             cited_exp_ids.add(exp_id)
-            bullets_by_exp.setdefault(exp_id, []).append(_scrub_source_ids(b.get("text", "")))
+            bullets_by_exp.setdefault(exp_id, []).append(_scrub_source_ids(b.get("text", ""), known))
 
     if cited_exp_ids:
         _section_header(doc, "Experience")
@@ -228,6 +229,7 @@ def render_cover_letter_docx(*, profile: Profile, tailored: dict[str, Any],
                              secrets: Secrets, out_path: Path,
                              company: str, salutation: str = "Dear Hiring Team,",
                              date_iso: str | None = None) -> Path:
+    known = collect_known_ids(profile.data)
     doc = Document()
     for section in doc.sections:
         section.top_margin = Inches(0.85)
@@ -268,7 +270,7 @@ def render_cover_letter_docx(*, profile: Profile, tailored: dict[str, Any],
     _set_run(r, size_pt=11, color=INK, bold=False)
 
     for para in tailored.get("cover_letter_paragraphs") or []:
-        text = _scrub_source_ids(para.get("text", "")).strip()
+        text = _scrub_source_ids(para.get("text", ""), known).strip()
         if not text:
             continue
         p = doc.add_paragraph()

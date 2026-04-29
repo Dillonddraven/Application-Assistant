@@ -26,9 +26,11 @@ def _write_profile(workspace: Path) -> None:
         "preferences": {
             "target_roles": ["Security Analyst"],
             "industries_avoid": ["military", "defense"],
+            "locations": ["Tulsa, OK"],
             "remote_ok": True,
             "hybrid_ok": True,
             "onsite_ok": True,
+            "willing_to_relocate": False,
         },
     }
     (workspace / "profile" / "master_profile.yaml").write_text(yaml.safe_dump(prof))

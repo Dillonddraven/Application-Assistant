@@ -14,17 +14,55 @@ from .profile_loader import Profile, Secrets
 
 # LLMs occasionally leak parenthetical source-id citations into prose
 # ("...summaries (dillards_intern.b1)..."). Scrub them at render time so
-# user-facing documents stay clean. Pattern: a parenthesized snake_case dotted
-# id, optionally preceded by whitespace.
+# user-facing documents stay clean.
+#
+# Two-layer defense:
+#   1. The dotted-id regex catches "experience.foo.b1" / "reusable_answers.x" etc.
+#   2. When a `known_ids` set is passed, any parenthetical exactly matching a
+#      known id (or a known id prefix) is also stripped. This catches single-
+#      token project ids like "(proj_centralized_logging_lab)".
 _SOURCE_ID_LEAK_RE = re.compile(r"\s*\(\s*[a-z][a-z0-9_]*(?:\.[a-z0-9_]+)+\s*\)")
+_PARENTHETICAL = re.compile(r"\s*\(\s*([a-z][a-z0-9_]*)\s*\)")
 
 
-def _scrub_source_ids(text: str) -> str:
+def _scrub_source_ids(text: str, known_ids: set[str] | None = None) -> str:
     cleaned = _SOURCE_ID_LEAK_RE.sub("", text)
+    if known_ids:
+        def _strip_known(match: re.Match) -> str:
+            ident = match.group(1)
+            if ident in known_ids:
+                return ""
+            return match.group(0)
+        cleaned = _PARENTHETICAL.sub(_strip_known, cleaned)
     # Collapse any double spaces left behind, and tidy " ." or " ," seams.
     cleaned = re.sub(r" {2,}", " ", cleaned)
     cleaned = re.sub(r"\s+([.,;:!?])", r"\1", cleaned)
     return cleaned
+
+
+def collect_known_ids(profile_data: dict[str, Any]) -> set[str]:
+    """Build the set of profile-derived ids that should be scrubbed if leaked."""
+    out: set[str] = set()
+    for section in ("experience", "education", "certifications", "projects"):
+        for item in profile_data.get(section) or []:
+            if isinstance(item, dict):
+                ident = item.get("id")
+                if isinstance(ident, str):
+                    out.add(ident)
+                for bullet in item.get("bullets") or []:
+                    if isinstance(bullet, dict):
+                        bid = bullet.get("id")
+                        if isinstance(bid, str):
+                            # bullet ids are typically dotted (already covered by
+                            # the dotted regex) but we add the trailing token in
+                            # case the LLM cites just the suffix.
+                            out.add(bid)
+                            tail = bid.rsplit(".", 1)[-1]
+                            out.add(tail)
+    ra = profile_data.get("reusable_answers")
+    if isinstance(ra, dict):
+        out.update(ra.keys())
+    return out
 
 
 def substitute_pii(text: str, secrets: Secrets) -> str:
@@ -45,6 +83,7 @@ def _contact_line(secrets: Secrets) -> str:
 
 def render_resume(*, profile: Profile, tailored: dict[str, Any], secrets: Secrets) -> str:
     p = profile.data
+    known = collect_known_ids(p)
     name = p.get("identity", {}).get("full_name", "")
     contact = _contact_line(secrets)
     lines: list[str] = [f"# {name}"]
@@ -52,7 +91,7 @@ def render_resume(*, profile: Profile, tailored: dict[str, Any], secrets: Secret
         lines.append(contact)
     lines.append("")
 
-    summary = _scrub_source_ids(tailored.get("summary") or "")
+    summary = _scrub_source_ids(tailored.get("summary") or "", known)
     if summary:
         lines += ["## Summary", summary, ""]
 
@@ -90,7 +129,7 @@ def render_resume(*, profile: Profile, tailored: dict[str, Any], secrets: Secret
                 meta_bits.append(location)
             lines.append(" • ".join(meta_bits))
             for txt in bullets_by_exp.get(exp.get("id"), []):
-                lines.append(f"- {_scrub_source_ids(txt)}")
+                lines.append(f"- {_scrub_source_ids(txt, known)}")
             lines.append("")
 
     edu = p.get("education") or []
@@ -126,6 +165,7 @@ def render_cover_letter(
     company: str,
     salutation: str = "Dear Hiring Team,",
 ) -> str:
+    known = collect_known_ids(profile.data)
     pm = secrets.placeholder_map()
     addr_lines = []
     if pm.get("{{address_street}}"):
@@ -150,7 +190,7 @@ def render_cover_letter(
     lines.append(salutation)
     lines.append("")
     for para in tailored.get("cover_letter_paragraphs") or []:
-        lines.append(_scrub_source_ids(para.get("text", "")))
+        lines.append(_scrub_source_ids(para.get("text", ""), known))
         lines.append("")
     name = profile.data.get("identity", {}).get("full_name", "")
     lines.append("Sincerely,")
@@ -162,25 +202,27 @@ def render_cover_letter(
     return "\n".join(lines).rstrip() + "\n"
 
 
-def render_application_answers(*, tailored: dict[str, Any]) -> str:
+def render_application_answers(*, tailored: dict[str, Any], profile: Profile | None = None) -> str:
     items = tailored.get("application_answers") or []
     if not items:
         return "_(no anticipated application answers generated)_\n"
+    known = collect_known_ids(profile.data) if profile else None
     lines: list[str] = ["# Application Answers", ""]
     for a in items:
         q = a.get("question", "")
-        ans = _scrub_source_ids(a.get("answer", ""))
+        ans = _scrub_source_ids(a.get("answer", ""), known)
         lines.append(f"### {q}")
         lines.append(ans)
         lines.append("")
     return "\n".join(lines).rstrip() + "\n"
 
 
-def render_email(*, subject: str, body_paragraphs: list[dict[str, Any]], signature_name: str, secrets: Secrets) -> str:
+def render_email(*, subject: str, body_paragraphs: list[dict[str, Any]], signature_name: str,
+                 secrets: Secrets, known_ids: set[str] | None = None) -> str:
     pm = secrets.placeholder_map()
-    lines = [f"**Subject:** {_scrub_source_ids(subject)}", ""]
+    lines = [f"**Subject:** {_scrub_source_ids(subject, known_ids)}", ""]
     for p in body_paragraphs:
-        lines.append(_scrub_source_ids(p.get("text", "")))
+        lines.append(_scrub_source_ids(p.get("text", ""), known_ids))
         lines.append("")
     lines.append(signature_name)
     sig_bits = [pm.get("{{email}}", ""), pm.get("{{phone}}", "")]
@@ -190,8 +232,8 @@ def render_email(*, subject: str, body_paragraphs: list[dict[str, Any]], signatu
     return "\n".join(lines).rstrip() + "\n"
 
 
-def render_linkedin_dm(text: str) -> str:
-    return _scrub_source_ids(text).rstrip() + "\n"
+def render_linkedin_dm(text: str, known_ids: set[str] | None = None) -> str:
+    return _scrub_source_ids(text, known_ids).rstrip() + "\n"
 
 
 def render_match_report(analyzed: dict[str, Any], packet: dict[str, Any]) -> str:

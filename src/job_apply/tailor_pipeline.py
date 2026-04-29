@@ -73,25 +73,28 @@ def run_tailor(
     out_dir.mkdir(parents=True, exist_ok=True)
 
     # Render markdown views (substitution happens here, locally only).
+    known_ids = render.collect_known_ids(profile.data)
     resume_md = render.render_resume(profile=profile, tailored=tailored, secrets=secrets)
     cover_md = render.render_cover_letter(
         profile=profile, tailored=tailored, secrets=secrets,
         company=analyzed.get("company") or "your team",
     )
-    answers_md = render.render_application_answers(tailored=tailored)
+    answers_md = render.render_application_answers(tailored=tailored, profile=profile)
     rec_email_md = render.render_email(
         subject=emails["recruiter"].get("subject", ""),
         body_paragraphs=emails["recruiter"].get("body_paragraphs") or [],
         signature_name=profile.full_name,
         secrets=secrets,
+        known_ids=known_ids,
     )
     hm_email_md = render.render_email(
         subject=emails["hiring_manager"].get("subject", ""),
         body_paragraphs=emails["hiring_manager"].get("body_paragraphs") or [],
         signature_name=profile.full_name,
         secrets=secrets,
+        known_ids=known_ids,
     )
-    dm_md = render.render_linkedin_dm(emails["linkedin_dm"].get("text") or "")
+    dm_md = render.render_linkedin_dm(emails["linkedin_dm"].get("text") or "", known_ids)
 
     packet: dict[str, Any] = {
         "job_id": job_id,

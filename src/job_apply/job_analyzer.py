@@ -138,22 +138,49 @@ def compute_fit_score(*, llm_fields: dict[str, Any], profile: Profile) -> dict[s
     else:
         exp_match = max(0, 40 - 10 * (min_years - 2))
 
-    # Location
+    # Location. The candidate must actually be reachable for the role:
+    # remote-ok job + remote_ok candidate, OR posting location intersects the
+    # candidate's preferred locations, OR willing_to_relocate=True. Otherwise
+    # the role is not realistically attainable and the score reflects that.
     prefs = profile.data.get("preferences") or {}
     remote_mode = (llm_fields.get("remote_mode") or "unknown").lower()
-    location_match = 100
+    posting_loc = (llm_fields.get("location") or "").lower()
+    wanted_locs = [w.lower() for w in (prefs.get("locations") or [])]
+    location_intersects = bool(wanted_locs and any(w in posting_loc for w in wanted_locs))
+    relocation_ok = bool(prefs.get("willing_to_relocate"))
+
     if remote_mode == "remote":
-        location_match = 100 if prefs.get("remote_ok", True) else 40
+        location_match = 100 if prefs.get("remote_ok", True) else 35
     elif remote_mode == "hybrid":
-        location_match = 100 if prefs.get("hybrid_ok", True) else 50
-    elif remote_mode == "onsite":
-        # Onsite needs to intersect preferred locations to score well
-        loc = (llm_fields.get("location") or "").lower()
-        wanted = [w.lower() for w in (prefs.get("locations") or [])]
-        if not wanted:
-            location_match = 70 if prefs.get("onsite_ok", True) else 30
+        if not prefs.get("hybrid_ok", True):
+            location_match = 35
+        elif location_intersects:
+            location_match = 100
+        elif relocation_ok:
+            location_match = 65
         else:
-            location_match = 100 if any(w in loc for w in wanted) else 30
+            location_match = 30
+    elif remote_mode == "onsite":
+        if not prefs.get("onsite_ok", True):
+            location_match = 25
+        elif location_intersects:
+            location_match = 100
+        elif relocation_ok:
+            location_match = 65
+        else:
+            location_match = 25
+    else:
+        # remote_mode == "unknown" — the posting didn't say. Be conservative:
+        # treat as if onsite-required since that's the riskier failure mode.
+        if location_intersects:
+            location_match = 90
+        elif relocation_ok:
+            location_match = 60
+        elif prefs.get("remote_ok", True):
+            # If the user is open to remote, give partial credit even when unknown.
+            location_match = 55
+        else:
+            location_match = 30
 
     industry_filter = llm_fields.get("industry_filter", "ok")
     industry_penalty = {"ok": 0, "review": 25, "avoid": 80}.get(industry_filter, 0)

@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import Any
 
 from .profile_loader import Profile, Secrets
-from .render import _scrub_source_ids
+from .render import _scrub_source_ids, collect_known_ids
 
 
 class PDFRenderError(RuntimeError):
@@ -43,9 +43,10 @@ def _contact_line(profile: Profile, secrets: Secrets) -> str:
 
 def _resume_html(profile: Profile, tailored: dict[str, Any], secrets: Secrets) -> str:
     p = profile.data
+    known = collect_known_ids(p)
     name = _h(p.get("identity", {}).get("full_name", ""))
     contact = _contact_line(profile, secrets)
-    summary = _scrub_source_ids(tailored.get("summary") or "").strip()
+    summary = _scrub_source_ids(tailored.get("summary") or "", known).strip()
 
     parts: list[str] = []
     parts.append(f'<div class="name">{name}</div>')
@@ -72,7 +73,7 @@ def _resume_html(profile: Profile, tailored: dict[str, Any], secrets: Secrets) -
         if len(bits) >= 2 and bits[0] == "experience":
             exp_id = bits[1]
             cited_exp_ids.add(exp_id)
-            bullets_by_exp.setdefault(exp_id, []).append(_scrub_source_ids(b.get("text", "")))
+            bullets_by_exp.setdefault(exp_id, []).append(_scrub_source_ids(b.get("text", ""), known))
 
     if cited_exp_ids:
         parts.append("<h2>Experience</h2>")
@@ -143,6 +144,7 @@ def _cover_html(
     *, profile: Profile, tailored: dict[str, Any], secrets: Secrets,
     company: str, salutation: str = "Dear Hiring Team,", date_iso: str,
 ) -> str:
+    known = collect_known_ids(profile.data)
     pm = secrets.placeholder_map()
     name = _h(profile.data.get("identity", {}).get("full_name", ""))
 
@@ -169,7 +171,7 @@ def _cover_html(
     parts.append(f'<div class="date">{_h(date_iso)}</div>')
     parts.append(f'<div class="salutation">{_h(salutation)}</div>')
     for para in tailored.get("cover_letter_paragraphs") or []:
-        text = _scrub_source_ids(para.get("text", "")).strip()
+        text = _scrub_source_ids(para.get("text", ""), known).strip()
         if text:
             parts.append(f'<p class="body">{_h(text)}</p>')
 
