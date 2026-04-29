@@ -72,9 +72,23 @@ def _cmd_tailor(args: argparse.Namespace) -> int:
     val = packet["validation"]
     blocks = val.get("fabrication_blocks") or []
     warns = val.get("fabrication_warnings") or []
-    print(f"packet drafted: outputs/{slug}/")
-    print(f"  employer: outputs/{slug}/employer/  (resume.pdf, resume.docx, cover.pdf, cover.docx)")
-    print(f"  internal: outputs/{slug}/internal/  (markdown views, match_report.md)")
+    is_blocked = bool(packet.get("blocked"))
+    print(f"packet drafted: outputs/{slug}/  run_id={packet.get('run_id', '?')}")
+    if is_blocked:
+        print(f"  ⛔ BLOCKED — employer renders and Mail draft suppressed.")
+        reasons = packet.get("block_reasons", {})
+        for issue in reasons.get("high_qa_issues") or []:
+            print(f"    [HIGH/{issue.get('category')}] {issue.get('where', '')}")
+            fix = (issue.get("fix_suggestion") or "").strip()
+            if fix:
+                print(f"      fix: {fix[:200]}")
+        for fb in reasons.get("fabrication_blocks") or []:
+            print(f"    [FAB/{fb.get('rule')}] {fb.get('detail', '')}")
+        print(f"  Internal review files: outputs/{slug}/internal/")
+        print(f"  Fix the issues, edit profile if needed, then re-run tailor.")
+    else:
+        print(f"  employer: outputs/{slug}/employer/  (PDF resume + cover letter)")
+        print(f"  internal: outputs/{slug}/internal/  (markdown views, qa_report.md, evidence_map.json, match_report.md)")
     from . import state as _state
     analyzed = _state.load_analyzed(packet["job_id"])
     if analyzed:
@@ -87,21 +101,19 @@ def _cmd_tailor(args: argparse.Namespace) -> int:
             reason = analyzed.get("source_confidence_reason") or ""
             print(f"  ℹ source confidence: medium — {reason}")
     if blocks:
-        print(f"\n  ⚠ {len(blocks)} fabrication BLOCKS — fix before approving:")
+        print(f"\n  ⚠ {len(blocks)} fabrication BLOCKS:")
         for b in blocks[:5]:
             print(f"    - [{b['rule']}] {b['detail']}")
         if len(blocks) > 5:
             print(f"    … and {len(blocks) - 5} more (see match_report.md).")
     if warns:
-        print(f"  ℹ {len(warns)} warnings (non-blocking).")
+        print(f"  ℹ {len(warns)} fabrication warnings (non-blocking).")
     qa = val.get("qa") or {}
     qa_issues = qa.get("issues") or []
     if qa:
         polish = qa.get("overall_polish", "ready")
-        print(f"  QA polish: {polish} ({len(qa_issues)} issue(s))")
-        for issue in [i for i in qa_issues if i.get("severity") == "high"][:3]:
-            print(f"    - [HIGH/{issue.get('category')}] {issue.get('where', '')}: {issue.get('fix_suggestion', '')}")
-    return 0 if not blocks else 2
+        print(f"  QA polish: {polish} ({len(qa_issues)} issue(s) — see internal/qa_report.md)")
+    return 2 if is_blocked else 0
 
 
 def _cmd_review(args: argparse.Namespace) -> int:
@@ -189,13 +201,29 @@ def _cmd_track_add(args: argparse.Namespace) -> int:
 
 def _cmd_send_outreach(args: argparse.Namespace) -> int:
     """Open a Mail.app draft addressed to a recruiter or hiring manager,
-    using one of the generated outreach variants and ONLY employer/ attachments."""
+    using one of the generated outreach variants and ONLY employer/ attachments.
+
+    Blocked packets (HIGH-severity QA issues or fabrication blocks) are refused
+    unless --force is passed. DOCX attachments are off by default (employer
+    portals usually accept PDF; some explicitly request DOCX — use --include-docx).
+    """
     from . import approval_queue, mail_draft, state
     try:
         slug, packet = approval_queue._resolve(args.ident)
     except approval_queue.ApprovalError as e:
         print(f"send-outreach failed: {e}", file=sys.stderr)
         return 1
+    if packet.get("blocked") and not args.force:
+        reasons = packet.get("block_reasons", {})
+        high = reasons.get("high_qa_issues") or []
+        fab = reasons.get("fabrication_blocks") or []
+        print(
+            f"send-outreach refused: packet is BLOCKED "
+            f"({len(high)} high QA issue(s), {len(fab)} fabrication block(s)). "
+            f"Re-run tailor after fixing, or pass --force to override.",
+            file=sys.stderr,
+        )
+        return 2
     emails = packet.get("emails") or {}
     variant = emails.get(args.variant)
     if not variant:
@@ -212,23 +240,34 @@ def _cmd_send_outreach(args: argparse.Namespace) -> int:
               file=sys.stderr)
         return 1
     out_dir = state.packet_dir(slug)
-    attachments = mail_draft.packet_attachments(out_dir, mode="employer")
+    attachments = mail_draft.packet_attachments(
+        out_dir, mode="employer", include_docx=args.include_docx,
+    )
     if not attachments:
         print(f"send-outreach: no employer-facing attachments found in {out_dir / 'employer'}",
               file=sys.stderr)
         return 1
+    run_id = packet.get("run_id", "")
+    stamped_subject = mail_draft.stamp_subject(subject, run_id)
     try:
         mail_draft.open_draft(
-            to_addr=args.to,
-            subject=subject,
-            body=body_text,
+            to_addr=args.to, subject=stamped_subject, body=body_text,
             attachments=attachments,
         )
     except mail_draft.MailDraftError as e:
         print(f"send-outreach failed: {e}", file=sys.stderr)
         return 1
     print(f"draft opened to {args.to}  variant={args.variant}  attachments={len(attachments)}")
+    print(f"  run id: {run_id}")
     print("(NOT sent. Review in Mail and click Send when ready.)")
+    return 0
+
+
+def _cmd_close_drafts(args: argparse.Namespace) -> int:
+    """Close any open Mail compose windows whose subject contains the given run id."""
+    from . import mail_draft
+    closed = mail_draft.close_drafts_with_run_id(args.run_id)
+    print(f"closed {closed} draft(s) with run id {args.run_id}")
     return 0
 
 
@@ -310,7 +349,18 @@ def build_parser() -> argparse.ArgumentParser:
         choices=["recruiter", "hiring_manager"],
         help="Which outreach variant to use as the email body.",
     )
+    p_so.add_argument("--include-docx", action="store_true",
+                      help="Also attach DOCX (default: PDF only).")
+    p_so.add_argument("--force", action="store_true",
+                      help="Open the draft even if the packet is BLOCKED by QA / fabrication checks.")
     p_so.set_defaults(func=_cmd_send_outreach)
+
+    p_cd = sub.add_parser(
+        "close-drafts",
+        help="Close Mail.app compose windows tagged with a given run id (safe; only matches stamped drafts).",
+    )
+    p_cd.add_argument("run_id")
+    p_cd.set_defaults(func=_cmd_close_drafts)
 
     return p
 

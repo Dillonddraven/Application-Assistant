@@ -169,37 +169,11 @@ def run_tailor(
     (internal_dir / "outreach_hiring_manager.md").write_text(hm_email_md)
     (internal_dir / "linkedin_dm.md").write_text(dm_md)
 
-    # PDF + DOCX renders. PDF is best-effort (Chromium may be missing); we log
-    # the failure into validation but never block the rest of the packet.
+    # Defer the employer-facing render (PDF + DOCX) until AFTER the QA pass
+    # so HIGH-severity issues can hard-block it. We need fabrication validator
+    # blocks to also block here. Below: stage 3 QA → guard → render.
     company = analyzed.get("company") or "Hiring Team"
     today = state.now_iso()[:10]
-    render_errors: list[str] = []
-    try:
-        render_pdf.render_resume_pdf(
-            profile=profile, tailored=tailored, secrets=secrets,
-            out_path=employer_dir / "tailored_resume.pdf",
-        )
-        render_pdf.render_cover_letter_pdf(
-            profile=profile, tailored=tailored, secrets=secrets,
-            out_path=employer_dir / "cover_letter.pdf",
-            company=company, date_iso=today,
-        )
-    except render_pdf.PDFRenderError as e:
-        render_errors.append(f"pdf: {e}")
-    try:
-        render_docx.render_resume_docx(
-            profile=profile, tailored=tailored, secrets=secrets,
-            out_path=employer_dir / "tailored_resume.docx",
-        )
-        render_docx.render_cover_letter_docx(
-            profile=profile, tailored=tailored, secrets=secrets,
-            out_path=employer_dir / "cover_letter.docx",
-            company=company, date_iso=today,
-        )
-    except Exception as e:  # docx is pure-python; failures are unexpected
-        render_errors.append(f"docx: {e}")
-    if render_errors:
-        packet["validation"]["render_errors"] = render_errors
 
     # Stage 3: LLM-driven QA pass on the rendered views.
     try:
@@ -222,6 +196,67 @@ def run_tailor(
         packet["prompt_versions"]["qa_check"] = qa.get("prompt_version", "")
     except Exception as e:
         packet["validation"]["qa_error"] = str(e)
+        qa = {"issues": [], "overall_polish": "ready"}
+
+    # === GUARD ===
+    # Any HIGH-severity QA issue OR any fabrication block blocks the
+    # employer-facing render and the Mail draft. Internal markdowns are still
+    # written for review, but no PDF/DOCX is produced and no employer Mail
+    # draft will be opened. Packet status flips to "blocked".
+    high_issues = [i for i in (qa.get("issues") or []) if i.get("severity") == "high"]
+    fab_blocks = packet["validation"].get("fabrication_blocks") or []
+    is_blocked = bool(high_issues or fab_blocks)
+    packet["blocked"] = is_blocked
+    packet["block_reasons"] = {
+        "high_qa_issues": [
+            {"category": i.get("category"), "where": i.get("where"),
+             "snippet": i.get("snippet"), "fix_suggestion": i.get("fix_suggestion")}
+            for i in high_issues
+        ],
+        "fabrication_blocks": fab_blocks,
+    }
+
+    # Render employer PDF + DOCX ONLY if the packet is not blocked.
+    render_errors: list[str] = []
+    if not is_blocked:
+        try:
+            render_pdf.render_resume_pdf(
+                profile=profile, tailored=tailored, secrets=secrets,
+                out_path=employer_dir / "tailored_resume.pdf",
+            )
+            render_pdf.render_cover_letter_pdf(
+                profile=profile, tailored=tailored, secrets=secrets,
+                out_path=employer_dir / "cover_letter.pdf",
+                company=company, date_iso=today,
+            )
+        except render_pdf.PDFRenderError as e:
+            render_errors.append(f"pdf: {e}")
+        try:
+            render_docx.render_resume_docx(
+                profile=profile, tailored=tailored, secrets=secrets,
+                out_path=employer_dir / "tailored_resume.docx",
+            )
+            render_docx.render_cover_letter_docx(
+                profile=profile, tailored=tailored, secrets=secrets,
+                out_path=employer_dir / "cover_letter.docx",
+                company=company, date_iso=today,
+            )
+        except Exception as e:
+            render_errors.append(f"docx: {e}")
+    else:
+        # Clean any stale employer renders so a previous "ready" run doesn't
+        # leave stale PDFs lying around when this run is blocked.
+        for stale in employer_dir.glob("*"):
+            if stale.is_file():
+                stale.unlink()
+    if render_errors:
+        packet["validation"]["render_errors"] = render_errors
+
+    # Persist a separate qa_report.md and evidence_map.json under internal/ for visibility.
+    (internal_dir / "qa_report.md").write_text(render.render_qa_report(qa))
+    if jd:
+        import json as _json
+        (internal_dir / "evidence_map.json").write_text(_json.dumps(jd, indent=2))
 
     # Now write match_report (after QA so it includes the QA section).
     (internal_dir / "match_report.md").write_text(render.render_match_report(analyzed, packet))
@@ -230,23 +265,52 @@ def run_tailor(
 
     if open_mail:
         to_addr = secrets.data.get("email") if secrets.data else None
-        if to_addr and not (packet["validation"].get("fabrication_blocks") or []):
+        if not to_addr:
+            packet["validation"].setdefault("mail_draft_error",
+                                             "no email in secrets.yaml; cannot open draft")
+        elif is_blocked:
+            # Hard-stop: do not open a Mail draft when employer renders are blocked.
+            packet["validation"].setdefault(
+                "mail_draft_error",
+                f"BLOCKED: {len(high_issues)} high-severity QA issue(s) and "
+                f"{len(fab_blocks)} fabrication block(s). No employer-facing "
+                f"render produced; no Mail draft opened. Fix issues then re-tailor."
+            )
+        else:
             try:
-                mail_draft.open_draft(
-                    to_addr=to_addr,
-                    subject=f"{company} — {analyzed.get('title') or 'role'} application packet",
-                    body=(
-                        f"Application packet for {company} — {analyzed.get('title') or 'role'} "
-                        f"(fit score {analyzed.get('fit_score')}/100, "
-                        f"industry filter: {analyzed.get('industry_filter')}).\n\n"
-                        f"Files attached. Fabrication validator: 0 blocks. "
-                        f"Nothing has been sent — review and send when ready.\n\n"
-                        f"Source URL: {analyzed.get('source_url') or '(local file)'}"
-                    ),
-                    attachments=mail_draft.packet_attachments(out_dir),
+                run_id = packet["run_id"]
+                attachments = mail_draft.packet_attachments(
+                    out_dir, mode="employer", include_docx=False,
                 )
+                if not attachments:
+                    raise mail_draft.MailDraftError(
+                        "no employer-facing PDF found; refusing to open empty draft"
+                    )
+                subject = mail_draft.stamp_subject(
+                    f"{company} — {analyzed.get('title') or 'role'}", run_id,
+                )
+                body = (
+                    f"Draft for {company} — {analyzed.get('title') or 'role'}. "
+                    f"Fit {analyzed.get('fit_score')}/100, source confidence "
+                    f"{analyzed.get('source_confidence', 'unknown')}, QA polish "
+                    f"{(packet['validation'].get('qa') or {}).get('overall_polish', '?')}.\n\n"
+                    f"Attachments: polished resume + cover letter PDF only.\n"
+                    f"Source URL: {analyzed.get('source_url') or '(local file)'}\n\n"
+                    f"Internal review files (markdown views, match_report, qa_report) live "
+                    f"under outputs/{slug}/internal/ and were NOT attached.\n\n"
+                    f"Run id: {run_id}"
+                )
+                mail_draft.open_draft(
+                    to_addr=to_addr, subject=subject, body=body,
+                    attachments=attachments,
+                )
+                packet["mail_draft"] = {
+                    "opened": True, "run_id": run_id, "subject": subject,
+                    "attachment_count": len(attachments),
+                    "to": to_addr,
+                }
             except mail_draft.MailDraftError as e:
                 packet["validation"].setdefault("mail_draft_error", str(e))
-                state.save_packet(slug, packet)
+        state.save_packet(slug, packet)
 
     return packet, slug

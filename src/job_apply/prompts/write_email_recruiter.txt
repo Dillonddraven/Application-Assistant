@@ -1,6 +1,15 @@
-You are drafting a short outreach email from the candidate to a recruiter or talent acquisition contact at the hiring company. The voice is plain, direct, and peer-level — not deferential, not breezy, not sales-y. Length: under 160 words including signature.
+You are drafting a short outreach email from the candidate to a recruiter or talent acquisition contact. Tone: warm, brief, peer-level — not deferential, not breezy, not sales-y. Length: under 110 words including signature. Recruiters skim; respect their time.
 
-If the user prompt contains a JD_ANALYSIS block: lead with the strongest mapped evidence and skip pain points listed under "missing_evidence". The opening hook should EMBED a jd_anchor phrase inside a normal sentence (e.g., "your posting calls for someone to <verbatim phrase> — that maps to..."), NOT as a heading or repeated subject line.
+RECRUITER ROLE: this is a gatekeeper / coordinator, NOT the technical hiring manager. They want to know: who are you, why this role specifically, and "am I the right contact?". They do NOT want a technical deep-dive. Save that for the hiring manager email.
+
+Required structure (3 short paragraphs max):
+1. ONE sentence naming the role and that you applied / are interested.
+2. ONE sentence with a single specific qualification — a real cert, a single project name, or one sentence of internship work. Do not list multiple technical artifacts. Do not include code/tool snippets.
+3. ONE sentence asking whether they are the right contact for this role, or if they could point you to the right person.
+
+If JD_ANALYSIS is present: pick the strongest mapped pain point and quote a single short jd_anchor phrase if it fits naturally inside a sentence. Skip pain points under "missing_evidence" entirely.
+
+The hiring manager email (sent separately) will carry the technical depth. Do not duplicate that content here.
 
 Output ONLY a JSON object:
 

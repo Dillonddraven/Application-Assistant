@@ -92,19 +92,19 @@ def test_quotes_and_newlines_escaped(monkeypatch: pytest.MonkeyPatch, tmp_path: 
 
 
 def test_packet_attachments_legacy_layout_still_works(tmp_path: Path):
-    """Pre-split packets had everything at the top of out_dir — keep working."""
+    """Pre-split packets had everything at the top of out_dir — keep working in review mode."""
     out = tmp_path / "out"
     out.mkdir()
     (out / "tailored_resume.pdf").write_bytes(b"x")
     (out / "linkedin_dm.md").write_text("x")
-    paths = mail_draft.packet_attachments(out)
+    paths = mail_draft.packet_attachments(out, mode="review")
     names = [p.name for p in paths]
     assert "tailored_resume.pdf" in names
     assert "linkedin_dm.md" in names
     assert "cover_letter.pdf" not in names
 
 
-def test_packet_attachments_employer_mode_only_includes_pdf_docx(tmp_path: Path):
+def test_packet_attachments_employer_mode_default_is_pdf_only(tmp_path: Path):
     out = tmp_path / "out"
     (out / "employer").mkdir(parents=True)
     (out / "internal").mkdir(parents=True)
@@ -113,19 +113,40 @@ def test_packet_attachments_employer_mode_only_includes_pdf_docx(tmp_path: Path)
     (out / "employer" / "cover_letter.pdf").write_bytes(b"x")
     (out / "employer" / "cover_letter.docx").write_bytes(b"x")
     (out / "internal" / "outreach_recruiter.md").write_text("x")
-    (out / "internal" / "linkedin_dm.md").write_text("x")
     (out / "internal" / "match_report.md").write_text("x")
 
-    employer_paths = mail_draft.packet_attachments(out, mode="employer")
-    employer_names = [p.name for p in employer_paths]
-    # Only PDF + DOCX; no markdown leaks
-    assert sorted(employer_names) == sorted([
-        "tailored_resume.pdf", "tailored_resume.docx",
-        "cover_letter.pdf", "cover_letter.docx",
+    paths = mail_draft.packet_attachments(out, mode="employer")
+    names = [p.name for p in paths]
+    # PDF-only by default; DOCX off
+    assert sorted(names) == sorted(["tailored_resume.pdf", "cover_letter.pdf"])
+    assert not any(n.endswith(".md") for n in names)
+    assert not any(n.endswith(".docx") for n in names)
+
+
+def test_packet_attachments_employer_mode_with_docx_opt_in(tmp_path: Path):
+    out = tmp_path / "out"
+    (out / "employer").mkdir(parents=True)
+    (out / "employer" / "tailored_resume.pdf").write_bytes(b"x")
+    (out / "employer" / "tailored_resume.docx").write_bytes(b"x")
+    (out / "employer" / "cover_letter.pdf").write_bytes(b"x")
+    (out / "employer" / "cover_letter.docx").write_bytes(b"x")
+    paths = mail_draft.packet_attachments(out, mode="employer", include_docx=True)
+    names = [p.name for p in paths]
+    assert sorted(names) == sorted([
+        "tailored_resume.pdf", "cover_letter.pdf",
+        "tailored_resume.docx", "cover_letter.docx",
     ])
-    assert not any(n.endswith(".md") for n in employer_names)
-    assert not any("match_report" in n for n in employer_names)
-    assert not any("packet.json" in n for n in employer_names)
+
+
+def test_packet_attachments_default_mode_is_employer(tmp_path: Path):
+    """Calling with no mode argument should default to employer (safe default)."""
+    out = tmp_path / "out"
+    (out / "employer").mkdir(parents=True)
+    (out / "internal").mkdir(parents=True)
+    (out / "employer" / "tailored_resume.pdf").write_bytes(b"x")
+    (out / "internal" / "match_report.md").write_text("x")
+    paths = mail_draft.packet_attachments(out)
+    assert [p.name for p in paths] == ["tailored_resume.pdf"]
 
 
 def test_packet_attachments_review_mode_includes_internal(tmp_path: Path):

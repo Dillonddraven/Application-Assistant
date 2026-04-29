@@ -139,32 +139,39 @@ def open_draft(*, to_addr: str, subject: str, body: str,
         raise MailDraftError(f"osascript failed: {msg}")
 
 
-def packet_attachments(out_dir: Path, *, mode: str = "review") -> list[Path]:
+def packet_attachments(out_dir: Path, *, mode: str = "employer",
+                       include_docx: bool = False) -> list[Path]:
     """Files to attach for the given Mail-draft mode.
 
     Modes:
-      - "review": everything (internal + employer). For self-review email.
-      - "employer": ONLY the polished resume + cover letter (PDF + DOCX).
-                    For the actual outreach email to a recruiter / hiring manager.
-                    Internal files (markdown views, packet.json, match_report)
-                    must NEVER end up in an employer email.
+      - "employer" (default): ONLY the polished employer-facing resume + cover
+                              letter as PDF. Internal files (markdown views,
+                              packet.json, match_report, application_answers,
+                              outreach drafts, qa_report) must NEVER appear in
+                              an employer email. DOCX is optional and off by
+                              default — set include_docx=True to attach DOCX
+                              when the application specifically asks for it.
+      - "review": everything we generated (employer + internal). For a
+                  self-review email — never sent to an employer.
     """
     employer_dir = out_dir / "employer"
     internal_dir = out_dir / "internal"
 
     if mode == "employer":
-        candidates = [
+        candidates: list[Path] = [
             employer_dir / "tailored_resume.pdf",
             employer_dir / "cover_letter.pdf",
-            employer_dir / "tailored_resume.docx",
-            employer_dir / "cover_letter.docx",
         ]
+        if include_docx:
+            candidates += [
+                employer_dir / "tailored_resume.docx",
+                employer_dir / "cover_letter.docx",
+            ]
         return [c for c in candidates if c.exists()]
 
     if mode != "review":
         raise ValueError(f"unknown mode: {mode!r}")
 
-    # Review: include everything we generated, employer + internal.
     out: list[Path] = []
     for p in (
         employer_dir / "tailored_resume.pdf",
@@ -176,10 +183,10 @@ def packet_attachments(out_dir: Path, *, mode: str = "review") -> list[Path]:
         internal_dir / "linkedin_dm.md",
         internal_dir / "application_answers.md",
         internal_dir / "match_report.md",
+        internal_dir / "qa_report.md",
     ):
         if p.exists():
             out.append(p)
-    # Backward compatibility: pre-split packets had files at the top of out_dir.
     if not out:
         legacy = [
             "tailored_resume.pdf", "cover_letter.pdf",
@@ -189,3 +196,50 @@ def packet_attachments(out_dir: Path, *, mode: str = "review") -> list[Path]:
         ]
         out = [out_dir / c for c in legacy if (out_dir / c).exists()]
     return out
+
+
+def stamp_subject(subject: str, run_id: str) -> str:
+    """Append a [run: <run_id>] tag to the subject for traceability and cleanup."""
+    if not run_id:
+        return subject
+    if f"[run: {run_id}]" in subject:
+        return subject
+    return f"{subject.rstrip()} [run: {run_id}]"
+
+
+def close_drafts_with_run_id(run_id: str) -> int:
+    """Close any open Mail compose windows whose subject contains the given run id.
+    Returns the number of windows closed. Best-effort; does not raise on AppleScript
+    failure (Mail might not be running, the user might have closed it manually, etc).
+    """
+    if not run_id:
+        return 0
+    # Match the marker we stamp into subjects.
+    marker = f"[run: {run_id}]"
+    script = f"""
+tell application "Mail"
+    set closedCount to 0
+    try
+        repeat with w in (every window whose name contains "{marker}")
+            try
+                close w saving no
+                set closedCount to closedCount + 1
+            end try
+        end repeat
+    end try
+    return closedCount
+end tell
+"""
+    try:
+        proc = subprocess.run(
+            [_osascript_path()],
+            input=script, text=True, capture_output=True, timeout=30,
+        )
+        if proc.returncode == 0:
+            try:
+                return int((proc.stdout or "0").strip())
+            except ValueError:
+                return 0
+    except Exception:
+        pass
+    return 0

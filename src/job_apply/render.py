@@ -243,6 +243,43 @@ def render_linkedin_dm(text: str, known_ids: set[str] | None = None) -> str:
     return _scrub_source_ids(text, known_ids).rstrip() + "\n"
 
 
+def render_qa_report(qa: dict[str, Any]) -> str:
+    """Render a standalone QA report for `internal/qa_report.md`."""
+    if not qa:
+        return "# QA report\n\n(no QA pass run)\n"
+    lines: list[str] = ["# QA report", ""]
+    polish = qa.get("overall_polish", "ready")
+    lines.append(f"**Overall polish: `{polish}`**")
+    lines.append("")
+    issues = qa.get("issues") or []
+    if not issues:
+        lines.append("No issues flagged.")
+        return "\n".join(lines) + "\n"
+    by_sev = {"high": [], "medium": [], "low": []}
+    for issue in issues:
+        sev = issue.get("severity", "low")
+        if sev in by_sev:
+            by_sev[sev].append(issue)
+    for sev in ("high", "medium", "low"):
+        items = by_sev.get(sev) or []
+        if not items:
+            continue
+        lines.append(f"## {sev.upper()} ({len(items)})")
+        lines.append("")
+        for issue in items:
+            cat = issue.get("category", "?")
+            where = issue.get("where", "")
+            snip = (issue.get("snippet") or "").strip()
+            fix = (issue.get("fix_suggestion") or "").strip()
+            lines.append(f"### [{cat}] {where}")
+            if snip:
+                lines.append(f"> {snip}")
+            if fix:
+                lines.append(f"\n**Fix:** {fix}")
+            lines.append("")
+    return "\n".join(lines).rstrip() + "\n"
+
+
 def render_match_report(analyzed: dict[str, Any], packet: dict[str, Any]) -> str:
     lines = [f"# Match report: {analyzed.get('company')} — {analyzed.get('title')}", ""]
     lines.append(f"- Job ID: `{analyzed.get('id')}`")

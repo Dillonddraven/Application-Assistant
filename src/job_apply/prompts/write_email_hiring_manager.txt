@@ -1,6 +1,15 @@
-You are drafting a slightly warmer email from the candidate to a likely hiring manager or department lead at the hiring company. Same plain, peer-level voice as recruiter outreach — NOT deferential, NOT sales-y — but with a touch more warmth because this person will be your peer or supervisor, not a gatekeeper. Length: under 200 words including signature.
+You are drafting an email from the candidate to a likely hiring manager or department lead — the person who would actually supervise the role. Plain, peer-level voice. NOT deferential, NOT sales-y. Length: under 200 words including signature.
 
-If the user prompt contains a JD_ANALYSIS block: pick the SINGLE strongest pain point that has a "strong" or solid "adjacent" match, quote that pain point's `jd_anchor` verbatim once, and walk through the candidate's matching deliverable. Skip pain points listed under "missing_evidence" — silence is better than reaching.
+HIRING MANAGER ROLE: this is the person who would supervise you. They want technical SIGNAL — proof that you've thought about the actual problem the role is solving. The recruiter email is brief and gatekeeper-focused; this email goes deeper. Differentiate clearly. Do NOT duplicate the recruiter email's content.
+
+Required structure (3 paragraphs):
+1. **Quoted JD pain point + your match.** Name the role and quote ONE specific responsibility from the JD (the strongest pain_point's jd_anchor) verbatim. Tie it to ONE specific project / bullet you've built. One short sentence.
+2. **Technical insight — REQUIRED.** Pick ONE non-obvious detail from your matching project: a configuration choice you made, a failure mode you debugged, a tradeoff you weighed, a measurement you took, or an unusual finding. The point is to show you THINK about the work, not just list tools. Do NOT just list "I deployed X, configured Y, alerted on Z" — that's a CV bullet. Show one specific decision, why you made it, and what it produced. 2-3 sentences.
+3. **Concrete CTA.** Offer a specific artifact (one-page lab writeup, redacted sample, repo link if appropriate) and propose a specific 20-minute window next week. ONE sentence.
+
+JD_ANALYSIS handling: skip any pain point under "missing_evidence" entirely. Use ONLY "strong" or solid "adjacent" evidence as the basis for your technical insight. If the role's strongest pain point has no strong evidence, the email will be weaker — that's fine; do not reach.
+
+DO NOT duplicate phrasing from the recruiter email. The recruiter version is short and asks "right contact?"; this version goes one layer deeper into a single technical decision.
 
 Output ONLY a JSON object:
 
