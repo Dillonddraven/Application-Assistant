@@ -100,38 +100,64 @@ def _normalize(s: str) -> str:
 
 
 def _resolve_source(source_id: str, profile: dict[str, Any]) -> dict[str, Any] | None:
-    """Resolve dotted ids like 'experience.dillards_intern.b1' to the profile node.
+    """Resolve a source_id to the profile node it cites.
 
-    Returns the deepest matched node (bullet, experience, education, etc.) or
-    None if it can't be resolved. 'skills', 'general', and unknown ids return
-    None — those are treated as "no per-source numeric whitelist; fall back to
-    metrics_allowed only".
+    Accepts multiple shapes the LLM produces:
+      - "experience.dillards_intern"      -> the experience entry
+      - "experience.dillards_intern.b1"   -> the bullet inside that entry
+      - "dillards_intern.b1"              -> bare bullet id (no section prefix)
+      - "proj_foo"                        -> bare project/experience id
+      - "reusable_answers.<key>"          -> a reusable-answer string
+
+    Returns None for unresolvable ids (treat as "no per-source numerics; fall
+    back to metrics_allowed only"). 'skills' and 'general' return None on purpose.
     """
     if not source_id or source_id in {"skills", "general"}:
         return None
     parts = source_id.split(".")
-    if len(parts) < 2:
-        return None
-    section = parts[0]
-    section_id = parts[1]
-    sub = parts[2] if len(parts) >= 3 else None
 
-    items = profile.get(section)
-    if not isinstance(items, list):
-        # Handle "reusable_answers.<key>"
+    # Form A: section.<id>[.<sub>]
+    if len(parts) >= 2:
+        section, section_id = parts[0], parts[1]
+        sub = parts[2] if len(parts) >= 3 else None
+        items = profile.get(section)
+        if isinstance(items, list):
+            parent = next(
+                (it for it in items if isinstance(it, dict) and it.get("id") == section_id),
+                None,
+            )
+            if parent is not None:
+                if sub is None:
+                    return parent
+                return next(
+                    (b for b in (parent.get("bullets") or [])
+                     if isinstance(b, dict) and b.get("id") == source_id),
+                    None,
+                )
         if section == "reusable_answers":
             ra = profile.get("reusable_answers") or {}
             if isinstance(ra, dict) and section_id in ra:
                 return {"text": ra[section_id]}
-        return None
+            return None
 
-    parent = next((it for it in items if isinstance(it, dict) and it.get("id") == section_id), None)
-    if parent is None:
-        return None
-    if sub is None:
-        return parent
-    bullets = parent.get("bullets") or []
-    return next((b for b in bullets if isinstance(b, dict) and b.get("id") == source_id), None)
+    # Form B: bare bullet id "<exp_id>.b1" — search experience bullets.
+    if len(parts) == 2:
+        for exp in profile.get("experience") or []:
+            if not isinstance(exp, dict):
+                continue
+            for b in exp.get("bullets") or []:
+                if isinstance(b, dict) and b.get("id") == source_id:
+                    return b
+
+    # Form C: bare id with no dot — search all sections that carry ids.
+    if len(parts) == 1:
+        bare = parts[0]
+        for section_name in ("experience", "projects", "education", "certifications"):
+            for item in profile.get(section_name) or []:
+                if isinstance(item, dict) and item.get("id") == bare:
+                    return item
+
+    return None
 
 
 def _allowed_numerics_for(source_id: str, profile: dict[str, Any]) -> list[str]:

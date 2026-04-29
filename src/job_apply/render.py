@@ -103,13 +103,20 @@ def render_resume(*, profile: Profile, tailored: dict[str, Any], secrets: Secret
         lines.append("")
 
     # Experience: only experiences cited by tailored bullets get rendered, in profile order.
+    # Tolerate both "experience.foo.b1" and "foo.b1" — the LLM is inconsistent about the prefix.
+    exp_id_set = {e.get("id") for e in (p.get("experience") or []) if isinstance(e, dict)}
     cited_exp_ids: set[str] = set()
     bullets_by_exp: dict[str, list[str]] = {}
     for b in tailored.get("bullets") or []:
         sid = b.get("source_id", "")
         parts = sid.split(".")
-        if len(parts) >= 2 and parts[0] == "experience":
-            exp_id = parts[1]
+        # Try parts[0] then parts[1] — first part that resolves to an experience wins.
+        exp_id = None
+        for candidate in parts[:2]:
+            if candidate in exp_id_set:
+                exp_id = candidate
+                break
+        if exp_id:
             cited_exp_ids.add(exp_id)
             bullets_by_exp.setdefault(exp_id, []).append(b.get("text", ""))
 

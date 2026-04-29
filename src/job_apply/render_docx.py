@@ -154,13 +154,18 @@ def render_resume_docx(*, profile: Profile, tailored: dict[str, Any],
                 r2 = p.add_run(f"·  {right}")
                 _set_run(r2, size_pt=10, color=INK)
 
+    exp_id_set = {e.get("id") for e in (profile.data.get("experience") or []) if isinstance(e, dict)}
     cited_exp_ids: set[str] = set()
     bullets_by_exp: dict[str, list[str]] = {}
     for b in tailored.get("bullets") or []:
         sid = b.get("source_id", "")
         bits = sid.split(".")
-        if len(bits) >= 2 and bits[0] == "experience":
-            exp_id = bits[1]
+        exp_id = None
+        for candidate in bits[:2]:
+            if candidate in exp_id_set:
+                exp_id = candidate
+                break
+        if exp_id:
             cited_exp_ids.add(exp_id)
             bullets_by_exp.setdefault(exp_id, []).append(_scrub_source_ids(b.get("text", ""), known))
 
