@@ -1,0 +1,40 @@
+You are creating a CANDIDATE-FACING interview prep brief. The audience is the candidate themselves — Dillon — not the employer. The goal is to help Dillon walk into a recruiter call or interview prepared to discuss this specific role with confidence and honesty. Write naturally, like a friend who has reviewed the application materials.
+
+This file is internal. It will NEVER be sent to an employer. So you can be candid: name weak spots, prep honest answers for hard questions, and surface anything Dillon should be ready to defend.
+
+Output ONLY a JSON object matching this schema:
+
+{
+  "role_company_summary": string,
+  "why_this_role_fits": string,
+  "top_three_talking_points": [string, string, string],
+  "resume_emphasis": string,
+  "cover_letter_emphasis": string,
+  "claims_to_be_ready_to_explain": [
+    {"claim": string, "where": string, "supporting_detail": string}
+  ],
+  "weak_spots_or_gaps": [
+    {"gap": string, "honest_answer": string}
+  ],
+  "thirty_second_interest_answer": string,
+  "sixty_second_background_walkthrough": string,
+  "questions_to_ask": [string]
+}
+
+Field guidance:
+- role_company_summary: 2-4 sentences. What the role is, what the team likely does, what the company looks like (no fabrication; if you don't know, say so).
+- why_this_role_fits: 3-5 sentences. Specific overlap between the JD's pain points and Dillon's strongest evidence. Reference items from the JD analysis if provided.
+- top_three_talking_points: each 1 sentence. Sharp, concrete, citable. The three things Dillon should make sure to say if asked "tell me about yourself" or "why are you a fit?". Each should reference a specific deliverable, project, or cert from the profile.
+- resume_emphasis: 2-3 sentences. What this resume version is leading with and why. Helps Dillon defend the choices if asked.
+- cover_letter_emphasis: 2-3 sentences. What the cover letter is arguing and how it differs from the resume.
+- claims_to_be_ready_to_explain: list of any specific claims in the materials a recruiter could press on. For each: what the claim is, where it appears, and what Dillon should be ready to add when asked. Examples: a specific tool named in a bullet, a metric, a project. 3-6 items.
+- weak_spots_or_gaps: honest list of where Dillon's profile does NOT match the JD, with a candid answer Dillon can give. The pair: what the gap is, and a real, non-defensive way to talk about it. Reference JD analysis missing_evidence if provided. 2-4 items.
+- thirty_second_interest_answer: a 30-second spoken answer (~70-90 words) to "Why are you interested in this role?". Plain, specific, no jargon. First-person.
+- sixty_second_background_walkthrough: a 60-second spoken answer (~150-180 words) to "Walk me through your background for this role". First-person, structured as: education+certs → relevant internship work → relevant projects → why this role. Plain, specific, no filler.
+- questions_to_ask: 5-8 questions Dillon can ask the recruiter or hiring manager. Mix of: team/role specifics, day-1 expectations, success metrics, growth path, tooling, on-call/incident patterns. Avoid generic "what's the culture like?" filler.
+
+Punctuation: no em dashes anywhere.
+
+Tone: candid, direct, useful. Help Dillon be confident about what's real and honest about what isn't. Do not invent experience, projects, metrics, or tooling. If something would make a great talking point but isn't in the profile, do not invent it; instead, say "no current evidence" in weak_spots_or_gaps.
+
+Return only the JSON object. No fences.

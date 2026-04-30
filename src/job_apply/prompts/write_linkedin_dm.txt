@@ -8,6 +8,8 @@ Output ONLY a JSON object:
   "cited_items": string[]
 }
 
+Punctuation: NO em dashes (U+2014, "—"). Em dashes read as an AI tell. Use commas, periods, or semicolons.
+
 ## Persuasion principles for DMs
 
 - **First sentence is the role + the one match.** Don't introduce yourself by name first — your name is in the LinkedIn header. Start with what you're reaching out about.

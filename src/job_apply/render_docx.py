@@ -94,8 +94,15 @@ def _fmt_period(start: str, end: str) -> str:
 
 def _contact_line_text(secrets: Secrets) -> str:
     pm = secrets.placeholder_map()
-    bits = [pm.get("{{email}}", ""), pm.get("{{phone}}", ""),
-            pm.get("{{linkedin_url}}", ""), pm.get("{{github_url}}", "")]
+    city = pm.get("{{address_city}}") or ""
+    state = pm.get("{{address_state}}") or ""
+    bits = []
+    if city and state:
+        bits.append(f"{city}, {state}")
+    elif city:
+        bits.append(city)
+    bits += [pm.get("{{email}}", ""), pm.get("{{phone}}", ""),
+             pm.get("{{linkedin_url}}", ""), pm.get("{{github_url}}", "")]
     return "  •  ".join(b for b in bits if b)
 
 
@@ -186,7 +193,7 @@ def render_resume_docx(*, profile: Profile, tailored: dict[str, Any],
             r1 = p.add_run(company)
             _set_run(r1, size_pt=11, color=INK, bold=True)
             if title:
-                r2 = p.add_run(f"  —  {title}")
+                r2 = p.add_run(f", {title}")
                 _set_run(r2, size_pt=11, color=GREY)
             if right_meta:
                 p.add_run("\t")
@@ -212,7 +219,7 @@ def render_resume_docx(*, profile: Profile, tailored: dict[str, Any],
                 right_bits.append(str(e.get("end")))
             _two_col_line(
                 doc,
-                left=f"{degree}  —  {school}",
+                left=f"{degree}, {school}",
                 right=", ".join(right_bits),
                 left_bold=True,
             )

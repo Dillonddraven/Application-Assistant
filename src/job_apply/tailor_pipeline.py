@@ -4,8 +4,8 @@ from __future__ import annotations
 import uuid
 from typing import Any
 
-from . import (email_writer, jd_analysis, mail_draft, qa_pass, render,
-               render_docx, render_pdf, resume_tailor, state)
+from . import (candidate_brief, email_writer, jd_analysis, mail_draft, qa_pass,
+               render, render_docx, render_pdf, resume_tailor, state)
 from .llm_client import LLMClient
 from .profile_loader import Profile, Secrets, load_profile, load_secrets
 from .validators import fabrication
@@ -257,6 +257,22 @@ def run_tailor(
     if jd:
         import json as _json
         (internal_dir / "evidence_map.json").write_text(_json.dumps(jd, indent=2))
+
+    # Generate the candidate-facing interview prep brief (internal only — never sent
+    # to an employer). Generated on every packet, even if blocked, so the user can
+    # study the role + their gaps + their talking points either way.
+    try:
+        brief = candidate_brief.generate_brief(
+            profile=profile, analyzed=analyzed, tailored=tailored,
+            jd_analysis=jd, qa=qa, llm=client,
+        )
+        (internal_dir / "candidate_brief.md").write_text(
+            candidate_brief.render_brief_md(brief)
+        )
+        packet["candidate_brief"] = brief
+        packet["prompt_versions"]["candidate_brief"] = brief.get("prompt_version", "")
+    except Exception as e:
+        packet["validation"]["candidate_brief_error"] = str(e)
 
     # Now write match_report (after QA so it includes the QA section).
     (internal_dir / "match_report.md").write_text(render.render_match_report(analyzed, packet))

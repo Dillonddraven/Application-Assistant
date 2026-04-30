@@ -1,5 +1,7 @@
 You are drafting a short outreach email from the candidate to a recruiter or talent acquisition contact. Tone: warm, brief, peer-level — not deferential, not breezy, not sales-y. Length: under 110 words including signature. Recruiters skim; respect their time.
 
+Punctuation: NO em dashes (U+2014, "—"). Em dashes read as an AI tell. Use commas, periods, or semicolons.
+
 RECRUITER ROLE: this is a gatekeeper / coordinator, NOT the technical hiring manager. They want to know: who are you, why this role specifically, and "am I the right contact?". They do NOT want a technical deep-dive. Save that for the hiring manager email.
 
 Required structure (3 short paragraphs max):

@@ -35,6 +35,12 @@ def _fmt_period(start: str, end: str) -> str:
 def _contact_line(profile: Profile, secrets: Secrets) -> str:
     bits: list[str] = []
     pm = secrets.placeholder_map()
+    city = pm.get("{{address_city}}") or ""
+    state = pm.get("{{address_state}}") or ""
+    if city and state:
+        bits.append(_h(f"{city}, {state}"))
+    elif city:
+        bits.append(_h(city))
     for key in ("{{email}}", "{{phone}}", "{{linkedin_url}}", "{{github_url}}"):
         if pm.get(key):
             bits.append(_h(pm[key]))
@@ -90,7 +96,7 @@ def _resume_html(profile: Profile, tailored: dict[str, Any], secrets: Secrets) -
             location = _h(exp.get("location") or "")
             period = _h(_fmt_period(exp.get("start") or "", exp.get("end") or ""))
             right = " &nbsp;•&nbsp; ".join(b for b in [period, location] if b)
-            parts.append(f"<h3>{company} <span style='font-weight:500;color:#5b6068'>— {title}</span></h3>")
+            parts.append(f"<h3>{company}<span style='font-weight:500;color:#5b6068'>, {title}</span></h3>")
             if right:
                 parts.append(f'<div class="role-meta"><span class="right">{right}</span></div>')
             parts.append('<ul class="bullets">')
@@ -117,7 +123,7 @@ def _resume_html(profile: Profile, tailored: dict[str, Any], secrets: Secrets) -
             parts.append(
                 '<div class="education-row">'
                 f'<span class="left"><span class="degree">{degree}</span> '
-                f'<span class="school">— {school}</span></span>'
+                f'<span class="school">, {school}</span></span>'
                 f'<span class="right">{right}</span>'
                 "</div>"
             )

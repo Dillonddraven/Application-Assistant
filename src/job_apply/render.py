@@ -24,6 +24,20 @@ from .profile_loader import Profile, Secrets
 _SOURCE_ID_LEAK_RE = re.compile(r"\s*\(\s*[a-z][a-z0-9_]*(?:\.[a-z0-9_]+)+\s*\)")
 _PARENTHETICAL = re.compile(r"\s*\(\s*([a-z][a-z0-9_]*)\s*\)")
 
+# Em dashes (U+2014) are increasingly read as an AI-writing tell in resume
+# screening. Replace inline em dashes with ", " and normalize non-breaking
+# hyphens (U+2011) to regular hyphens. We deliberately keep en dashes (U+2013)
+# intact for date ranges like "2024-05 – 2024-08".
+_EM_DASH_RE = re.compile(r"\s*—\s*")
+_NB_HYPHEN_RE = re.compile(r"‑")
+
+
+def _strip_employer_unfriendly_punctuation(text: str) -> str:
+    text = _EM_DASH_RE.sub(", ", text)
+    text = _NB_HYPHEN_RE.sub("-", text)
+    text = re.sub(r",\s*,", ",", text)
+    return text
+
 
 def _scrub_source_ids(text: str, known_ids: set[str] | None = None) -> str:
     cleaned = _SOURCE_ID_LEAK_RE.sub("", text)
@@ -34,6 +48,7 @@ def _scrub_source_ids(text: str, known_ids: set[str] | None = None) -> str:
                 return ""
             return match.group(0)
         cleaned = _PARENTHETICAL.sub(_strip_known, cleaned)
+    cleaned = _strip_employer_unfriendly_punctuation(cleaned)
     # Collapse any double spaces left behind, and tidy " ." or " ," seams.
     cleaned = re.sub(r" {2,}", " ", cleaned)
     cleaned = re.sub(r"\s+([.,;:!?])", r"\1", cleaned)
@@ -75,6 +90,12 @@ def substitute_pii(text: str, secrets: Secrets) -> str:
 def _contact_line(secrets: Secrets) -> str:
     bits = []
     pm = secrets.placeholder_map()
+    city = pm.get("{{address_city}}") or ""
+    state = pm.get("{{address_state}}") or ""
+    if city and state:
+        bits.append(f"{city}, {state}")
+    elif city:
+        bits.append(city)
     for k in ("{{email}}", "{{phone}}", "{{linkedin_url}}", "{{github_url}}"):
         if pm.get(k):
             bits.append(pm[k])
@@ -130,7 +151,7 @@ def render_resume(*, profile: Profile, tailored: dict[str, Any], secrets: Secret
             location = exp.get("location", "")
             start = exp.get("start", "")
             end = exp.get("end", "") or "Present"
-            lines.append(f"### {company} — {title}")
+            lines.append(f"### {company}, {title}")
             meta_bits = [f"{start} – {end}"]
             if location:
                 meta_bits.append(location)
@@ -148,7 +169,7 @@ def render_resume(*, profile: Profile, tailored: dict[str, Any], secrets: Secret
             status = e.get("status", "")
             expected = e.get("expected_end", "")
             tail = " (in progress" + (f", expected {expected}" if expected else "") + ")" if status == "in_progress" else ""
-            lines.append(f"- **{degree}** — {school}{tail}")
+            lines.append(f"- **{degree}**, {school}{tail}")
         lines.append("")
 
     certs = p.get("certifications") or []

@@ -1,5 +1,7 @@
 You are drafting an email from the candidate to a likely hiring manager or department lead — the person who would actually supervise the role. Plain, peer-level voice. NOT deferential, NOT sales-y. Length: under 200 words including signature.
 
+Punctuation: NO em dashes (U+2014, "—"). Em dashes read as an AI tell. Use commas, periods, or semicolons.
+
 HIRING MANAGER ROLE: this is the person who would supervise you. They want technical SIGNAL — proof that you've thought about the actual problem the role is solving. The recruiter email is brief and gatekeeper-focused; this email goes deeper. Differentiate clearly. Do NOT duplicate the recruiter email's content.
 
 Required structure (3 paragraphs):

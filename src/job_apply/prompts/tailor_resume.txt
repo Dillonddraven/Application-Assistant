@@ -11,6 +11,22 @@ JD_ANALYSIS handling — STRICT RULES (the system blocks output that violates th
 
 Cover letter closing — NO hedging language. Forbidden: "I'd welcome the chance", "I look forward to", "I'd love the opportunity", "I'm confident I can", "looking for an opportunity to grow". Make the close specific: name a concrete artifact you can share AND propose a specific time window. If you have nothing concrete to offer, end with a direct one-sentence factual statement (e.g., "I'm authorized to work in the US and can provide samples of the SAST report tooling on request.") — not a generic warm-up.
 
+Cover letter ANTI-REDUNDANCY rules (resume vs cover letter division of labor):
+- Resume bullets answer "WHAT did you do?" — concrete deliverables, tools, scope.
+- Cover-letter prose answers "WHY did it matter / for whom / what changed?" — impact, audience, decision-making value.
+- Do NOT paraphrase or copy resume bullet text into the cover letter. If a bullet says "Built X using Y to produce Z", the cover letter must talk about WHO USED Z, what they did differently because of it, or what the alternative would have been — not restate the build.
+- Specifically for the SAST / vulnerability-reporting work: in the cover letter focus on the VALUE side — making vulnerability data understandable, surfacing severity and ownership clearly, and helping stakeholders prioritize remediation faster than reading raw scanner output. Do NOT relist the technical mechanics (GitLab + Excel + severity + team views) — those belong in the resume bullet only.
+- Same principle applies to logging-lab work: resume = the stack and configuration; cover letter = what monitoring or alerting capability that produced and how it changes triage.
+- A reader who has seen the resume should learn something NEW from the cover letter — not be re-told the same facts in different words.
+
+Punctuation: NO em dashes (U+2014, "—") anywhere in resume bullets, summary, cover letter, or application answers. Em dashes are increasingly flagged as an AI-writing tell by screeners. Use commas, periods, or semicolons. Restructure sentences if needed. En dashes (U+2013, "–") are fine inside date ranges only ("2024-05 – 2024-08"); never use en dashes for parenthetical interruption.
+
+Cover letter PHRASING rules (specific to avoid known-bad patterns):
+- NEVER write a sentence that reads like a JD-copy graft, e.g. "That combination fits Acme's need to <verbatim JD bullet>." — that phrasing is awkward and looks templated. Instead, integrate the JD theme as natural language: "That combination lines up with the core of this role: <plain rewording of 2-3 themes>." The candidate can mirror JD vocabulary, but inside their own sentence — never as a stitched-on quote.
+- Use TEAM-ACCURATE attribution. If the candidate's profile bullet text uses "helped build" or "supported", the cover letter must use "I helped..." or "I supported..." — not solo verbs like "I built" or "I converted". Solo verbs imply individual ownership the bullet does not claim. Match the bullet's voice exactly.
+- CONFIDENTIALITY: when offering deliverables from internship work, never offer raw company outputs or reports. Phrase as "a sanitized sample or mockup of the reporting format" — never "sample SAST report outputs", "the actual report", or "a copy of the report". The intern's prior employer's data is not the candidate's to share.
+- "I can provide..." offers must always reference sanitized/mockup forms when the underlying artifact is internship-derived.
+
 Output ONLY a single JSON object matching this schema exactly:
 
 {

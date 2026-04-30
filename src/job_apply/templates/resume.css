@@ -1,6 +1,6 @@
 @page {
   size: letter;
-  margin: 0.6in 0.7in;
+  margin: 0.45in 0.55in;
 }
 
 * {
@@ -10,15 +10,15 @@
 body {
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter",
                "Helvetica Neue", Arial, sans-serif;
-  font-size: 10.5pt;
-  line-height: 1.42;
+  font-size: 10pt;
+  line-height: 1.32;
   color: #1d1f24;
   margin: 0;
   -webkit-font-smoothing: antialiased;
 }
 
 .name {
-  font-size: 22pt;
+  font-size: 19pt;
   font-weight: 600;
   letter-spacing: -0.01em;
   color: #1a3a5c;
@@ -27,9 +27,9 @@ body {
 }
 
 .contact {
-  font-size: 9.5pt;
+  font-size: 9pt;
   color: #5b6068;
-  margin: 5pt 0 16pt 0;
+  margin: 3pt 0 10pt 0;
   letter-spacing: 0.01em;
 }
 
@@ -39,27 +39,27 @@ body {
 }
 
 h2 {
-  font-size: 9.5pt;
+  font-size: 9pt;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.10em;
   color: #1a3a5c;
-  margin: 14pt 0 5pt 0;
-  padding-bottom: 2pt;
+  margin: 9pt 0 3pt 0;
+  padding-bottom: 1pt;
   border-bottom: 1px solid #1a3a5c;
 }
 
 h3 {
-  font-size: 11pt;
+  font-size: 10.5pt;
   font-weight: 600;
   color: #1d1f24;
-  margin: 9pt 0 1pt 0;
+  margin: 6pt 0 0 0;
 }
 
 .role-meta {
-  font-size: 9.5pt;
+  font-size: 9pt;
   color: #5b6068;
-  margin: 0 0 4pt 0;
+  margin: 0 0 2pt 0;
   display: flex;
   justify-content: space-between;
 }
@@ -71,16 +71,16 @@ h3 {
 }
 
 .summary {
-  margin: 0 0 4pt 0;
+  margin: 0 0 2pt 0;
 }
 
 ul {
-  margin: 2pt 0 6pt 13pt;
+  margin: 1pt 0 3pt 12pt;
   padding: 0;
 }
 
 ul li {
-  margin-bottom: 2pt;
+  margin-bottom: 1pt;
   padding-left: 2pt;
 }
 
@@ -91,34 +91,34 @@ ul.bullets {
 
 ul.bullets li {
   position: relative;
-  padding-left: 12pt;
-  margin-bottom: 3pt;
+  padding-left: 11pt;
+  margin-bottom: 1.5pt;
 }
 
 ul.bullets li::before {
   content: "";
   position: absolute;
   left: 0;
-  top: 6.5pt;
+  top: 5.5pt;
   width: 4pt;
   height: 1px;
   background: #1a3a5c;
 }
 
 .skills-list {
-  margin: 3pt 0 0 0;
+  margin: 1pt 0 0 0;
   padding: 0;
   list-style: none;
-  columns: 2;
-  column-gap: 24pt;
+  columns: 3;
+  column-gap: 20pt;
 }
 
 .skills-list li {
   break-inside: avoid;
-  padding-left: 10pt;
-  margin-bottom: 2pt;
+  padding-left: 9pt;
+  margin-bottom: 1pt;
   position: relative;
-  font-size: 10pt;
+  font-size: 9.5pt;
 }
 
 .skills-list li::before {
@@ -131,9 +131,10 @@ ul.bullets li::before {
 
 .education-row,
 .cert-row {
-  margin-bottom: 2pt;
+  margin-bottom: 1pt;
   display: flex;
   justify-content: space-between;
+  font-size: 9.5pt;
 }
 
 .education-row .left,
