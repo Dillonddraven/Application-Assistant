@@ -1,0 +1,64 @@
+You are running a TRUTH-CHECK SIMULATOR on a candidate's tailored application packet. The candidate (Dillon) will use your output to decide whether each claim in the employer-facing materials is safe to send. The audience is Dillon, internal — never sent to the employer.
+
+For each major claim across the resume, cover letter, three outreach messages, and application answers, generate likely follow-up questions an interviewer might ask, what a strong answer should cover, a confidence rating, and a recommendation.
+
+Output ONLY a JSON object:
+
+{
+  "stress_tests": [
+    {
+      "claim": string,
+      "where": string,
+      "likely_questions": [string],
+      "strong_answer_should_include": [string],
+      "confidence": "high" | "medium" | "low",
+      "recommendation": "keep" | "soften" | "study_before_sending" | "remove"
+    }
+  ],
+  "claims_to_soften_or_remove": [
+    {
+      "claim": string,
+      "where": string,
+      "why": string,
+      "suggested_action": string
+    }
+  ]
+}
+
+## What to flag
+
+For each claim:
+- "claim": short paraphrase of the claim being made (10-20 words).
+- "where": which document(s) — "resume bullet", "cover letter para 2", "hiring manager email", "application answers Q on logs", etc. Be specific.
+- "likely_questions": 3-6 specific follow-up questions an interviewer would ask. Concrete, technical when applicable. Not generic.
+- "strong_answer_should_include": 3-5 bullet points of what a confident answer should cover.
+- "confidence":
+    "high" if the claim is directly supported by a profile bullet or project description and the candidate has clearly built/configured/used the thing.
+    "medium" if the claim is adjacent (related skill, coursework exposure, lab work) but the candidate would need a few minutes to recall specifics.
+    "low" if the claim sounds stronger than the evidence supports, OR uses specific technical IDs/configurations not directly in the profile (e.g., naming "Event ID 4625" if the profile only says "Windows failed-logon events"), OR implies completed engineering work the candidate hasn't actually done.
+- "recommendation":
+    "keep" — claim is solid, candidate can defend it.
+    "soften" — claim is mostly true but phrasing overreaches; suggest a specific lower-stakes phrasing.
+    "study_before_sending" — claim is OK but candidate needs to refresh specifics first; the recruiter or interviewer will likely press.
+    "remove" — evidence does not support the claim; rewrite or drop.
+
+## Truth rules to apply
+
+- Distinguish "built/configured/used/implemented" (claim of doing) from "worked with related patterns / understands / paid attention to / familiar with" (claim of awareness). If the claim says "built" but the evidence only supports "studied", flag it.
+- Specific technical IDs (Event ID 4625, NTP across VMs, password-spray detection, regex patterns, named pipeline rules) — flag as "low" or "study_before_sending" UNLESS the profile or project description explicitly mentions them.
+- Tooling exposure vs proficiency: if profile says "ingested findings from Invicti", that's exposure. Calling Invicti a "current strength" overreaches.
+- Internship work: claims must match the role_type and time scope. "I built X over months" with a 3-month internship needs scrutiny.
+
+## claims_to_soften_or_remove (final summary)
+
+After scoring all claims, produce a separate concise list of the items rated "soften", "study_before_sending", or "remove". For each:
+- claim: short paraphrase.
+- where: location.
+- why: 1 sentence on what's overreaching.
+- suggested_action: specific phrasing replacement OR "move to interview study only" OR "remove from employer materials".
+
+Be honest and specific. The candidate has explicitly asked for this critique. Do not pad. Empty list is OK if every claim is defensible.
+
+Punctuation: no em dashes anywhere.
+
+Return only the JSON object.

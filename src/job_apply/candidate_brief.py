@@ -16,10 +16,15 @@ from .llm_client import LLMClient
 from .profile_loader import Profile
 
 PROMPT_VERSION = "candidate_brief@v1"
+STRESS_TEST_PROMPT_VERSION = "claim_stress_test@v1"
 
 
 def _prompt() -> str:
     return files("job_apply.prompts").joinpath("candidate_brief.txt").read_text()
+
+
+def _stress_test_prompt() -> str:
+    return files("job_apply.prompts").joinpath("claim_stress_test.txt").read_text()
 
 
 def generate_brief(
@@ -83,6 +88,63 @@ def generate_brief(
     obj["prompt_version"] = PROMPT_VERSION
     obj["model"] = resp.model
     return obj
+
+
+def generate_stress_test(
+    *,
+    profile: Profile,
+    analyzed: dict[str, Any],
+    tailored: dict[str, Any],
+    rendered_views: dict[str, str],
+    jd_analysis: dict[str, Any] | None = None,
+    llm: LLMClient | None = None,
+) -> dict[str, Any]:
+    """Truth-check simulator for the employer-facing materials. Returns
+    structured stress-test data that gets appended to candidate_brief.md."""
+    client = llm or LLMClient()
+    parts = [
+        "PROFILE (only source of evidence for claims):",
+        json.dumps(profile.data, indent=2, default=str),
+        "",
+        "JOB POSTING:",
+        json.dumps(
+            {k: analyzed.get(k) for k in (
+                "company", "title", "required_skills", "preferred_skills",
+                "responsibilities", "required_certifications",
+            )},
+            indent=2,
+        ),
+        "",
+        "RENDERED EMPLOYER-FACING MATERIALS (everything below is what the employer will see):",
+    ]
+    for label, text in rendered_views.items():
+        parts.append(f"\n--- {label} ---")
+        parts.append(text.strip() if isinstance(text, str) else "")
+    if jd_analysis:
+        from .jd_analysis import render_for_prompt
+        rendered_jd = render_for_prompt(jd_analysis)
+        if rendered_jd:
+            parts += ["", rendered_jd]
+    user = "\n".join(parts)
+
+    resp = client.complete(
+        tier="deep",
+        system=_stress_test_prompt(),
+        user=user,
+        json_mode=True,
+        temperature=0.3,
+    )
+    obj = resp.as_json()
+    if not isinstance(obj, dict):
+        raise RuntimeError(f"stress_test returned non-object: {type(obj).__name__}")
+    return {
+        "stress_tests": [t for t in (obj.get("stress_tests") or []) if isinstance(t, dict)],
+        "claims_to_soften_or_remove": [
+            c for c in (obj.get("claims_to_soften_or_remove") or []) if isinstance(c, dict)
+        ],
+        "prompt_version": STRESS_TEST_PROMPT_VERSION,
+        "model": resp.model,
+    }
 
 
 def render_brief_md(brief: dict[str, Any]) -> str:
@@ -158,5 +220,59 @@ def render_brief_md(brief: dict[str, Any]) -> str:
         for q in brief["questions_to_ask"]:
             lines.append(f"- {q}")
         lines.append("")
+
+    # Stress test (truth-check simulator). Optional — only present if
+    # generate_stress_test() was run and merged into the brief.
+    st = brief.get("stress_test") or {}
+    tests = st.get("stress_tests") or []
+    if tests:
+        lines.append("## Claim Stress Test: Likely Interview Questions")
+        lines.append("")
+        lines.append(
+            "For each major claim in the resume, cover letter, outreach messages, "
+            "and application answers, this section gives likely interview follow-ups, "
+            "what a strong answer should cover, a confidence rating, and a recommendation. "
+            "Use it as a truth-check before sending."
+        )
+        lines.append("")
+        for t in tests:
+            claim = t.get("claim", "")
+            where = t.get("where", "")
+            conf = t.get("confidence", "?")
+            rec = t.get("recommendation", "?")
+            lines.append(f"### {claim}")
+            lines.append("")
+            lines.append(f"- **Where:** {where}")
+            lines.append(f"- **Confidence:** {conf}")
+            lines.append(f"- **Recommendation:** {rec}")
+            qs = t.get("likely_questions") or []
+            if qs:
+                lines.append(f"- **Likely follow-up questions:**")
+                for q in qs:
+                    lines.append(f"    - {q}")
+            ans = t.get("strong_answer_should_include") or []
+            if ans:
+                lines.append(f"- **A strong answer should include:**")
+                for a in ans:
+                    lines.append(f"    - {a}")
+            lines.append("")
+
+    soften = st.get("claims_to_soften_or_remove") or []
+    if soften:
+        lines.append("## Claims to Remove or Soften Before Sending")
+        lines.append("")
+        for s in soften:
+            claim = s.get("claim", "")
+            where = s.get("where", "")
+            why = s.get("why", "")
+            action = s.get("suggested_action", "")
+            lines.append(f"### {claim}")
+            lines.append("")
+            lines.append(f"- **Where:** {where}")
+            if why:
+                lines.append(f"- **Why:** {why}")
+            if action:
+                lines.append(f"- **Suggested action:** {action}")
+            lines.append("")
 
     return "\n".join(lines).rstrip() + "\n"

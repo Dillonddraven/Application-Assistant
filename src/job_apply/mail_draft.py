@@ -184,6 +184,7 @@ def packet_attachments(out_dir: Path, *, mode: str = "employer",
         internal_dir / "application_answers.md",
         internal_dir / "match_report.md",
         internal_dir / "qa_report.md",
+        internal_dir / "candidate_brief.md",
     ):
         if p.exists():
             out.append(p)

@@ -258,14 +258,24 @@ def run_tailor(
         import json as _json
         (internal_dir / "evidence_map.json").write_text(_json.dumps(jd, indent=2))
 
-    # Generate the candidate-facing interview prep brief (internal only — never sent
-    # to an employer). Generated on every packet, even if blocked, so the user can
-    # study the role + their gaps + their talking points either way.
+    # Generate the candidate-facing interview prep brief + claim stress test
+    # (both internal only, never sent to an employer). Generated on every packet,
+    # including blocked ones, so the user can study the role + their gaps + their
+    # talking points + truth-check claims either way.
     try:
         brief = candidate_brief.generate_brief(
             profile=profile, analyzed=analyzed, tailored=tailored,
             jd_analysis=jd, qa=qa, llm=client,
         )
+        try:
+            stress = candidate_brief.generate_stress_test(
+                profile=profile, analyzed=analyzed, tailored=tailored,
+                rendered_views=rendered_views, jd_analysis=jd, llm=client,
+            )
+            brief["stress_test"] = stress
+            packet["prompt_versions"]["claim_stress_test"] = stress.get("prompt_version", "")
+        except Exception as e:
+            packet["validation"]["stress_test_error"] = str(e)
         (internal_dir / "candidate_brief.md").write_text(
             candidate_brief.render_brief_md(brief)
         )
