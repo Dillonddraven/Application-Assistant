@@ -1,0 +1,848 @@
+{
+  "job_id": "e96ec639e44d",
+  "slug": "pacific-legal-foundation_data-security-analyst",
+  "run_id": "6394ddb6",
+  "tailored": {
+    "summary": "Early-career security analyst with hands-on onsite troubleshooting, access control workflow design for a healthcare nonprofit, and practical security monitoring and vulnerability reporting. Brings clear, stakeholder-ready communication and disciplined documentation across IT support and entry-level security operations.",
+    "skills_emphasis": [
+      "Network administration",
+      "Windows Server troubleshooting",
+      "Linux administration",
+      "Wireshark",
+      "Security monitoring",
+      "Vulnerability management",
+      "Authentication and MFA workflows",
+      "Security documentation",
+      "Stakeholder communication",
+      "Excel / XLSX automation",
+      "Python",
+      "Technical presentations"
+    ],
+    "bullets": [
+      {
+        "source_id": "experience.accurate_interpretations_intern.b1",
+        "text": "Built and maintained secure computer networks onsite and troubleshot performance and connectivity issues for users."
+      },
+      {
+        "source_id": "experience.accurate_interpretations_intern.b2",
+        "text": "Performed network traffic analysis with Wireshark to identify anomalies, support troubleshooting, and strengthen secure operations."
+      },
+      {
+        "source_id": "experience.nonprofit_health_consultant.b3",
+        "text": "Designed a low-cost SMS MFA workflow using Twilio Verify, tokenized links, and database-backed forms to strengthen access control for monitor and client information."
+      },
+      {
+        "source_id": "experience.security_automation_projects.b2",
+        "text": "Built monitoring and approval-gate workflows to detect automation failures, flag risky actions, and route remediation steps through human review."
+      },
+      {
+        "source_id": "experience.dillards_intern.b1",
+        "text": "Helped build a SAST reporting workflow that converted GitLab findings into clear Excel reports with severity breakdowns, team and repository views, and visual summaries for stakeholders."
+      },
+      {
+        "source_id": "experience.dillards_intern.b4",
+        "text": "Translated technical vulnerability findings into actionable reporting for decision-makers."
+      },
+      {
+        "source_id": "experience.nonprofit_health_consultant.b2",
+        "text": "Presented migration risks, security considerations, and rollout recommendations to technical and non-technical stakeholders."
+      }
+    ],
+    "cover_letter_paragraphs": [
+      {
+        "source_id": "general",
+        "text": "I am an early-career security analyst who pairs hands-on IT troubleshooting with practical security operations. My background includes onsite network support, designing access control workflows for a healthcare nonprofit, and turning vulnerability data into clear, stakeholder-ready guidance."
+      },
+      {
+        "source_id": "experience.dillards_intern",
+        "text": "At Dillard's I focused on the layer between raw scanner output and the people who have to act on it. I translated findings into reports that let teams see severity and ownership at a glance, so they could prioritize remediation without digging through raw scans or mismatched exports."
+      },
+      {
+        "source_id": "general",
+        "text": "I built a centralized logging lab that produced practical alerting on authentication activity, which made it easier to spot issues quickly and start triage with context. For a nonprofit client I also helped leadership plan stronger access safeguards with an SMS-based MFA approach that fit their budget and reduced risk from shared or weak credentials."
+      },
+      {
+        "source_id": "general",
+        "text": "I can provide a sanitized mockup of the vulnerability reporting format and a simple diagram of the SMS MFA flow. I am available this week on Wednesday or Thursday between 1 and 4 pm ET to discuss how this experience would support PLF's DC office."
+      }
+    ],
+    "application_answers": [
+      {
+        "question": "How has your education and project work prepared you for this entry-level role?",
+        "source_id": "reusable_answers.how_coursework_prepared_me",
+        "answer": "My coursework targeted what entry-level analysts actually do day-to-day. In an incident-response course I built a playbook that started from a business impact analysis, identified sales as the client's essential function and sequenced infrastructure-restoration steps so sales-supporting systems came back online first. I also designed a tiered cloud backup schedule that placed frequently accessed data in fast-retrieval storage and infrequently accessed data in cheaper archival tiers, balancing recovery time against ongoing cost. Combined with my Dillard's internship work on SAST ingestion and vulnerability reporting, my Graylog/OpenSearch centralized logging lab (rsyslog and NXLog forwarding with sudo/auth and failed-logon alerts), Wireshark-based traffic analysis from the Accurate Interpretations role, and CMMC v2 / NIST SP 800-171 documentation work, I'm coming in ready to monitor events, triage findings, and escalate when needed."
+      },
+      {
+        "question": "Describe your experience with security monitoring and logs.",
+        "source_id": "reusable_answers.security_logs_experience",
+        "answer": "In a secure systems administration lab, I configured log forwarding from Linux and Windows endpoints into a centralized logging environment. This gave me hands-on experience validating event ingestion, reviewing authentication activity, and troubleshooting cases where expected events were not appearing. I also built a Python script to classify log entries into clearer categories, which improved visibility into system activity and made it easier to identify security-relevant patterns. That experience helped me understand the full monitoring workflow: generating events, forwarding logs, validating collection, classifying activity, and using the results to support investigation."
+      },
+      {
+        "question": "Describe your experience turning vulnerability data into remediation guidance.",
+        "source_id": "reusable_answers.vulnerability_assessment_experience",
+        "answer": "I have direct experience turning vulnerability data into remediation guidance. During my information security internship, I helped build a SAST reporting workflow that ingested findings from company GitLab repositories and converted raw scan output into clean Excel reports with severity breakdowns, team/repository views, and visual summaries. The value was not just collecting vulnerabilities, it was making them understandable. The reports gave stakeholders a clearer view into active vulnerabilities across GitLab repos and helped them prioritize remediation based on severity, ownership, and visibility instead of sorting through raw scanner output."
+      },
+      {
+        "question": "Are you authorized to work in the United States?",
+        "source_id": "reusable_answers.authorized_to_work",
+        "answer": "Yes, US citizen, no sponsorship required."
+      },
+      {
+        "question": "What relevant certifications do you hold?",
+        "source_id": "general",
+        "answer": "CompTIA Network+. CompTIA Security+."
+      }
+    ]
+  },
+  "rendered": {
+    "employer": {
+      "tailored_resume_pdf": "employer/tailored_resume.pdf",
+      "tailored_resume_docx": "employer/tailored_resume.docx",
+      "cover_letter_pdf": "employer/cover_letter.pdf",
+      "cover_letter_docx": "employer/cover_letter.docx"
+    },
+    "internal": {
+      "tailored_resume_md": "internal/tailored_resume.md",
+      "cover_letter_md": "internal/cover_letter.md",
+      "application_answers_md": "internal/application_answers.md",
+      "outreach_recruiter_md": "internal/outreach_recruiter.md",
+      "outreach_hiring_manager_md": "internal/outreach_hiring_manager.md",
+      "linkedin_dm_md": "internal/linkedin_dm.md",
+      "match_report_md": "internal/match_report.md"
+    }
+  },
+  "emails": {
+    "recruiter": {
+      "subject": "Data Security Analyst - Centralized Logging Lab",
+      "body_paragraphs": [
+        {
+          "source_id": "job_posting",
+          "text": "I applied to Pacific Legal Foundation's Data Security Analyst role, aligning with \"Supporting monitoring activities to identify anomalies, inappropriate data access, or potential policy violations\"."
+        },
+        {
+          "source_id": "proj_centralized_logging_lab",
+          "text": "Built the Centralized Logging Lab (Graylog + OpenSearch + MongoDB) with rsyslog and NXLog forwarding and alerts for Linux sudo/auth and Windows failed-logon events."
+        },
+        {
+          "source_id": "cta",
+          "text": "I can share a one-page lab summary, and I am open to a 15-minute call next Tuesday or Wednesday afternoon; are you the right contact for this role, or could you point me to the right person? Thanks, Dillon Stinson"
+        }
+      ],
+      "cited_items": [
+        "proj_centralized_logging_lab"
+      ],
+      "_model": "gpt-5"
+    },
+    "hiring_manager": {
+      "subject": "Data Security Analyst at Pacific Legal Foundation - Graylog alerts",
+      "body_paragraphs": [
+        {
+          "source_id": "proj_centralized_logging_lab",
+          "text": "For the Data Security Analyst role, your posting calls for someone to 'Support monitoring for anomalies and policy violations', which maps to my Centralized Logging Lab deploying Graylog with rsyslog/NXLog and alerting on sudo/auth and Windows failed-logon events."
+        },
+        {
+          "source_id": "proj_centralized_logging_lab",
+          "text": "I sent Windows logs via NXLog in GELF format to keep fields like event_id, logon_type, and target_user intact, while Linux used Syslog for lower overhead. Early on, timestamp mismatches between hosts made sequences look out of order; setting everything to UTC in Graylog and the forwarders fixed correlation. I also filtered known-noisy services so alerts focused on repeated failed logons and sudo misuse, not background chatter."
+        },
+        {
+          "source_id": "proj_centralized_logging_lab",
+          "text": "I can share a one-page lab writeup with the docker-compose, inputs, and alert logic; is 20 minutes on Wednesday next week, 11:00 to 11:20 ET, workable?"
+        }
+      ],
+      "cited_items": [
+        "proj_centralized_logging_lab"
+      ],
+      "_model": "gpt-5"
+    },
+    "linkedin_dm": {
+      "text": "Data Security Analyst role; Serve as primary IT support for DC office staff maps to my onsite troubleshooting work. At Accurate Interpretations I built and maintained secure networks and resolved connectivity issues, backed by CompTIA Network+. Are you the right person to talk to about this?",
+      "cited_items": [
+        "accurate_interpretations_intern.b1"
+      ],
+      "_model": "gpt-5"
+    }
+  },
+  "validation": {
+    "fabrication_blocks": [],
+    "fabrication_warnings": [
+      {
+        "rule": "strong_adjective",
+        "detail": "strong-claim phrase 'lead' detected \u2014 verify it matches profile reality",
+        "source_id": null
+      }
+    ],
+    "schema_ok": true,
+    "qa": {
+      "issues": [
+        {
+          "category": "evidence_gap",
+          "severity": "high",
+          "where": "outreach_recruiter / linkedin_dm",
+          "snippet": "Serve as primary IT support for DC office staff maps to my onsite troubleshooting work.",
+          "fix_suggestion": "Don't imply you can be the 'primary' onsite IT contact without showing sustained helpdesk ownership. Either remove the 'primary' framing or add concrete evidence (ticketing system used, typical ticket volume, examples of onboarding/offboarding tasks you handled, asset tagging/checkout lists you maintained, or that you staffed an office helpdesk shift)."
+        },
+        {
+          "category": "evidence_gap",
+          "severity": "high",
+          "where": "tailored_resume (Experience & Skills)",
+          "snippet": "No mention of hardware inventory, device lifecycle, asset tagging, MDM, or managing peripherals in Experience or Skills.",
+          "fix_suggestion": "The JD asks explicitly for hardware inventory/device lifecycle work. If you have any experience (even limited) \u2014 add a bullet: e.g., 'Maintained asset inventory (XX devices) using [tool/Excel sheet], prepared devices for new hires, handled returns/wiping and redeployment.' If you don't, remove or avoid claiming hardware-related responsibilities in outreach/cover materials and state willingness to learn or train on asset management systems."
+        },
+        {
+          "category": "evidence_gap",
+          "severity": "high",
+          "where": "cover_letter / tailored_resume",
+          "snippet": "Coordinating onboarding logistics including parking passes, metro cards, and physical security access (key fobs) \u2014 no supporting examples in materials.",
+          "fix_suggestion": "Don't suggest you handle logistical onboarding items unless you can cite specific examples. Either add a short example (e.g., 'Coordinated issuing of keycards and temporary access for X new hires') or rephrase to focus on technical provisioning experience you do have (MFA, account provisioning workflows) and state you can coordinate with facilities/security on physical access."
+        },
+        {
+          "category": "overclaiming",
+          "severity": "medium",
+          "where": "cover_letter / application_answers",
+          "snippet": "\"I built a centralized logging lab that produced practical alerting on authentication activity...\" (presented as production-ready capability)",
+          "fix_suggestion": "Clarify scope: if this was a personal lab, label it as a lab/project (e.g., 'personal Graylog/OpenSearch lab') and note its scale and purpose. Employers care whether tooling was run in production, supported real users, or was a proof-of-concept. State limits (number of hosts, simulated vs real traffic) or tie it to a measurable outcome."
+        },
+        {
+          "category": "redundancy",
+          "severity": "low",
+          "where": "cover_letter / outreach_hiring_manager / application_answers",
+          "snippet": "Multiple near-identical descriptions of the 'centralized logging lab' and Graylog alerting appear across documents.",
+          "fix_suggestion": "Consolidate: keep one concise, consistent phrasing of the Graylog/centralized logging project in the resume, and in other documents reference it briefly with an offer to share the one-page lab writeup. This reduces repetition and lets each document highlight a different strength."
+        },
+        {
+          "category": "tone",
+          "severity": "low",
+          "where": "cover_letter",
+          "snippet": "\"I am available this week on Wednesday or Thursday between 1 and 4 pm ET to discuss how this experience would support PLF's DC office.\"",
+          "fix_suggestion": "Avoid overly prescriptive availability in an initial cover letter. Offer general availability windows or say 'I'd welcome a conversation \u2014 I'm flexible and can accommodate your schedule' or ask them to suggest times."
+        }
+      ],
+      "overall_polish": "needs_work",
+      "prompt_version": "qa_check@v1",
+      "model": "gpt-5-mini"
+    }
+  },
+  "status": "draft",
+  "approval_log": [
+    {
+      "ts": "2026-05-01T17:28:48+00:00",
+      "action": "draft"
+    }
+  ],
+  "prompt_versions": {
+    "tailor": "tailor_resume@v1",
+    "recruiter": "write_email_recruiter@v2",
+    "hiring_manager": "write_email_hiring_manager@v2",
+    "linkedin_dm": "write_linkedin_dm@v2",
+    "jd_analysis": "extract_jd_analysis@v1",
+    "qa_check": "qa_check@v1",
+    "claim_stress_test": "claim_stress_test@v1",
+    "candidate_brief": "candidate_brief@v1"
+  },
+  "model": "gpt-5",
+  "jd_analysis": {
+    "pain_points": [
+      {
+        "text": "Provide primary IT support for DC office staff including troubleshooting and resolving general technical issues",
+        "jd_anchor": "Serve as primary IT support for DC office staff",
+        "stakes": "Ensuring smooth daily operations and minimizing downtime for office staff is critical to maintaining productivity and supporting the organization's mission."
+      },
+      {
+        "text": "Manage IT hardware inventory and device lifecycle to ensure availability and prevent waste",
+        "jd_anchor": "Manage IT hardware inventory: monitors, keyboards & mice, cables, and other peripherals",
+        "stakes": "Proper hardware management prevents resource shortages and supports efficient onboarding and offboarding processes."
+      },
+      {
+        "text": "Assist with onboarding and separation workflows including provisioning and deprovisioning system access and coordinating physical security access",
+        "jd_anchor": "Coordinate onboarding logistics including parking passes, metro cards, and physical security access (key fobs)",
+        "stakes": "Accurate and timely access control during onboarding and separation protects organizational data and reduces security risks."
+      },
+      {
+        "text": "Support monitoring activities to identify anomalies, inappropriate data access, or potential policy violations",
+        "jd_anchor": "Supporting monitoring activities to identify anomalies, inappropriate data access, or potential policy violations",
+        "stakes": "Early detection of security incidents is essential to prevent data breaches and maintain compliance."
+      },
+      {
+        "text": "Help maintain security documentation and incident response materials to support security operations",
+        "jd_anchor": "Helping maintain PLF\u2019s access control program by assisting with least-privilege reviews, entitlement checks, and regular access audits",
+        "stakes": "Up-to-date documentation and access reviews ensure effective security governance and compliance with policies."
+      },
+      {
+        "text": "Communicate effectively with non-technical staff to explain technical concepts and support security awareness and compliance activities",
+        "jd_anchor": "Excellent communication skills and professional fluency in English (written and verbal) to effectively handle documentation, incident response, and explain technical concepts to non-technical staff",
+        "stakes": "Clear communication fosters user compliance, reduces security risks, and supports organizational security culture."
+      }
+    ],
+    "evidence_map": [
+      {
+        "pain_point_index": 0,
+        "candidate_evidence": [
+          {
+            "source_id": "nonprofit_health_consultant.b2",
+            "summary": "Presented migration risks and security considerations to technical and non-technical stakeholders, demonstrating communication and support skills.",
+            "match_strength": "adjacent"
+          },
+          {
+            "source_id": "accurate_interpretations_intern.b1",
+            "summary": "Built and maintained secure computer networks onsite while troubleshooting performance and connectivity issues.",
+            "match_strength": "strong"
+          },
+          {
+            "source_id": "accurate_interpretations_intern.b2",
+            "summary": "Performed network traffic analysis to support troubleshooting and strengthen secure operations.",
+            "match_strength": "adjacent"
+          }
+        ]
+      },
+      {
+        "pain_point_index": 1,
+        "candidate_evidence": [
+          {
+            "source_id": "nonprofit_health_consultant.b3",
+            "summary": "Designed secure access workflows including tokenized links and database-backed forms, showing experience managing secure systems and related resources.",
+            "match_strength": "adjacent"
+          }
+        ]
+      },
+      {
+        "pain_point_index": 2,
+        "candidate_evidence": [
+          {
+            "source_id": "nonprofit_health_consultant.b1",
+            "summary": "Mapped workflows and tech environment to security and implementation risks during a planned migration, indicating understanding of onboarding and access control risks.",
+            "match_strength": "adjacent"
+          },
+          {
+            "source_id": "nonprofit_health_consultant.b3",
+            "summary": "Designed SMS MFA workflow to strengthen access control, showing practical experience with access provisioning.",
+            "match_strength": "strong"
+          }
+        ]
+      },
+      {
+        "pain_point_index": 3,
+        "candidate_evidence": [
+          {
+            "source_id": "security_automation_projects.b1",
+            "summary": "Designed security automation workflows for vulnerability discovery and remediation tracking with alerting and approval gates.",
+            "match_strength": "strong"
+          },
+          {
+            "source_id": "security_automation_projects.b2",
+            "summary": "Built monitoring and approval-gate workflows to detect automation failures and flag risky actions.",
+            "match_strength": "strong"
+          },
+          {
+            "source_id": "proj_centralized_logging_lab",
+            "summary": "Deployed centralized logging with alert conditions for authentication and failed logon events.",
+            "match_strength": "strong"
+          }
+        ]
+      },
+      {
+        "pain_point_index": 4,
+        "candidate_evidence": [
+          {
+            "source_id": "dillards_intern.b1",
+            "summary": "Helped build SAST reporting workflow converting raw scanner output into clean reports with severity breakdowns and stakeholder views.",
+            "match_strength": "strong"
+          },
+          {
+            "source_id": "dillards_intern.b4",
+            "summary": "Translated technical vulnerability findings into actionable reporting for decision-makers.",
+            "match_strength": "strong"
+          },
+          {
+            "source_id": "nonprofit_health_consultant.b2",
+            "summary": "Presented migration risks and rollout recommendations to stakeholders, supporting documentation and communication.",
+            "match_strength": "adjacent"
+          }
+        ]
+      },
+      {
+        "pain_point_index": 5,
+        "candidate_evidence": [
+          {
+            "source_id": "dillards_intern.b4",
+            "summary": "Translated technical vulnerability findings into actionable reporting for decision-makers, demonstrating communication skills.",
+            "match_strength": "strong"
+          },
+          {
+            "source_id": "nonprofit_health_consultant.b2",
+            "summary": "Presented technical and non-technical stakeholders with security considerations, showing ability to explain technical concepts clearly.",
+            "match_strength": "strong"
+          }
+        ]
+      }
+    ],
+    "missing_evidence": [
+      {
+        "pain_point_index": 1,
+        "note": "No direct evidence of managing IT hardware inventory and device lifecycle; closest is secure access workflow design but not hardware inventory."
+      }
+    ],
+    "prompt_version": "extract_jd_analysis@v1",
+    "model": "gpt-4.1-mini"
+  },
+  "blocked": true,
+  "block_reasons": {
+    "high_qa_issues": [
+      {
+        "category": "evidence_gap",
+        "where": "outreach_recruiter / linkedin_dm",
+        "snippet": "Serve as primary IT support for DC office staff maps to my onsite troubleshooting work.",
+        "fix_suggestion": "Don't imply you can be the 'primary' onsite IT contact without showing sustained helpdesk ownership. Either remove the 'primary' framing or add concrete evidence (ticketing system used, typical ticket volume, examples of onboarding/offboarding tasks you handled, asset tagging/checkout lists you maintained, or that you staffed an office helpdesk shift)."
+      },
+      {
+        "category": "evidence_gap",
+        "where": "tailored_resume (Experience & Skills)",
+        "snippet": "No mention of hardware inventory, device lifecycle, asset tagging, MDM, or managing peripherals in Experience or Skills.",
+        "fix_suggestion": "The JD asks explicitly for hardware inventory/device lifecycle work. If you have any experience (even limited) \u2014 add a bullet: e.g., 'Maintained asset inventory (XX devices) using [tool/Excel sheet], prepared devices for new hires, handled returns/wiping and redeployment.' If you don't, remove or avoid claiming hardware-related responsibilities in outreach/cover materials and state willingness to learn or train on asset management systems."
+      },
+      {
+        "category": "evidence_gap",
+        "where": "cover_letter / tailored_resume",
+        "snippet": "Coordinating onboarding logistics including parking passes, metro cards, and physical security access (key fobs) \u2014 no supporting examples in materials.",
+        "fix_suggestion": "Don't suggest you handle logistical onboarding items unless you can cite specific examples. Either add a short example (e.g., 'Coordinated issuing of keycards and temporary access for X new hires') or rephrase to focus on technical provisioning experience you do have (MFA, account provisioning workflows) and state you can coordinate with facilities/security on physical access."
+      }
+    ],
+    "fabrication_blocks": []
+  },
+  "candidate_brief": {
+    "role_company_summary": "Pacific Legal Foundation is a legal nonprofit. This Data Security Analyst role blends front-line IT support for the DC office with entry-level security operations tasks like access control, onboarding and separation logistics, monitoring for anomalies, and maintaining security documentation. The stack likely involves Microsoft 365 and an identity platform such as Okta or Azure AD, plus ticketing and EDR tools as noted in the JD. Hybrid presence in Arlington is expected.",
+    "why_this_role_fits": "Your onsite troubleshooting at Accurate Interpretations maps well to being the go-to helper for day-to-day tech issues. The nonprofit healthcare capstone where you designed an SMS MFA workflow shows you understand access control, onboarding considerations, and budget-aware security. Your Graylog lab and security automation projects demonstrate monitoring fundamentals and alerting, which the JD calls out. The Dillard's internship shows you can turn technical findings into clear, stakeholder-ready documentation, which helps with incident response materials and access reviews. You do not yet have ticketing or M365/Okta admin experience, so frame that as a fast ramp area.",
+    "top_three_talking_points": [
+      "Onsite troubleshooting experience: at Accurate Interpretations I maintained networks, configured firewalls and switches, and used Wireshark to diagnose user connectivity issues.",
+      "Access control design: for a healthcare nonprofit I built a Twilio Verify SMS MFA and tokenized link workflow in WordPress/PHP and presented rollout recommendations to leadership.",
+      "Security fundamentals with evidence: CompTIA Network+ and Security+, plus a Graylog lab I built with Linux and Windows log forwarding and alerts on sudo/auth and failed logons."
+    ],
+    "resume_emphasis": "This version leads with hands-on support and practical security: onsite network troubleshooting, access control design for a nonprofit, and clear reporting from the Dillard's internship. It intentionally avoids claiming hardware inventory or ticketing system ownership since there is no current evidence, while still showing strong documentation and monitoring fundamentals.",
+    "cover_letter_emphasis": "The letter positions you as a steady first-line helper who brings security discipline to onboarding, access reviews, and incident documentation. It cites the SAST reporting pipeline and the personal Graylog lab as concrete examples and offers sanitized artifacts to show work quality. It does not over-promise on hardware inventory or M365 admin, and instead signals a fast learning curve on those tools.",
+    "claims_to_be_ready_to_explain": [
+      {
+        "claim": "Designed a low-cost SMS MFA workflow using Twilio Verify, tokenized links, and database-backed forms.",
+        "where": "Resume bullet and project: WordPress Secure Access + SMS MFA",
+        "supporting_detail": "Be ready to diagram the flow: enrollment, verification, token generation, token TTL, storage, and recovery options; note it was HIPAA-aligned design for a small nonprofit and costs were estimated using Twilio published rates and projected volumes."
+      },
+      {
+        "claim": "Helped build a SAST reporting workflow that converted GitLab findings into clear Excel reports.",
+        "where": "Dillard's internship bullets and project: SAST Vulnerability Reporting + Excel Automation",
+        "supporting_detail": "Walk through inputs and outputs: parsers used, severity normalization, team and repo mapping, OpenPyXL formatting, and how stakeholders used the summary tabs to prioritize remediation."
+      },
+      {
+        "claim": "Deployed a centralized logging lab with alert conditions for Linux sudo/auth and Windows failed-logon events.",
+        "where": "Project: Centralized Logging Lab (Graylog + OpenSearch + MongoDB)",
+        "supporting_detail": "Clarify scope: personal Proxmox lab, number and types of hosts, rsyslog and NXLog configs, example alert queries, and how you validated ingestion versus simulated events."
+      },
+      {
+        "claim": "Built monitoring and approval-gate workflows to detect automation failures and flag risky actions for human review.",
+        "where": "Security Automation Projects and Command Broker project",
+        "supporting_detail": "Explain the guardrails: HMAC-signed requests, allowlists, path normalization, never-touch paths, TTL, audit logs, and a simple human-in-the-loop queue for approvals."
+      },
+      {
+        "claim": "Built and maintained secure computer networks onsite and troubleshot performance and connectivity issues.",
+        "where": "Accurate Interpretations internship",
+        "supporting_detail": "Provide concrete examples of tasks performed: basic firewall rule updates, switch port configuration, DHCP or DNS troubleshooting, and using Wireshark packet captures to isolate issues."
+      },
+      {
+        "claim": "Supported secure code training efforts to help developers meet PCI expectations.",
+        "where": "Dillard's internship bullet",
+        "supporting_detail": "Describe your role as support: helping assemble or circulate materials, answering basic questions, or tracking participation, not owning PCI program decisions."
+      }
+    ],
+    "weak_spots_or_gaps": [
+      {
+        "gap": "No hands-on experience with a ticketing system like ServiceNow, Zendesk, or Freshdesk.",
+        "honest_answer": "I have not run a formal ticket queue yet. I understand triage, documentation, and SLAs conceptually from internships and projects, and I can ramp quickly on your platform. If helpful, I can complete a short admin or agent course before start and mirror an experienced teammate for my first two weeks."
+      },
+      {
+        "gap": "No direct hardware inventory or device lifecycle ownership, and no MDM experience.",
+        "honest_answer": "I have not owned an asset inventory or Intune/Jamf. I am detail oriented with spreadsheets and process docs, and I am ready to learn your asset tagging, checkout, and wipe-redeploy process. I would start by following your current SOPs, then help tighten them with clear checklists."
+      },
+      {
+        "gap": "Limited admin experience with Microsoft 365, Azure AD/Entra, Okta, Salesforce, or Intune.",
+        "honest_answer": "My access control work is real, but not on those enterprise platforms. I am studying identity fundamentals and can complete vendor fundamentals training early on. I would like to shadow your provisioning and deprovisioning flows in my first weeks to learn the specifics."
+      },
+      {
+        "gap": "EDR or DLP tools only at awareness level, not production ownership.",
+        "honest_answer": "I have awareness of EDR and DLP concepts but have not administered them. I can learn your tool quickly and focus on following playbooks, capturing the right details, and escalating cleanly."
+      },
+      {
+        "gap": "Primary help desk ownership and 1 to 3 years of direct IT support is not yet met.",
+        "honest_answer": "I am early career. What I bring is hands-on troubleshooting, clear communication, and strong documentation habits. I am comfortable being front line with users and asking for help when needed."
+      },
+      {
+        "gap": "Hybrid Arlington requirement vs current location in Tulsa.",
+        "honest_answer": "I am currently in Tulsa. Can you share the hybrid schedule and timeline expectations for being onsite in Arlington? If relocation is required, I would want to discuss timing and whether a short remote ramp-in is acceptable."
+      }
+    ],
+    "thirty_second_interest_answer": "I like this role because it mixes real support for people with practical security. I have onsite troubleshooting experience, I have built access control workflows for a nonprofit, and I am comfortable documenting issues and closing the loop with users. I can help your DC staff stay productive, keep access clean during onboarding and separation, and contribute to monitoring and incident materials. I am Security+ and Network+ certified and ready to ramp on your ticketing, identity, and M365 stack.",
+    "sixty_second_background_walkthrough": "I am finishing a BS in Computer Information Systems with a Cybersecurity minor and an MS in Cybersecurity at the University of Tulsa. I hold CompTIA Network+ and Security+. My onsite support experience comes from a technical operations internship where I maintained networks, configured firewalls and switches, and used Wireshark for troubleshooting. At Dillard\u2019s I helped build a SAST reporting pipeline that turned raw GitLab findings into clear Excel reports for remediation and supported secure code training for PCI. For a healthcare nonprofit capstone I designed an SMS-based MFA and tokenized link workflow in WordPress and presented rollout recommendations. I also built a personal Graylog lab with Linux and Windows forwarding and alerts on authentication activity, and I have documentation experience mapping controls to NIST SP 800-171. I want to bring that mix of hands-on support, access control awareness, and clean documentation to your DC office and ramp quickly on your tools.",
+    "questions_to_ask": [
+      "What ticketing system do you use today, and what does a typical daily ticket volume look like for the DC office?",
+      "Which identity stack powers access control (Okta vs Azure AD/Entra), and how are onboarding and separation requests initiated and tracked?",
+      "How do you manage hardware inventory and device lifecycle today, and is Intune or another MDM in place for provisioning and wiping devices?",
+      "What security tools do analysts touch day to day (EDR, email security, DLP), and what are the top two or three common incidents or requests?",
+      "How will you define success for this role in the first 30, 60, and 90 days, especially around documentation quality and response times?",
+      "What parts of the job are most time sensitive during business hours, and is there any after-hours on-call or escalation rotation?",
+      "How is the split managed between IT support tasks and security operations or documentation work over a typical week?",
+      "For the hybrid requirement, what onsite schedule do you expect and what timeline do you have in mind for someone not yet in Arlington?"
+    ],
+    "prompt_version": "candidate_brief@v1",
+    "model": "gpt-5",
+    "stress_test": {
+      "stress_tests": [
+        {
+          "claim": "Hands-on onsite troubleshooting supporting users and small-office networks in production settings.",
+          "where": "tailored_resume summary; Accurate Interpretations experience bullet 1; linkedin_dm",
+          "likely_questions": [
+            "What types of issues did you troubleshoot most often and how many users/devices?",
+            "Walk me through a difficult connectivity problem you solved end to end.",
+            "Which tools did you rely on (Wireshark, iperf, Event Viewer) and why?",
+            "How did you document fixes and communicate next steps to non-technical users?"
+          ],
+          "strong_answer_should_include": [
+            "Environment scope (number of users, ISP, firewall, switches, WiFi) and ticket categories",
+            "Concrete troubleshooting steps and data (packet captures, interface stats, logs) to isolate root cause",
+            "Specific tools and commands used and how they informed decisions",
+            "User communication, documentation, and prevention steps implemented afterward"
+          ],
+          "confidence": "high",
+          "recommendation": "keep"
+        },
+        {
+          "claim": "Designed low-cost Twilio Verify SMS MFA with tokenized links and database-backed forms.",
+          "where": "tailored_resume Nonprofit Healthcare Organization bullet 1; cover_letter para 3; project 'WordPress Secure Access + SMS MFA + Monitor Workflow'",
+          "likely_questions": [
+            "Why choose SMS MFA and what risks did you mitigate (SIM swap, OTP reuse)?",
+            "Describe the Twilio Verify integration flow, error handling, and fallback options.",
+            "How were tokenized links generated, stored, expired, and validated in PHP/MySQL?",
+            "How did you estimate monthly cost and protect any PII in transit and at rest?"
+          ],
+          "strong_answer_should_include": [
+            "Design rationale vs alternatives and compensating controls (short TTLs, rate limits, recovery)",
+            "Twilio Verify API steps, webhook/verification checks, and error paths",
+            "Token lifecycle: generation, hashing/storage, single use, expiry, audit logging",
+            "Rough cost model and data protection measures aligned to HIPAA considerations"
+          ],
+          "confidence": "high",
+          "recommendation": "keep"
+        },
+        {
+          "claim": "Presented migration risks and rollout recommendations to technical and non-technical stakeholders.",
+          "where": "tailored_resume Nonprofit Healthcare Organization bullet 2; cover_letter para 2",
+          "likely_questions": [
+            "What were the top three risks you identified and how did you assess impact/likelihood?",
+            "What artifacts did you produce (risk register, comms plan, diagrams) and who used them?",
+            "Describe a recommendation leadership adopted and its outcome.",
+            "How did you tailor messaging differently for technical vs non-technical audiences?"
+          ],
+          "strong_answer_should_include": [
+            "Specific risk categories with examples and rationale",
+            "Artifacts produced and how they informed decisions or phased rollout",
+            "A concrete decision changed or confirmed based on your input",
+            "Approach to simplifying language and highlighting escalation paths"
+          ],
+          "confidence": "high",
+          "recommendation": "keep"
+        },
+        {
+          "claim": "Built monitoring and approval-gate workflows to flag risky automation and require human review.",
+          "where": "tailored_resume Security Automation Projects bullet; projects 'AI Agent Mission Control' and 'Privileged Command Broker'",
+          "likely_questions": [
+            "What qualifies as a risky action and how is it detected?",
+            "How are approvals enforced technically and audited afterward?",
+            "Describe the HMAC signing flow and key management approach.",
+            "How did you prevent path traversal or shell metacharacter abuse?"
+          ],
+          "strong_answer_should_include": [
+            "Concrete risky-action rules and failure-detection triggers",
+            "Approval queue, role requirements, and audit log contents",
+            "HMAC-SHA256 request signing, nonce/TTL, secret storage",
+            "Allowlist, realpath normalization, forbidden paths, and metacharacter filtering"
+          ],
+          "confidence": "high",
+          "recommendation": "keep"
+        },
+        {
+          "claim": "Built centralized logging lab with Graylog, rsyslog, NXLog, and auth-event alerting.",
+          "where": "cover_letter para 3; outreach_recruiter; project 'Centralized Logging Lab (Graylog + OpenSearch + MongoDB)'",
+          "likely_questions": [
+            "Outline the architecture and inputs you configured in Graylog.",
+            "Show an example alert for sudo misuse or repeated failed logons.",
+            "How did you test event generation on Linux and Windows endpoints?",
+            "What steps did you take to reduce noise and false positives?"
+          ],
+          "strong_answer_should_include": [
+            "Docker Compose services, Syslog UDP and GELF inputs, rsyslog/NXLog config overview",
+            "Concrete alert conditions and thresholds tied to auth events",
+            "Methods for generating test events and validating ingestion",
+            "Basic tuning steps (streams, filters, suppression criteria) and rationale"
+          ],
+          "confidence": "high",
+          "recommendation": "keep"
+        },
+        {
+          "claim": "Used NXLog with GELF to preserve fields like event_id, logon_type, and target_user.",
+          "where": "outreach_hiring_manager email paragraph 2",
+          "likely_questions": [
+            "Show the NXLog config snippet you used to send GELF to Graylog.",
+            "Which Windows channels and event IDs did you subscribe to and why?",
+            "How does GELF mapping keep structured fields intact in Graylog streams?",
+            "What logon types indicate RDP vs interactive sessions and how did you use that?"
+          ],
+          "strong_answer_should_include": [
+            "Concrete NXLog configuration and Graylog GELF input settings",
+            "Subscribed channels (e.g., Security) and the targeted auth events",
+            "Explanation of field mapping and downstream query examples",
+            "Interpretation of logon types and how alerts leveraged them"
+          ],
+          "confidence": "medium",
+          "recommendation": "study_before_sending"
+        },
+        {
+          "claim": "Resolved timestamp mismatches by standardizing everything to UTC in Graylog and forwarders.",
+          "where": "outreach_hiring_manager email paragraph 2",
+          "likely_questions": [
+            "Where did you configure timezone or timestamp handling in NXLog and rsyslog?",
+            "Which Graylog settings affected timestamp parsing and display?",
+            "How did you verify correct ordering and handle daylight saving time?",
+            "Did you adjust host clocks or only transform timestamps in transit?"
+          ],
+          "strong_answer_should_include": [
+            "Specific config locations or directives for time normalization",
+            "Graylog extractor or processing details for timestamps",
+            "Verification steps (test events, correlation checks, dashboards)",
+            "Clear statement on host time settings vs transformation and why"
+          ],
+          "confidence": "medium",
+          "recommendation": "study_before_sending"
+        },
+        {
+          "claim": "Filtered noisy services so alerts focused on repeated failed logons and sudo misuse.",
+          "where": "outreach_hiring_manager email paragraph 2",
+          "likely_questions": [
+            "Which services or event sources were the main noise drivers and how identified?",
+            "Show an example filter or pipeline rule you wrote to suppress noise.",
+            "How did you avoid suppressing truly suspicious events?",
+            "What metrics did you use to measure alert quality improvements?"
+          ],
+          "strong_answer_should_include": [
+            "Named noisy sources and evidence from log volume patterns",
+            "Sample Graylog pipeline rule or stream filter and its logic",
+            "Safeguards like thresholds, allowlists, or exception routes",
+            "Before/after alert counts or precision improvements, even if approximate"
+          ],
+          "confidence": "medium",
+          "recommendation": "study_before_sending"
+        },
+        {
+          "claim": "Helped build a GitLab SAST-to-Excel workflow with severity, team, and repo summaries.",
+          "where": "tailored_resume Dillard's bullet 1; cover_letter para 2; project 'SAST Vulnerability Reporting + Excel Automation'",
+          "likely_questions": [
+            "Which GitLab APIs or artifacts did you pull and in what format?",
+            "How did you normalize severities and handle duplicates across scans?",
+            "How did you map findings to teams and repositories reliably?",
+            "What did the Excel deliverable include (tabs, charts, pivots) and how often delivered?"
+          ],
+          "strong_answer_should_include": [
+            "Specific endpoints or artifacts and fields extracted into JSON/CSV",
+            "Severity normalization rules and deduping approach",
+            "Team-to-repo mapping source and join logic",
+            "OpenPyXL techniques for formatting, summaries, and distribution cadence"
+          ],
+          "confidence": "high",
+          "recommendation": "keep"
+        },
+        {
+          "claim": "Translated technical vulnerability findings into actionable reporting for decision-makers.",
+          "where": "tailored_resume Dillard's bullet 2; cover_letter para 2",
+          "likely_questions": [
+            "Give an example finding and how you made it actionable.",
+            "How did you prioritize remediation and show ownership clearly?",
+            "What feedback did stakeholders give about usefulness of the reports?"
+          ],
+          "strong_answer_should_include": [
+            "A concrete vulnerability example and context",
+            "Clear prioritization framework tied to severity and ownership",
+            "Stakeholder feedback and any process changes resulting from reports"
+          ],
+          "confidence": "high",
+          "recommendation": "keep"
+        },
+        {
+          "claim": "Performed Wireshark-based traffic analysis to find anomalies and support troubleshooting.",
+          "where": "tailored_resume Accurate Interpretations bullet 2; application_answers 'security monitoring and logs' context",
+          "likely_questions": [
+            "Describe a specific anomaly you identified and how you confirmed it.",
+            "Which display filters or techniques did you use most often?",
+            "How did packet analysis feed into remediation or configuration changes?"
+          ],
+          "strong_answer_should_include": [
+            "Concrete pcap scenario with filters and evidence",
+            "Relevant protocol knowledge and interpretation",
+            "Resulting fix and validation steps after the change"
+          ],
+          "confidence": "high",
+          "recommendation": "keep"
+        },
+        {
+          "claim": "Built and maintained secure onsite computer networks and resolved performance/connectivity issues.",
+          "where": "tailored_resume Accurate Interpretations bullet 1",
+          "likely_questions": [
+            "What did the network topology look like (firewall, VLANs, DHCP, WiFi)?",
+            "Which configurations did you change on firewalls or switches and why?",
+            "Share a performance bottleneck you identified and resolved."
+          ],
+          "strong_answer_should_include": [
+            "Topology overview and hardware/software specifics used",
+            "Examples of rule, NAT, or VLAN changes with rationale",
+            "Measurable outcome from a resolved bottleneck"
+          ],
+          "confidence": "high",
+          "recommendation": "keep"
+        },
+        {
+          "claim": "Built an incident-response playbook from a business impact analysis with prioritized recovery.",
+          "where": "application_answers Q1; project 'Incident Response Playbook + Tiered Cloud Backup Schedule'",
+          "likely_questions": [
+            "What RTO and RPO did you set for priority systems and why?",
+            "How did you sequence restoration to support sales first?",
+            "How would you test and maintain the playbook over time?"
+          ],
+          "strong_answer_should_include": [
+            "Defined RTO/RPO tied to business needs",
+            "Clear restoration order and dependencies",
+            "Testing, review cadence, and update triggers"
+          ],
+          "confidence": "high",
+          "recommendation": "keep"
+        },
+        {
+          "claim": "Designed a tiered cloud backup schedule balancing recovery time with ongoing storage cost.",
+          "where": "application_answers Q1; project 'Incident Response Playbook + Tiered Cloud Backup Schedule'",
+          "likely_questions": [
+            "Which data went to fast vs archival tiers and on what criteria?",
+            "How did you estimate restore times and storage costs?",
+            "What was the validation process for restore integrity?"
+          ],
+          "strong_answer_should_include": [
+            "Data classification and tiering criteria",
+            "Simple cost and RTO comparisons across tiers",
+            "Test restore process and integrity checks"
+          ],
+          "confidence": "high",
+          "recommendation": "keep"
+        },
+        {
+          "claim": "CMMC v2 and NIST SP 800-171 documentation and control mapping coursework.",
+          "where": "application_answers Q1; project 'CMMC v2 / NIST SP 800-171 Documentation'",
+          "likely_questions": [
+            "Explain differences between CMMC v1 and v2 levels in brief.",
+            "Map a sample CMMC practice to specific NIST 800-171 requirements.",
+            "How would you approach a self-assessment and evidence collection?"
+          ],
+          "strong_answer_should_include": [
+            "Concise summary of CMMC v2 structure and intent",
+            "Example mapping with assessment objectives",
+            "Evidence collection approach and scoring considerations"
+          ],
+          "confidence": "high",
+          "recommendation": "keep"
+        },
+        {
+          "claim": "Ready to monitor events, triage findings, and escalate appropriately in an entry-level role.",
+          "where": "application_answers Q1 closing statement",
+          "likely_questions": [
+            "Walk me through your triage process for a suspicious login alert.",
+            "What information do you need before escalating and to whom?",
+            "How do you document and track the incident lifecycle?"
+          ],
+          "strong_answer_should_include": [
+            "Structured triage steps and enrichment data sought",
+            "Clear escalation criteria and communication path",
+            "Concise, repeatable documentation approach"
+          ],
+          "confidence": "high",
+          "recommendation": "keep"
+        },
+        {
+          "claim": "Built a Python script to classify log entries into clearer categories for visibility.",
+          "where": "application_answers 'Describe your experience with security monitoring and logs' paragraph 2",
+          "likely_questions": [
+            "Can you show the repo or code snippet and sample input/output?",
+            "What categories did you define and how did parsing logic work?",
+            "How did this change analyst workload or detection quality?"
+          ],
+          "strong_answer_should_include": [
+            "Concrete code or pseudocode for parsing and classification",
+            "Examples of categories and mapping rules with edge cases",
+            "Before/after effect on searchability or alert signal"
+          ],
+          "confidence": "low",
+          "recommendation": "soften"
+        },
+        {
+          "claim": "CompTIA Network+ and Security+ certifications held and relevant to the role.",
+          "where": "tailored_resume Certifications",
+          "likely_questions": [
+            "When did you earn them and do you have certificate IDs?",
+            "Which domains were most applicable to your internships?",
+            "How have you applied the knowledge in real scenarios?"
+          ],
+          "strong_answer_should_include": [
+            "Dates, verification details if asked",
+            "Specific domains tied to hands-on examples",
+            "Concrete application stories from internships or labs"
+          ],
+          "confidence": "high",
+          "recommendation": "keep"
+        },
+        {
+          "claim": "SMS-based MFA approach reduced risk from shared or weak credentials at the nonprofit.",
+          "where": "cover_letter para 3; tailored_resume Nonprofit Healthcare Organization bullet 1",
+          "likely_questions": [
+            "What was the baseline risk and how did you measure improvement?",
+            "How did you handle users without mobile access or with phone changes?",
+            "What adoption or usability feedback did you receive?"
+          ],
+          "strong_answer_should_include": [
+            "Baseline issues (shared accounts, weak passwords) and mitigation reasoning",
+            "Fallback and recovery procedures and support approach",
+            "Adoption observations or pilot feedback and next steps"
+          ],
+          "confidence": "high",
+          "recommendation": "keep"
+        }
+      ],
+      "claims_to_soften_or_remove": [
+        {
+          "claim": "Used NXLog GELF to preserve fields like event_id, logon_type, target_user; Linux via Syslog.",
+          "where": "outreach_hiring_manager email paragraph 2",
+          "why": "Names specific field preservation and format choices that invite config-level questions not detailed in the profile.",
+          "suggested_action": "Study NXLog and Graylog GELF config details and be ready with a snippet; otherwise soften to 'sent Windows logs via NXLog in GELF and Linux via Syslog to retain structured fields' without naming specific fields."
+        },
+        {
+          "claim": "Resolved timestamp mismatches by setting everything to UTC in Graylog and the forwarders.",
+          "where": "outreach_hiring_manager email paragraph 2",
+          "why": "Time normalization steps are not documented in the profile and may lead to detailed follow-ups on exact settings.",
+          "suggested_action": "Study exact time-handling settings for NXLog, rsyslog, and Graylog; or soften to 'standardized time handling to fix ordering issues' if unsure of specifics."
+        },
+        {
+          "claim": "Filtered known-noisy services so alerts focused on repeated failed logons and sudo misuse.",
+          "where": "outreach_hiring_manager email paragraph 2",
+          "why": "Noise tuning details are not captured in the profile and will prompt requests for concrete examples or rules.",
+          "suggested_action": "Prepare 1\u20132 concrete examples of noisy sources and a sample Graylog pipeline rule; if not available, soften to 'tuned alerts to reduce common noise and highlight auth patterns.'"
+        },
+        {
+          "claim": "Built a Python script to classify log entries into clearer categories for visibility.",
+          "where": "application_answers 'Describe your experience with security monitoring and logs' paragraph 2",
+          "why": "Script is not evidenced in the profile; interviewer may ask for code, categories, or results you cannot show.",
+          "suggested_action": "Replace with 'organized logs using Graylog streams and queries to highlight auth activity' or move to interview study only if you have code ready to share."
+        }
+      ],
+      "prompt_version": "claim_stress_test@v1",
+      "model": "gpt-5"
+    }
+  }
+}

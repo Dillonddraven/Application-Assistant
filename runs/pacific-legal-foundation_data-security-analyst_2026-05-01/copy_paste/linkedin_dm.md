@@ -1,0 +1,1 @@
+Data Security Analyst role; Serve as primary IT support for DC office staff maps to my onsite troubleshooting work. At Accurate Interpretations I built and maintained secure networks and resolved connectivity issues, backed by CompTIA Network+. Are you the right person to talk to about this?

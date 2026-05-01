@@ -1,0 +1,1 @@
+Cybersecurity Analyst role at PurpleBox, I can help you run daily processes and tools for managing cybersecurity. At Dillard's I built a GitLab SAST reporting workflow that converted raw findings into clear vulnerability reports for teams. Is your team still hiring for this?

@@ -1,0 +1,1 @@
+Security analyst role at Bloomreach, translating raw vulnerability scanner output into clear reports. I built a GitLab SAST to Excel pipeline with OpenPyXL that turned findings into stakeholder-ready summaries, aligning with Contribute to leading technologies. Are you the right person to talk to about this?

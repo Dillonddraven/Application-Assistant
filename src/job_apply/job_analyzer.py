@@ -166,19 +166,28 @@ def _has_any_internship_or_more(profile: Profile) -> bool:
 
 
 def compute_fit_score(*, llm_fields: dict[str, Any], profile: Profile) -> dict[str, Any]:
-    """Deterministic component scores in [0,100] and a weighted total."""
+    """Deterministic component scores in [0,100] and a weighted total.
+
+    Returns the score plus an `apply_reasoning` list of human-readable strings
+    explaining why each component scored what it did. The reasoning is used by
+    `bench.build_scorecard` and the production-mode early-stop logic.
+    """
+    reasoning: list[str] = []
+
     req_skills = [s.lower() for s in llm_fields.get("required_skills") or []]
     pref_skills = [s.lower() for s in llm_fields.get("preferred_skills") or []]
     profile_skills = _flat_profile_skills(profile)
 
-    def overlap(needed: list[str]) -> int:
+    def overlap(needed: list[str]) -> tuple[int, int, int]:
         if not needed:
-            return 100
+            return 100, 0, 0
         hits = sum(1 for s in needed if any(s in ps or ps in s for ps in profile_skills))
-        return int(round(100 * hits / len(needed)))
+        return int(round(100 * hits / len(needed))), hits, len(needed)
 
-    skills_match = overlap(req_skills)
-    pref_skills_match = overlap(pref_skills)
+    skills_match, skill_hits, skill_total = overlap(req_skills)
+    pref_skills_match, _, _ = overlap(pref_skills)
+    if req_skills:
+        reasoning.append(f"required-skill overlap: {skill_hits}/{skill_total} = {skills_match}")
 
     needed_certs = [c.lower() for c in llm_fields.get("required_certifications") or []]
     profile_certs = _profile_cert_names(profile)
@@ -187,64 +196,111 @@ def compute_fit_score(*, llm_fields: dict[str, Any], profile: Profile) -> dict[s
     else:
         hits = sum(1 for c in needed_certs if any(pc in c or c in pc for pc in profile_certs))
         cert_match = int(round(100 * hits / len(needed_certs)))
+        reasoning.append(f"cert match: {hits}/{len(needed_certs)} = {cert_match}")
 
-    # Experience: penalize if min_years > 1 since profile has internship-level experience
+    # Experience-level scoring (revised May 2026):
+    # 0-3 years required + has internships/projects -> high (still a fit)
+    # 4 years -> medium penalty
+    # 5+ years OR senior/lead/principal -> heavy penalty
+    title_lc = (llm_fields.get("title") or "").lower()
+    senior_signal = any(t in title_lc for t in (
+        "senior", "staff", "principal", "lead", "manager", "architect"
+    ))
     min_years = int(llm_fields.get("min_years_experience") or 0)
-    if min_years <= 0:
-        exp_match = 100
-    elif min_years == 1:
-        exp_match = 80 if _has_any_internship_or_more(profile) else 50
-    elif min_years == 2:
-        exp_match = 60 if _has_any_internship_or_more(profile) else 30
-    else:
-        exp_match = max(0, 40 - 10 * (min_years - 2))
+    has_intern = _has_any_internship_or_more(profile)
 
-    # Location. The candidate must actually be reachable for the role:
-    # remote-ok job + remote_ok candidate, OR posting location intersects the
-    # candidate's preferred locations, OR willing_to_relocate=True. Otherwise
-    # the role is not realistically attainable and the score reflects that.
+    if senior_signal:
+        exp_match = 15
+        reasoning.append(f"senior/lead/principal/staff title detected -> heavy penalty (exp_match=15)")
+    elif min_years <= 2:
+        exp_match = 100 if has_intern else 70
+        reasoning.append(f"≤2 years required + internships present -> exp_match={exp_match}")
+    elif min_years == 3:
+        exp_match = 75 if has_intern else 50
+        reasoning.append(f"3 years required (within stretch range for early-career) -> exp_match={exp_match}")
+    elif min_years == 4:
+        exp_match = 55 if has_intern else 30
+        reasoning.append(f"4 years required -> stretch; exp_match={exp_match}")
+    else:
+        exp_match = max(0, 30 - 5 * (min_years - 5))
+        reasoning.append(f"5+ years required -> heavy penalty; exp_match={exp_match}")
+
+    # Location scoring (revised May 2026): the candidate is now flexible across
+    # developed metros. Don't over-penalize unfamiliar cities. Hard-block only
+    # on clearance/visa/citizenship/relocation-impossible cases (handled in
+    # apply_recommendation, not here).
     prefs = profile.data.get("preferences") or {}
     remote_mode = (llm_fields.get("remote_mode") or "unknown").lower()
     posting_loc = (llm_fields.get("location") or "").lower()
     wanted_locs = [w.lower() for w in (prefs.get("locations") or [])]
+    preferred_metros = [m.lower() for m in (prefs.get("preferred_metros") or [])]
     location_intersects = bool(wanted_locs and any(w in posting_loc for w in wanted_locs))
+    metro_match = bool(preferred_metros and any(m in posting_loc for m in preferred_metros))
     relocation_ok = bool(prefs.get("willing_to_relocate"))
 
+    location_confidence = "neutral"
     if remote_mode == "remote":
-        location_match = 100 if prefs.get("remote_ok", True) else 35
+        if prefs.get("remote_ok", True):
+            location_match = 100
+            location_confidence = "strong"
+            reasoning.append("remote role + remote_ok=true -> location_match=100")
+        else:
+            location_match = 35
+            location_confidence = "negative"
+            reasoning.append("remote role but candidate doesn't accept remote -> 35")
     elif remote_mode == "hybrid":
         if not prefs.get("hybrid_ok", True):
             location_match = 35
-        elif location_intersects:
+            location_confidence = "negative"
+            reasoning.append("hybrid role but candidate doesn't accept hybrid -> 35")
+        elif location_intersects or metro_match:
             location_match = 100
+            location_confidence = "strong"
+            reasoning.append(f"hybrid role in preferred metro -> 100 ({posting_loc})")
         elif relocation_ok:
-            location_match = 65
+            location_match = 80
+            location_confidence = "neutral"
+            reasoning.append("hybrid role + willing_to_relocate -> 80 (worth considering)")
         else:
-            location_match = 30
+            location_match = 45
+            location_confidence = "negative"
+            reasoning.append("hybrid role outside preferred metros + no relocation -> 45")
     elif remote_mode == "onsite":
         if not prefs.get("onsite_ok", True):
             location_match = 25
-        elif location_intersects:
+            location_confidence = "negative"
+            reasoning.append("onsite role but candidate doesn't accept onsite -> 25")
+        elif location_intersects or metro_match:
             location_match = 100
+            location_confidence = "strong"
+            reasoning.append(f"onsite role in preferred metro -> 100 ({posting_loc})")
         elif relocation_ok:
-            location_match = 65
-        else:
-            location_match = 25
-    else:
-        # remote_mode == "unknown" — the posting didn't say. Be conservative:
-        # treat as if onsite-required since that's the riskier failure mode.
-        if location_intersects:
-            location_match = 90
-        elif relocation_ok:
-            location_match = 60
-        elif prefs.get("remote_ok", True):
-            # If the user is open to remote, give partial credit even when unknown.
-            location_match = 55
+            location_match = 75
+            location_confidence = "neutral"
+            reasoning.append("onsite + willing_to_relocate -> 75 (relocation worth it for fit)")
         else:
             location_match = 30
+            location_confidence = "negative"
+            reasoning.append("onsite outside preferred metros + no relocation -> 30")
+    else:
+        # remote_mode unknown
+        if location_intersects or metro_match:
+            location_match = 90
+            location_confidence = "strong"
+            reasoning.append(f"unknown remote_mode but location is preferred metro -> 90")
+        elif relocation_ok or prefs.get("remote_ok", True):
+            location_match = 70
+            location_confidence = "neutral"
+            reasoning.append("unknown remote_mode but candidate is flexible -> 70")
+        else:
+            location_match = 40
+            location_confidence = "negative"
+            reasoning.append("unknown remote_mode + candidate not flexible -> 40")
 
     industry_filter = llm_fields.get("industry_filter", "ok")
     industry_penalty = {"ok": 0, "review": 25, "avoid": 80}.get(industry_filter, 0)
+    if industry_penalty:
+        reasoning.append(f"industry filter = {industry_filter} -> -{industry_penalty}")
 
     weighted = (
         0.40 * skills_match
@@ -254,6 +310,25 @@ def compute_fit_score(*, llm_fields: dict[str, Any], profile: Profile) -> dict[s
         + 0.10 * location_match
     )
     total = max(0, int(round(weighted - industry_penalty)))
+    reasoning.append(
+        f"weighted total = 0.40*skills({skills_match}) + 0.15*pref({pref_skills_match}) + "
+        f"0.20*cert({cert_match}) + 0.15*exp({exp_match}) + 0.10*loc({location_match}) "
+        f"- industry({industry_penalty}) = {total}"
+    )
+
+    # Top reasons for / against
+    component_scores = {
+        "required-skills overlap": skills_match,
+        "preferred-skills overlap": pref_skills_match,
+        "cert match": cert_match,
+        "experience-level": exp_match,
+        "location": location_match,
+    }
+    sorted_components = sorted(component_scores.items(), key=lambda x: -x[1])
+    top_reasons_for = [f"{name}: {score}" for name, score in sorted_components[:3]
+                       if score >= 60]
+    top_gaps = [f"{name}: {score}" for name, score in sorted_components[::-1][:3]
+                if score < 60]
 
     return {
         "fit_score": total,
@@ -263,8 +338,12 @@ def compute_fit_score(*, llm_fields: dict[str, Any], profile: Profile) -> dict[s
             "cert_match": cert_match,
             "experience_match": exp_match,
             "location_match": location_match,
+            "location_confidence": location_confidence,
             "industry_filter": industry_filter,
         },
+        "apply_reasoning": reasoning,
+        "top_reasons_for": top_reasons_for,
+        "top_gaps": top_gaps,
     }
 
 

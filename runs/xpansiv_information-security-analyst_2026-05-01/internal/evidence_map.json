@@ -1,0 +1,163 @@
+{
+  "pain_points": [
+    {
+      "text": "Monitor, investigate, and respond to security alerts and incidents across systems, networks, and cloud environments",
+      "jd_anchor": "Monitor, investigate, and respond to security alerts and incidents",
+      "stakes": "Effective monitoring and incident response are critical to quickly detect and mitigate security threats, minimizing potential damage to the organization."
+    },
+    {
+      "text": "Perform regular vulnerability assessments, patch verification, and risk remediation tracking",
+      "jd_anchor": "Perform regular vulnerability assessments, patch verification, and risk remediation tracking",
+      "stakes": "Regular vulnerability assessments and remediation tracking ensure that security weaknesses are identified and addressed promptly to reduce risk exposure."
+    },
+    {
+      "text": "Collaborate with IT, DevOps, and engineering teams to implement secure configurations, code reviews, and cloud security best practices",
+      "jd_anchor": "Collaborate with IT, DevOps, and engineering teams on security",
+      "stakes": "Cross-team collaboration is essential to embed security into development and operations processes, preventing vulnerabilities and ensuring secure deployments."
+    },
+    {
+      "text": "Support audit and compliance efforts including conducting access reviews and contributing to risk assessments and control testing",
+      "jd_anchor": "Conduct periodic access reviews and support audit and compliance efforts",
+      "stakes": "Supporting audit and compliance ensures the organization meets regulatory requirements and maintains a strong security posture."
+    },
+    {
+      "text": "Stay current on emerging threats, vulnerabilities, and regulatory requirements impacting the business",
+      "jd_anchor": "Stay current on emerging threats, vulnerabilities, and regulatory requirements",
+      "stakes": "Keeping up to date with evolving threats and regulations is vital to proactively adapt security controls and maintain compliance."
+    },
+    {
+      "text": "Manage endpoint security tools and identity/access management systems",
+      "jd_anchor": "Manage endpoint security tools and identity/access management",
+      "stakes": "Proper management of endpoint protection and access controls prevents unauthorized access and reduces attack surface."
+    }
+  ],
+  "evidence_map": [
+    {
+      "pain_point_index": 0,
+      "candidate_evidence": [
+        {
+          "source_id": "experience.security_automation_projects.b1",
+          "summary": "Designed security-focused automation workflows for vulnerability discovery and remediation tracking, using structured logs, alerting, and approval gates to improve visibility across automated systems.",
+          "match_strength": "strong"
+        },
+        {
+          "source_id": "experience.security_automation_projects.b2",
+          "summary": "Built security monitoring and approval-gate workflows to detect automation failures, flag risky actions, and route remediation steps through human review.",
+          "match_strength": "strong"
+        },
+        {
+          "source_id": "experience.accurate_interpretations_intern.b2",
+          "summary": "Performed onsite network traffic analysis with Wireshark to identify anomalies, support troubleshooting, and strengthen secure network operations.",
+          "match_strength": "adjacent"
+        },
+        {
+          "source_id": "projects.proj_centralized_logging_lab",
+          "summary": "Deployed Graylog stack with alert conditions for Linux sudo/auth activity and Windows failed-logon attempts, demonstrating monitoring and alerting capabilities.",
+          "match_strength": "strong"
+        }
+      ]
+    },
+    {
+      "pain_point_index": 1,
+      "candidate_evidence": [
+        {
+          "source_id": "experience.dillards_intern.b1",
+          "summary": "Helped build a SAST reporting workflow that ingested findings from GitLab repositories and converted raw scanner output into clean Excel reports with severity breakdowns and team views.",
+          "match_strength": "strong"
+        },
+        {
+          "source_id": "experience.dillards_intern.b2",
+          "summary": "Correlated vulnerability details such as severity and logging dates to improve visibility into remediation priorities.",
+          "match_strength": "strong"
+        },
+        {
+          "source_id": "projects.proj_sast_xlsx",
+          "summary": "Developed Python tooling to normalize severity, color-code findings, and build management-ready reports combining multiple vulnerability scanners.",
+          "match_strength": "strong"
+        }
+      ]
+    },
+    {
+      "pain_point_index": 2,
+      "candidate_evidence": [
+        {
+          "source_id": "experience.r1649_intern.b2",
+          "summary": "Supported software security operations by identifying potential risks and helping protect proprietary APIs and internal tools.",
+          "match_strength": "adjacent"
+        },
+        {
+          "source_id": "experience.nonprofit_health_consultant.b1",
+          "summary": "Mapped workflows and tech environment to security, privacy, and implementation risks during a planned migration, indicating collaboration with technical teams.",
+          "match_strength": "adjacent"
+        },
+        {
+          "source_id": "experience.nonprofit_health_consultant.b2",
+          "summary": "Presented migration risks and security considerations to technical and non-technical stakeholders, supporting cross-team communication.",
+          "match_strength": "adjacent"
+        }
+      ]
+    },
+    {
+      "pain_point_index": 3,
+      "candidate_evidence": [
+        {
+          "source_id": "projects.proj_cmmc_nist_docs",
+          "summary": "Coursework comparing CMMC v2 and NIST SP 800-171 controls, analyzing self-assessment implications, and writing assessment-objective explanations for monitoring controls and CUI handling.",
+          "match_strength": "adjacent"
+        },
+        {
+          "source_id": "experience.nonprofit_health_consultant.b2",
+          "summary": "Presented security risks and rollout recommendations to leadership, helping them understand vulnerabilities and escalation paths, relevant to compliance communication.",
+          "match_strength": "adjacent"
+        }
+      ]
+    },
+    {
+      "pain_point_index": 4,
+      "candidate_evidence": [
+        {
+          "source_id": "reusable_answers.security_logs_experience",
+          "summary": "Configured log forwarding and alerting in a centralized logging environment, gaining hands-on experience with event ingestion, classification, and investigation.",
+          "match_strength": "strong"
+        },
+        {
+          "source_id": "projects.proj_cmmc_nist_docs",
+          "summary": "Studied security frameworks and regulatory requirements, supporting knowledge of compliance and emerging standards.",
+          "match_strength": "adjacent"
+        },
+        {
+          "source_id": "experience.dillards_intern.b4",
+          "summary": "Translated technical vulnerability findings into actionable reporting for decision-makers, demonstrating awareness of evolving threats and communication.",
+          "match_strength": "adjacent"
+        }
+      ]
+    },
+    {
+      "pain_point_index": 5,
+      "candidate_evidence": [
+        {
+          "source_id": "experience.nonprofit_health_consultant.b3",
+          "summary": "Designed a low-cost SMS MFA workflow using Twilio Verify and tokenized links to strengthen access control, demonstrating experience with identity and access management.",
+          "match_strength": "strong"
+        },
+        {
+          "source_id": "experience.r1649_intern.b2",
+          "summary": "Supported software security operations including protecting proprietary APIs and internal tools, relevant to endpoint and access security.",
+          "match_strength": "adjacent"
+        }
+      ]
+    }
+  ],
+  "missing_evidence": [
+    {
+      "pain_point_index": 2,
+      "note": "No direct evidence of implementing secure configurations, code reviews, or cloud security best practices in collaboration with IT, DevOps, and engineering teams."
+    },
+    {
+      "pain_point_index": 3,
+      "note": "No direct evidence of conducting access reviews or supporting formal audit and compliance efforts beyond coursework and presentations."
+    }
+  ],
+  "prompt_version": "extract_jd_analysis@v1",
+  "model": "gpt-4.1-mini"
+}

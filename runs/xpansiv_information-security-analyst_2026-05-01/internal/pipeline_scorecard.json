@@ -1,0 +1,65 @@
+{
+  "company": "Xpansiv",
+  "role_title": "Information Security Analyst",
+  "source_url": "https://jobs.lever.co/Xpansiv%20/6652760b-5fda-44dc-a3e6-2d853886bdf8",
+  "source_confidence": "high",
+  "source_confidence_reason": "direct ATS board (lever.co)",
+  "role_category": "GRC / Compliance",
+  "fit_score": 46,
+  "fit_breakdown": {
+    "skills_match": 20,
+    "preferred_skills_match": 25,
+    "cert_match": 100,
+    "experience_match": 30,
+    "location_match": 100,
+    "industry_filter": "ok"
+  },
+  "industry_filter": "ok",
+  "apply_recommendation": "skip",
+  "apply_reason": "blocked: 1 HIGH QA, 0 fabrication block(s)",
+  "top_match_reasons": [
+    "Monitor, investigate, and respond to security alerts and incidents across systems, networks, and cloud environments",
+    "Perform regular vulnerability assessments, patch verification, and risk remediation tracking",
+    "Stay current on emerging threats, vulnerabilities, and regulatory requirements impacting the business",
+    "Manage endpoint security tools and identity/access management systems"
+  ],
+  "top_gaps": [
+    "No direct evidence of implementing secure configurations, code reviews, or cloud security best practices in collaboratio",
+    "No direct evidence of conducting access reviews or supporting formal audit and compliance efforts beyond coursework and "
+  ],
+  "unsupported_claims_count": 4,
+  "softened_claims_count": 6,
+  "fabrication_blocks_count": 0,
+  "qa_high_count": 1,
+  "qa_medium_count": 3,
+  "qa_low_count": 1,
+  "resume_page_count": 0,
+  "ats_safety_status": "missing",
+  "cover_letter_quality": "fair",
+  "qa_polish": "needs_work",
+  "outreach_risk": "high",
+  "portal_complexity": "low",
+  "manual_review_required_fields": [
+    "desired_salary",
+    "sponsorship_visa",
+    "relocation",
+    "shift_availability",
+    "start_date",
+    "custom_long_answers",
+    "legal_acknowledgements",
+    "demographic_or_disability_or_veteran",
+    "final_submit"
+  ],
+  "never_auto_answer_fields": [
+    "demographic_identity",
+    "disability_status",
+    "veteran_status",
+    "criminal_background",
+    "legal_attestation"
+  ],
+  "estimated_user_review_time_minutes": 26,
+  "final_status": "needs_patch",
+  "run_id": "f1632301",
+  "slug": "xpansiv_information-security-analyst",
+  "id": 4
+}

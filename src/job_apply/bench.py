@@ -228,8 +228,21 @@ def pdf_page_count(pdf_path: Path) -> int:
         return 0
 
 
+def production_mode_would_have_done(analyzed: dict[str, Any]) -> str:
+    """What production mode would have decided based on fit + industry filter alone.
+    Used in benchmark scorecards to show 'this role would have early-stopped'."""
+    fit = int(analyzed.get("fit_score") or 0)
+    if (analyzed.get("industry_filter") or "ok") == "avoid":
+        return "skip"
+    if fit < 50:
+        return "skip"
+    if fit < 65:
+        return "lightweight"
+    return "full"
+
+
 def build_scorecard(*, slug: str, run_dir: Path, analyzed: dict[str, Any],
-                    packet: dict[str, Any]) -> dict[str, Any]:
+                    packet: dict[str, Any], time_seconds: float | None = None) -> dict[str, Any]:
     qa = (packet.get("validation") or {}).get("qa") or {}
     brief = packet.get("candidate_brief") or {}
     stress = (brief.get("stress_test") or {})
@@ -285,6 +298,14 @@ def build_scorecard(*, slug: str, run_dir: Path, analyzed: dict[str, Any],
                 top_match_reasons.append(pain_points[idx].get("text", "")[:120])
     top_gaps = [m.get("note", "")[:120] for m in missing_ev[:5]]
 
+    fit_breakdown = analyzed.get("fit_breakdown") or {}
+    location_confidence = fit_breakdown.get("location_confidence", "neutral")
+
+    prod_decision = production_mode_would_have_done(analyzed)
+    # If the packet was actually produced in benchmark mode but production mode
+    # WOULD have early-stopped, surface that for the summary.
+    early_stop_in_prod = prod_decision in ("skip", "lightweight")
+
     return {
         "company": analyzed.get("company") or "",
         "role_title": analyzed.get("title") or "",
@@ -293,10 +314,18 @@ def build_scorecard(*, slug: str, run_dir: Path, analyzed: dict[str, Any],
         "source_confidence_reason": analyzed.get("source_confidence_reason") or "",
         "role_category": role_cat,
         "fit_score": analyzed.get("fit_score") or 0,
-        "fit_breakdown": analyzed.get("fit_breakdown") or {},
+        "fit_breakdown": fit_breakdown,
+        "location_confidence": location_confidence,
         "industry_filter": analyzed.get("industry_filter") or "ok",
         "apply_recommendation": apply_rec,
         "apply_reason": reason,
+        "production_mode_decision": prod_decision,
+        "would_early_stop_in_production": early_stop_in_prod,
+        "early_stop_triggered_actual": bool(packet.get("early_stop")),
+        "early_stop_reason": packet.get("early_stop_reason", ""),
+        "apply_reasoning": analyzed.get("apply_reasoning") or [],
+        "top_reasons_for_score": analyzed.get("top_reasons_for") or [],
+        "top_gaps_score": analyzed.get("top_gaps") or [],
         "top_match_reasons": top_match_reasons[:4],
         "top_gaps": top_gaps,
         "unsupported_claims_count": len(unsupported),
@@ -321,6 +350,7 @@ def build_scorecard(*, slug: str, run_dir: Path, analyzed: dict[str, Any],
         "estimated_user_review_time_minutes": estimate_review_time_minutes(
             packet=packet, qa=qa, portal_complexity=portal_complexity,
         ),
+        "time_seconds": time_seconds,
         "final_status": final_status,
         "run_id": packet.get("run_id"),
         "slug": slug,

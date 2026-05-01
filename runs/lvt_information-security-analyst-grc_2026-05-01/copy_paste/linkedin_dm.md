@@ -1,0 +1,1 @@
+Information Security Analyst (GRC) role, and I can Execute control testing, including evidence collection and documentation. At Dillard's I built a GitLab SAST reporting workflow that turned scanner output into clear Excel evidence for stakeholders. Are you the right person to talk to about this?

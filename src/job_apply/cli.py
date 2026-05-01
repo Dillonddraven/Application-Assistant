@@ -64,7 +64,7 @@ def _cmd_tailor(args: argparse.Namespace) -> int:
     try:
         packet, slug = tailor_pipeline.run_tailor(
             job_id=args.job_id, force=args.force, deep=args.deep,
-            open_mail=args.mail,
+            open_mail=args.mail, mode=args.mode,
         )
     except tailor_pipeline.TailorError as e:
         print(f"tailor failed: {e}", file=sys.stderr)
@@ -299,6 +299,11 @@ def build_parser() -> argparse.ArgumentParser:
     p_tailor.add_argument("--deep", action="store_true", help="Use higher-tier model on tough fits.")
     p_tailor.add_argument("--mail", action="store_true",
                           help="Open a Mail.app draft to your email (from secrets.yaml) with all attachments. macOS only.")
+    p_tailor.add_argument("--mode", default="production",
+                          choices=["production", "benchmark"],
+                          help=("production (default): early-stop on fit<50 (skip), 50-64 "
+                                "(lightweight, no PDFs unless --force), 65+ (full pipeline). "
+                                "benchmark: run full pipeline regardless of fit."))
     p_tailor.set_defaults(func=_cmd_tailor)
 
     p_review = sub.add_parser("review", help="Show packet contents + validation report.")

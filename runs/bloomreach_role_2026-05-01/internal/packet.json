@@ -1,0 +1,688 @@
+{
+  "job_id": "d6239869ff1e",
+  "slug": "bloomreach_role",
+  "run_id": "db1fa036",
+  "tailored": {
+    "summary": "Security-focused analyst who turns scanner output into clear remediation guidance, designs human-in-the-loop automation, and builds secure authentication workflows. Internship and project work span GitLab SAST to Excel reporting, approval-gate guardrails, and SMS MFA for a healthcare migration.",
+    "skills_emphasis": [
+      "Python",
+      "GitLab SAST",
+      "OpenPyXL",
+      "Excel automation",
+      "Vulnerability management",
+      "Security automation",
+      "Structured logging",
+      "Approval workflows",
+      "Stakeholder communication",
+      "Risk assessment",
+      "Twilio Verify",
+      "SMS MFA"
+    ],
+    "bullets": [
+      {
+        "source_id": "experience.dillards_intern.b1",
+        "text": "Helped build a GitLab SAST reporting workflow that converted raw findings into clean Excel reports with severity breakdowns, team and repository views, and visual summaries for stakeholders."
+      },
+      {
+        "source_id": "experience.dillards_intern.b4",
+        "text": "Translated technical vulnerability findings into actionable summaries that decision-makers could use to prioritize remediation."
+      },
+      {
+        "source_id": "experience.security_automation_projects.b1",
+        "text": "Designed automation for vulnerability discovery and remediation tracking with structured logs, alerting, and approval gates to improve visibility across automated systems."
+      },
+      {
+        "source_id": "experience.security_automation_projects.b2",
+        "text": "Built monitoring and approval-gate workflows that detected automation failures, flagged risky actions, and routed remediation steps through human review."
+      },
+      {
+        "source_id": "experience.nonprofit_health_consultant.b1",
+        "text": "Mapped existing workflows and the technology environment to security, privacy, and implementation risks for a planned migration."
+      },
+      {
+        "source_id": "experience.nonprofit_health_consultant.b3",
+        "text": "Designed a low-cost SMS MFA workflow with Twilio Verify, tokenized links, and database-backed forms to strengthen access control for monitor and client information."
+      },
+      {
+        "source_id": "experience.nonprofit_health_consultant.b2",
+        "text": "Presented migration risks, security considerations, and rollout recommendations to technical and non-technical stakeholders, clarifying potential vulnerabilities and escalation paths."
+      }
+    ],
+    "cover_letter_paragraphs": [
+      {
+        "source_id": "general",
+        "text": "Bloomreach\u2019s focus on contributing to leading technologies and accessing resources to develop new skills lines up with how I approach security work. I focus on making security data usable, automating safely with human approval points, and designing practical controls that fit real constraints."
+      },
+      {
+        "source_id": "experience.dillards_intern",
+        "text": "At Dillard's, I helped turn raw SAST findings into reports stakeholders could act on. Instead of wading through scanner output, teams saw what mattered, who owned it, and how to sequence fixes, which moved discussions from data cleanup to remediation decisions."
+      },
+      {
+        "source_id": "experience.security_automation_projects",
+        "text": "In my security automation projects, I designed monitoring and approval gates that keep automation fast without losing control when actions get risky. That pattern gave reviewers the right context at the right time, so remediation steps could proceed confidently with an audit trail."
+      },
+      {
+        "source_id": "experience.nonprofit_health_consultant",
+        "text": "For a nonprofit healthcare migration, I mapped risks and designed an SMS MFA flow that fit budget and access needs. That work helped leadership see tradeoffs clearly and choose a rollout that protected sensitive data while staying practical for staff."
+      },
+      {
+        "source_id": "general",
+        "text": "I can share a sanitized mockup of the vulnerability reporting format and walk through the approval-gate pattern next Tuesday or Wednesday between 1 and 4 pm CT."
+      }
+    ],
+    "application_answers": [
+      {
+        "question": "How has your education and project work prepared you for this entry-level role?",
+        "source_id": "reusable_answers.how_coursework_prepared_me",
+        "answer": "I developed Python tooling that turned GitLab SAST and related outputs into management-ready summaries, so stakeholders could prioritize remediation without parsing raw scanner data. I designed monitoring and approval-gate workflows that improved visibility and routed risky actions through human review with auditability. I mapped security and privacy risks during a healthcare system migration and presented the findings to technical and non-technical stakeholders. I also designed an SMS MFA workflow with Twilio Verify and tokenized links, and my compliance coursework included mapping CMMC v2 to NIST SP 800-171 to clarify control intent and assessment implications."
+      },
+      {
+        "question": "Why are you a good fit for this position?",
+        "source_id": "general",
+        "answer": "I make security data actionable, I build automation with human-in-the-loop guardrails, and I communicate risk clearly. I turned SAST findings into usable reports for decision-makers, designed approval-gate workflows that keep remediation safe and auditable, mapped migration risks for leadership, and built an SMS MFA flow to protect sensitive data. That combination lines up with the core of this role: clear reporting, thoughtful automation, and practical control design."
+      },
+      {
+        "question": "What is your experience with vulnerability assessment and reporting?",
+        "source_id": "reusable_answers.vulnerability_assessment_experience",
+        "answer": "I developed Python tooling that normalized and combined GitLab SAST and related outputs into clear Excel summaries with severity breakdowns, team and repository views, and visual summaries. At Dillard's, I turned technical findings into actionable reporting for decision-makers. The value was clarity and prioritization, so teams could focus on ownership and remediation sequence instead of parsing scanner output."
+      },
+      {
+        "question": "Are you authorized to work in the US?",
+        "source_id": "reusable_answers.authorized_to_work",
+        "answer": "Yes, US citizen, no sponsorship required."
+      },
+      {
+        "question": "What interests you about Bloomreach?",
+        "source_id": "general",
+        "answer": "Your emphasis on contributing to leading technologies, accessing resources to develop new skills, and joining a network that supports each other matches how I work. I want to apply my reporting, automation, and authentication design experience on a team that values practical impact and shared growth."
+      }
+    ]
+  },
+  "rendered": {
+    "employer": {
+      "tailored_resume_pdf": "employer/tailored_resume.pdf",
+      "tailored_resume_docx": "employer/tailored_resume.docx",
+      "cover_letter_pdf": "employer/cover_letter.pdf",
+      "cover_letter_docx": "employer/cover_letter.docx"
+    },
+    "internal": {
+      "tailored_resume_md": "internal/tailored_resume.md",
+      "cover_letter_md": "internal/cover_letter.md",
+      "application_answers_md": "internal/application_answers.md",
+      "outreach_recruiter_md": "internal/outreach_recruiter.md",
+      "outreach_hiring_manager_md": "internal/outreach_hiring_manager.md",
+      "linkedin_dm_md": "internal/linkedin_dm.md",
+      "match_report_md": "internal/match_report.md"
+    }
+  },
+  "emails": {
+    "recruiter": {
+      "subject": "Cybersecurity Analyst - GitLab SAST to Excel reporting",
+      "body_paragraphs": [
+        {
+          "source_id": "jd_analysis[0]",
+          "text": "I applied for the Cybersecurity Analyst role at Bloomreach to \"Contribute to leading technologies\" in clear vulnerability reporting."
+        },
+        {
+          "source_id": "dillards_intern.b1",
+          "text": "At Dillard's, I helped build a SAST reporting workflow that converted GitLab scanner output into Excel reports with severity breakdowns and stakeholder views."
+        },
+        {
+          "source_id": "general_cta",
+          "text": "I can share a one-page sample of that report and am open to a 15-minute call Tuesday or Wednesday afternoon; are you the right contact for this role, or could you point me to the right person?\n\nThanks,\nDillon Stinson"
+        }
+      ],
+      "cited_items": [
+        "jd_analysis[0]",
+        "dillards_intern.b1"
+      ],
+      "_model": "gpt-5"
+    },
+    "hiring_manager": {
+      "subject": "Cybersecurity Analyst at Bloomreach - SAST reporting in Excel",
+      "body_paragraphs": [
+        {
+          "source_id": "dillards_intern.b1",
+          "text": "For the Cybersecurity Analyst role, your posting calls for someone to 'Contribute to leading technologies,' which maps to my Dillard's SAST reporting workflow that turned GitLab output into stakeholder-ready Excel summaries."
+        },
+        {
+          "source_id": "proj_sast_xlsx",
+          "text": "One choice that mattered was normalizing severities across GitLab SAST, Invicti, and ACS; I mapped each tool's labels to a single 1-5 scale, then deduped by rule id, file path, and line to avoid double counting. I also included scan and first-seen dates to track age and highlight regressions rather than churn. The result was a workbook teams could sort the same way every time without arguing about whose scale applied."
+        },
+        {
+          "source_id": "dillards_intern.b1",
+          "text": "I can share a one-page writeup and a redacted sample workbook; is Tue 2:00-2:20 pm CT next week a fit?"
+        }
+      ],
+      "cited_items": [
+        "dillards_intern.b1",
+        "proj_sast_xlsx"
+      ],
+      "_model": "gpt-5"
+    },
+    "linkedin_dm": {
+      "text": "Security analyst role at Bloomreach, translating raw vulnerability scanner output into clear reports. I built a GitLab SAST to Excel pipeline with OpenPyXL that turned findings into stakeholder-ready summaries, aligning with Contribute to leading technologies. Are you the right person to talk to about this?",
+      "cited_items": [
+        "dillards_intern.b1"
+      ],
+      "_model": "gpt-5"
+    }
+  },
+  "validation": {
+    "fabrication_blocks": [],
+    "fabrication_warnings": [
+      {
+        "rule": "strong_adjective",
+        "detail": "strong-claim phrase 'lead' detected \u2014 verify it matches profile reality",
+        "source_id": null
+      }
+    ],
+    "schema_ok": true,
+    "qa": {
+      "issues": [
+        {
+          "category": "evidence_gap",
+          "severity": "medium",
+          "where": "application_answers \u2014 How has your education and project work prepared you for this entry-level role?",
+          "snippet": "my compliance coursework included mapping CMMC v2 to NIST SP 800-171 to clarify control intent and assessment implications.",
+          "fix_suggestion": "Either add a corresponding line under Projects or Education in the resume that cites this coursework / deliverable (project title, timeframe, brief outcome), or remove/soften the claim in the application answer so it doesn't introduce evidence not shown elsewhere."
+        },
+        {
+          "category": "generic_phrase",
+          "severity": "medium",
+          "where": "tailored_resume \u2014 Summary; application_answers \u2014 Why are you a good fit?",
+          "snippet": "\"I make security data actionable\" / \"I build automation with human-in-the-loop guardrails\"",
+          "fix_suggestion": "Replace broad phrases with specific, measurable outcomes or concise examples. e.g. 'Converted GitLab SAST output into N Excel workbooks used by Y teams, reducing triage time by Z%' or 'Implemented approval gates that prevented N risky automated changes and generated auditable logs.'"
+        },
+        {
+          "category": "redundancy",
+          "severity": "low",
+          "where": "cover_letter, tailored_resume (Summary), application_answers, outreach messages",
+          "snippet": "Repeated claims across documents: turning SAST into Excel reports, designing approval-gate workflows, and building SMS MFA for a healthcare migration (same language repeated in multiple places).",
+          "fix_suggestion": "Reduce verbatim repetition by tailoring each piece: resume \u2014 concise bullets; cover letter \u2014 one short example that illustrates impact; application answers \u2014 direct evidence/metrics; outreach \u2014 a single sentence hook plus an offer to share sample. Add small unique details in each place (metric, scope, or artifact) to avoid seeming copy-pasted."
+        }
+      ],
+      "overall_polish": "needs_work",
+      "prompt_version": "qa_check@v1",
+      "model": "gpt-5-mini"
+    }
+  },
+  "status": "draft",
+  "approval_log": [
+    {
+      "ts": "2026-05-01T18:44:31+00:00",
+      "action": "draft"
+    }
+  ],
+  "prompt_versions": {
+    "tailor": "tailor_resume@v1",
+    "recruiter": "write_email_recruiter@v2",
+    "hiring_manager": "write_email_hiring_manager@v2",
+    "linkedin_dm": "write_linkedin_dm@v2",
+    "jd_analysis": "extract_jd_analysis@v1",
+    "qa_check": "qa_check@v1",
+    "claim_stress_test": "claim_stress_test@v1",
+    "candidate_brief": "candidate_brief@v1"
+  },
+  "model": "gpt-5",
+  "jd_analysis": {
+    "pain_points": [
+      {
+        "text": "Translating raw vulnerability scanner output into actionable, clear reports for stakeholders to prioritize remediation effectively.",
+        "jd_anchor": "Contribute to leading technologies",
+        "stakes": "Clear vulnerability reporting enables faster and more accurate remediation, reducing security risks and improving overall security posture."
+      },
+      {
+        "text": "Designing and implementing security automation workflows that improve visibility, monitoring, and human-in-the-loop approval for safer remediation processes.",
+        "jd_anchor": "access resources to develop new skills",
+        "stakes": "Automation reduces manual effort and errors, enabling scalable and reliable security operations."
+      },
+      {
+        "text": "Communicating technical security risks and recommendations effectively to both technical and non-technical stakeholders to ensure informed decision-making.",
+        "jd_anchor": "join a network of people that all want to help each other succeed",
+        "stakes": "Effective communication ensures alignment and timely action across teams, preventing security gaps."
+      },
+      {
+        "text": "Mapping and assessing security and privacy risks during technology migrations to design compliant and secure workflows.",
+        "jd_anchor": "Contribute to leading technologies",
+        "stakes": "Identifying risks early in migrations prevents vulnerabilities and compliance issues that could lead to data breaches or operational disruptions."
+      },
+      {
+        "text": "Building and maintaining secure authentication workflows, including multi-factor authentication, to protect sensitive data and systems.",
+        "jd_anchor": "access resources to develop new skills",
+        "stakes": "Strong authentication controls are critical to prevent unauthorized access and protect sensitive information."
+      }
+    ],
+    "evidence_map": [
+      {
+        "pain_point_index": 0,
+        "candidate_evidence": [
+          {
+            "source_id": "dillards_intern.b1",
+            "summary": "Built a SAST reporting workflow converting raw scanner output into clean Excel reports with severity breakdowns and stakeholder views.",
+            "match_strength": "strong"
+          },
+          {
+            "source_id": "proj_sast_xlsx",
+            "summary": "Developed Python tooling to normalize and combine SAST reports into management-ready summaries.",
+            "match_strength": "strong"
+          }
+        ]
+      },
+      {
+        "pain_point_index": 1,
+        "candidate_evidence": [
+          {
+            "source_id": "security_automation_projects.b1",
+            "summary": "Designed security automation workflows for vulnerability discovery and remediation tracking with structured logs and approval gates.",
+            "match_strength": "strong"
+          },
+          {
+            "source_id": "security_automation_projects.b2",
+            "summary": "Built monitoring and approval-gate workflows to detect automation failures and route remediation through human review.",
+            "match_strength": "strong"
+          },
+          {
+            "source_id": "proj_command_broker",
+            "summary": "Designed approval workflows and audit logs for human-in-the-loop review of risky agent actions.",
+            "match_strength": "strong"
+          }
+        ]
+      },
+      {
+        "pain_point_index": 2,
+        "candidate_evidence": [
+          {
+            "source_id": "nonprofit_health_consultant.b2",
+            "summary": "Presented migration risks and security considerations to technical and non-technical stakeholders.",
+            "match_strength": "strong"
+          },
+          {
+            "source_id": "dillards_intern.b4",
+            "summary": "Translated technical vulnerability findings into actionable reporting for decision-makers.",
+            "match_strength": "strong"
+          },
+          {
+            "source_id": "leadership_sif.b1",
+            "summary": "Presented financial models and risk assessments to stakeholders.",
+            "match_strength": "adjacent"
+          }
+        ]
+      },
+      {
+        "pain_point_index": 3,
+        "candidate_evidence": [
+          {
+            "source_id": "nonprofit_health_consultant.b1",
+            "summary": "Mapped workflows and technology environment to security, privacy, and implementation risks during a planned migration.",
+            "match_strength": "strong"
+          },
+          {
+            "source_id": "proj_cmmc_nist_docs",
+            "summary": "Coursework mapping CMMC controls to NIST requirements and analyzing compliance implications.",
+            "match_strength": "adjacent"
+          }
+        ]
+      },
+      {
+        "pain_point_index": 4,
+        "candidate_evidence": [
+          {
+            "source_id": "nonprofit_health_consultant.b3",
+            "summary": "Designed a low-cost SMS MFA workflow using Twilio Verify and tokenized links to strengthen access control.",
+            "match_strength": "strong"
+          },
+          {
+            "source_id": "proj_secure_access_mfa",
+            "summary": "Built WordPress/PHP plugins implementing secure access via SMS MFA and tokenized email links.",
+            "match_strength": "strong"
+          }
+        ]
+      }
+    ],
+    "missing_evidence": [],
+    "prompt_version": "extract_jd_analysis@v1",
+    "model": "gpt-4.1-mini"
+  },
+  "blocked": false,
+  "block_reasons": {
+    "high_qa_issues": [],
+    "fabrication_blocks": []
+  },
+  "candidate_brief": {
+    "role_company_summary": "Bloomreach builds a digital experience platform used by ecommerce brands for search, merchandising, content, and marketing. The posting you applied to is a general interest opening with no specific role details, so it could route to multiple teams. If this lands with security or operations, expect needs around product and corporate security, developer enablement, and clear reporting to stakeholders. If it routes elsewhere, be ready to clarify where your security and automation strengths fit best.",
+    "why_this_role_fits": "Even without a defined role, your strongest evidence lines up with common needs at a fast-moving SaaS company: you turned GitLab SAST output into management-ready reporting, designed automation with human approval gates, and built an SMS MFA flow for a real client. Those address pain points around signal clarity, safe automation, and practical access control. You also have hands-on logging and alerting lab work that shows you can validate event flows and escalate intelligently. Your mix of communication and build skills makes you useful across security analysis, DevSecOps support, and enabling developers to act on findings.",
+    "top_three_talking_points": [
+      "At Dillard's I built Python + OpenPyXL tooling to convert GitLab SAST (plus Invicti and ACS outputs) into Excel reports with severity breakdowns and team mapping so stakeholders could prioritize fixes.",
+      "I designed an SMS MFA workflow for a nonprofit healthcare migration using Twilio Verify, tokenized links, and PHP/WordPress plugins backed by MySQL to strengthen access control within budget.",
+      "I set up a centralized logging lab with Graylog, OpenSearch, and MongoDB, forwarding via rsyslog and NXLog, and created alerts for Linux sudo/auth and Windows failed logons to practice triage."
+    ],
+    "resume_emphasis": "The resume leads with vulnerability reporting and security automation because they are broadly valuable to any team that needs clear security signal and safe remediation. It then shows the MFA access-control build to demonstrate you can move from analysis to practical control design. This order helps you look immediately useful even though the posting does not specify a role.",
+    "cover_letter_emphasis": "The cover letter argues you make security data usable and automation safe with human-in-the-loop patterns, and that you communicate tradeoffs clearly to non-technical stakeholders. It differs from the resume by telling one concise story for each theme and offering to walk through a sanitized reporting mockup, avoiding bullet-style repetition.",
+    "claims_to_be_ready_to_explain": [
+      {
+        "claim": "Built a GitLab SAST reporting workflow and combined multiple scanner outputs into actionable Excel summaries.",
+        "where": "Resume bullets and project: SAST Vulnerability Reporting + Excel Automation; Dillard's internship",
+        "supporting_detail": "Be ready to describe data sources (GitLab SAST, Invicti, ACS), normalization approach, team/repo mapping method, Excel structure (summary tabs, color coding), your personal scope vs team help, and how stakeholders used the output."
+      },
+      {
+        "claim": "Designed monitoring and approval-gate workflows that route risky actions through human review with audit logs.",
+        "where": "Security Automation Projects; Privileged Command Broker / Agent Guardrails project",
+        "supporting_detail": "Explain HMAC signing, allowlists, path normalization, never-touch paths, TTLs, approval queues, and audit logs. State clearly this was project-scale, not production at a large enterprise."
+      },
+      {
+        "claim": "Implemented an SMS MFA workflow with Twilio Verify and tokenized links for a healthcare migration, with a low-cost model.",
+        "where": "Nonprofit Healthcare capstone; WordPress Secure Access + SMS MFA project",
+        "supporting_detail": "Walk through PHP/WordPress plugin work, MySQL schema, token lifecycle, enrollment and recovery considerations, and how you reasoned about per-message and verification costs. Call the cost figures estimates based on Twilio pricing at the time, not audited billing."
+      },
+      {
+        "claim": "Centralized logging lab with Graylog/OpenSearch/MongoDB and alerts on auth-related events.",
+        "where": "Project: Centralized Logging Lab",
+        "supporting_detail": "Outline Docker Compose setup, rsyslog and NXLog configs, Syslog and GELF inputs, example alert queries, and how you validated end-to-end ingestion. Emphasize lab environment, not production."
+      },
+      {
+        "claim": "Supported secure code training to help teams meet PCI expectations.",
+        "where": "Dillard's internship bullet",
+        "supporting_detail": "Clarify your role was support: assembling materials, aligning with PCI requirements, and helping translate findings for developers. Do not imply you led PCI program ownership."
+      },
+      {
+        "claim": "CMMC v2 to NIST SP 800-171 control mapping and assessment-objective writeups.",
+        "where": "Project: CMMC v2 / NIST SP 800-171 Documentation",
+        "supporting_detail": "Note this was coursework. Be ready to name a few controls you mapped, what changed from v1 to v2, and how you captured assessor objectives. Keep scope to academic deliverables."
+      }
+    ],
+    "weak_spots_or_gaps": [
+      {
+        "gap": "The posting does not specify a role, so your fit may need to be mapped live to the right team.",
+        "honest_answer": "I applied because my reporting, automation, and access-control work translates across security and developer enablement. I am happy to share examples and let you point me to the team where this has the most impact."
+      },
+      {
+        "gap": "Limited professional SOC or on-call incident experience.",
+        "honest_answer": "My hands-on monitoring and triage is from labs and internships. I configured Graylog with Linux and Windows forwarding and practiced alerting on auth events, and I used Wireshark in a technical operations role. I want to do that work at production scale and I pick up new tooling quickly."
+      },
+      {
+        "gap": "Cloud security depth is light and not listed as a dedicated strength.",
+        "honest_answer": "I have fundamentals through projects and coursework but not production cloud security ownership yet. I am comfortable with logging, identity, and automation patterns and can ramp on your specific cloud stack and SIEM quickly."
+      },
+      {
+        "gap": "Few hard impact metrics tied to your bullets.",
+        "honest_answer": "I focused on clarity and reproducibility when I did the work. If helpful, I can propose metrics I would track in the first 60 to 90 days, like time to triage per report, remediation acknowledgment rates, or alert fidelity improvements."
+      }
+    ],
+    "thirty_second_interest_answer": "I\u2019m interested in Bloomreach because it is a high-velocity SaaS company where clear security signal, safe automation, and practical access controls matter. My recent work turned GitLab SAST data into reports teams could actually use, added human approval to risky automated steps, and implemented SMS MFA for a real client. I want to bring that mix of reporting, guardrails, and communication to a team where I can learn your stack and help developers and stakeholders act on security issues faster.",
+    "sixty_second_background_walkthrough": "I\u2019m finishing a BS in Computer Information Systems with a Cybersecurity minor and an MS in Cybersecurity at the University of Tulsa, with Network+ and Security+. Last summer at Dillard\u2019s I built Python and OpenPyXL tooling that converted GitLab SAST and related outputs into Excel summaries with severity breakdowns and team mapping, and I supported secure code training tied to PCI. Before that, I interned in technical operations doing Wireshark-based traffic analysis and network troubleshooting. On the project side, I set up a Graylog stack with rsyslog and NXLog forwarding and alerts on auth events, built approval-gate guardrails for risky automated actions, and implemented an SMS MFA workflow in PHP/WordPress with Twilio Verify for a nonprofit migration. I like making security data usable and building lightweight controls that fit real constraints, and I\u2019m excited to apply that on a Bloomreach team where I can grow quickly and contribute from day one.",
+    "questions_to_ask": [
+      "Since this posting is general, which teams are actively hiring now and where do you see my background fitting best?",
+      "If this routes to security, what are the top 2 or 3 problems you want an entry-level analyst or engineer to help with in the first 90 days?",
+      "What tools are in place today for code scanning, SIEM, and alerting, and where do you want reporting or automation to improve?",
+      "How do security and engineering collaborate on remediation at Bloomreach, and who owns prioritization and follow through?",
+      "What does on-call or incident participation look like for junior team members, and how is coaching handled during investigations?",
+      "Which cloud providers and data privacy frameworks are most relevant for Bloomreach\u2019s products right now, and how do they shape day-to-day security work?",
+      "What does success look like at the 30, 60, and 90 day marks for someone in this type of role, and how is it measured?"
+    ],
+    "prompt_version": "candidate_brief@v1",
+    "model": "gpt-5",
+    "stress_test": {
+      "stress_tests": [
+        {
+          "claim": "Built a GitLab SAST to Excel reporting pipeline with severity breakdowns and team/repo views.",
+          "where": "resume: Dillard's section bullet 1; cover letter para 2; application answers (vuln assessment Q); outreach_recruiter; linkedin_dm",
+          "likely_questions": [
+            "How did you ingest GitLab SAST results (API endpoints, artifacts, or downloads)?",
+            "How were repositories mapped to owning teams and kept up to date?",
+            "What did the Excel workbook structure look like (summary tabs, pivot tables, visuals)?",
+            "How did you normalize or translate severities from the raw SAST output?",
+            "How did you handle false positives or noisy rules and communicate that in reports?"
+          ],
+          "strong_answer_should_include": [
+            "Brief of GitLab API or pipeline artifact retrieval and auth method used (PAT/service account).",
+            "OpenPyXL-driven workbook with a summary tab, per-team/per-repo views, and consistent columns.",
+            "Severity mapping logic and rationale; clear ownership mapping from a maintained CSV or metadata.",
+            "Basic error handling and idempotent runs to avoid duplicate entries.",
+            "Example of a recommendation that changed prioritization or drove remediation."
+          ],
+          "confidence": "high",
+          "recommendation": "keep"
+        },
+        {
+          "claim": "Normalized severities across GitLab SAST, Invicti, and ACS; deduped by rule id/path/line; tracked first-seen and regressions.",
+          "where": "outreach_hiring_manager body",
+          "likely_questions": [
+            "What does ACS stand for in your context, and what output format did it produce?",
+            "How did you calculate first-seen dates and persist history across runs (DB, files, or tool API)?",
+            "How did your dedup logic handle same finding reported by multiple tools or line shifts after code changes?",
+            "What mapping did you use to bring different tool severity scales into a single 1\u20135 scale?",
+            "Did you implement regression detection programmatically? How did you distinguish re-opened from net-new?"
+          ],
+          "strong_answer_should_include": [
+            "Clear definition of ACS and the schema fields used (ID, severity, file, line).",
+            "Persistence approach for first-seen (e.g., SQLite/CSV keyed by fingerprint of rule+file+line).",
+            "Dedup strategy including fuzzy tolerance for line changes and repo path normalization.",
+            "Severity mapping table rationale and edge cases (informational, tool-specific labels).",
+            "Limitations and how discrepancies were flagged for manual review."
+          ],
+          "confidence": "medium",
+          "recommendation": "soften"
+        },
+        {
+          "claim": "Built monitoring and approval-gate workflows that detected automation failures and routed risky actions through human review with an audit trail.",
+          "where": "resume: Security Automation Projects bullets; cover letter para 3; application answers (education/prep and fit)",
+          "likely_questions": [
+            "Which actions were considered risky and what criteria triggered an approval gate?",
+            "How were approval requests presented to reviewers and how was approval captured and verified?",
+            "What prevented bypassing the gate (signing, allowlists, TTL, or role separation)?",
+            "What did the audit log contain and how did you ensure tamper evidence?",
+            "How did you handle timeouts, partial failures, or rollback if an approved action failed?"
+          ],
+          "strong_answer_should_include": [
+            "A concrete flow: detection, queueing an approval, reviewer context, and decision capture.",
+            "Controls such as HMAC-signed requests, command allowlists, nonces/TTLs, and least-privilege tokens.",
+            "JSONL or structured logs with actor, time, input, output, and decision; immutable storage pattern.",
+            "Clear escalation paths and safe defaults on failure (deny or rollback).",
+            "Example where the gate prevented or contained a risky change."
+          ],
+          "confidence": "high",
+          "recommendation": "keep"
+        },
+        {
+          "claim": "Designed a low-cost SMS MFA flow with Twilio Verify, tokenized links, and database-backed forms to protect monitor and client information.",
+          "where": "resume: Nonprofit Healthcare bullets; cover letter para 4; application answers (education/prep and fit)",
+          "likely_questions": [
+            "Why choose SMS MFA over app-based or hardware factors for this user base and budget?",
+            "How does the Twilio Verify challenge flow integrate with your application session lifecycle?",
+            "How were tokenized links generated, stored (hashed/salted), expired, and enforced as single-use?",
+            "How did you address replay attacks, SIM-swap risk, and rate limiting?",
+            "What HIPAA-aligned considerations did you document to avoid PHI exposure in SMS or URLs?"
+          ],
+          "strong_answer_should_include": [
+            "Tradeoff rationale (usability, device coverage, cost) and a future path to stronger factors.",
+            "Verify OTP flow tied to session establishment; no PHI in SMS; short TTL and attempt limits.",
+            "Hashed token storage with used flags and server-side checks to enforce single-use.",
+            "Abuse controls: rate limiting, lockouts, secondary verification for high-risk changes.",
+            "Cost estimate approach and monitoring (per-SMS pricing, thresholds, alerting)."
+          ],
+          "confidence": "high",
+          "recommendation": "keep"
+        },
+        {
+          "claim": "Built WordPress/PHP plugins implementing secure access via Twilio Verify and tokenized email links.",
+          "where": "projects: WordPress Secure Access + SMS MFA + Monitor Workflow",
+          "likely_questions": [
+            "Which WordPress hooks/shortcodes did you use and how did you protect against CSRF?",
+            "How did you handle input sanitization and output escaping in forms and emails?",
+            "What MySQL schema supported users, tokens, and audit logs?",
+            "How did you ensure deliverability for emails (SPF/DKIM/DMARC) and prevent link abuse?"
+          ],
+          "strong_answer_should_include": [
+            "Specific hooks/shortcodes, wp_nonce usage, and capability checks for sensitive actions.",
+            "Sanitization via WordPress helpers and prepared statements with $wpdb.",
+            "A simple ER model for users, tokens (hashed), and audit trail with timestamps.",
+            "Email best practices and token TTLs with rate limiting."
+          ],
+          "confidence": "high",
+          "recommendation": "keep"
+        },
+        {
+          "claim": "Mapped existing workflows and environment to security, privacy, and implementation risks during a healthcare system migration and presented recommendations.",
+          "where": "resume: Nonprofit Healthcare bullets 1 and 3; cover letter para 4; application answers (education/prep and fit)",
+          "likely_questions": [
+            "What were the top 3 migration risks you identified and how did you score likelihood and impact?",
+            "Which HIPAA Security Rule safeguards did you reference when designing controls?",
+            "What rollout approach did you recommend and how did you handle change management for staff?",
+            "What artifacts did you deliver (risk register, diagrams, decision log), and to whom?"
+          ],
+          "strong_answer_should_include": [
+            "Concrete risks with mitigations and a simple scoring model to prioritize.",
+            "Mapping to relevant HIPAA 164.3xx safeguards and rationale.",
+            "Phased rollout with pilot group, training plan, and rollback criteria.",
+            "Artifacts: risk register, swimlane diagrams, and an exec-ready summary deck."
+          ],
+          "confidence": "high",
+          "recommendation": "keep"
+        },
+        {
+          "claim": "Combined outputs from multiple scanners into a single Excel workbook for management-ready reporting.",
+          "where": "application answers (vuln assessment Q and education/prep Q); projects: SAST Vulnerability Reporting + Excel Automation",
+          "likely_questions": [
+            "Which formats did you parse for each tool (JSON, XML, CSV) and how did you normalize fields?",
+            "Did you access results via API or file artifacts, and how did you authenticate?",
+            "How did you handle duplicate or conflicting findings across tools?",
+            "How did end users interact with the workbook and what decisions it enabled?"
+          ],
+          "strong_answer_should_include": [
+            "Tool-specific parsers and a common internal schema (id, file, line, severity, rule).",
+            "API/file retrieval steps and token handling; rate limit/backoff notes.",
+            "Dedup strategy and caveats; a brief severity mapping description.",
+            "Example of how the combined view clarified ownership and priority."
+          ],
+          "confidence": "high",
+          "recommendation": "keep"
+        },
+        {
+          "claim": "Designed automation for vulnerability discovery and remediation tracking using structured logs, alerting, and approval gates.",
+          "where": "resume: Security Automation Projects bullet 1; application answers (why fit; education/prep)",
+          "likely_questions": [
+            "What were your primary data sources for vulnerability discovery and how did you structure the logs?",
+            "What conditions triggered alerts and how did you minimize noise or flapping?",
+            "How did you route remediation tasks and ensure they passed through approval gates?",
+            "What metrics or states did you track to show progress or regressions over time?"
+          ],
+          "strong_answer_should_include": [
+            "Specific sources (scanner outputs or config drift signals) and a normalized log schema.",
+            "Clear alert thresholds and suppression mechanisms; examples of tuning.",
+            "Queueing plus human-in-the-loop steps with auditability and SLAs.",
+            "Tracking first-seen, last-seen, status, and ownership to drive action."
+          ],
+          "confidence": "medium",
+          "recommendation": "study_before_sending"
+        },
+        {
+          "claim": "I can share a sanitized mockup of the vulnerability reporting format and walk through the approval-gate pattern next week.",
+          "where": "cover letter final paragraph",
+          "likely_questions": [
+            "Will the mockup or walkthrough contain any client or proprietary data?",
+            "What exactly will you show (schema, sample workbook, code snippets)?",
+            "Do you have permission to share artifacts, and how did you sanitize them?"
+          ],
+          "strong_answer_should_include": [
+            "Commitment to synthetic data only; no client identifiers or metadata.",
+            "Outline of mock schema, fake sample workbook, and high-level code structure.",
+            "Statement on respecting NDAs and offering a recreated sample."
+          ],
+          "confidence": "medium",
+          "recommendation": "soften"
+        },
+        {
+          "claim": "I can share a redacted sample workbook and a one-page writeup.",
+          "where": "outreach_hiring_manager closing paragraph",
+          "likely_questions": [
+            "Are you authorized to share a redacted sample from an internship project?",
+            "How did you ensure no sensitive data or metadata remains in the file?",
+            "Can you instead provide a synthetic sample that mirrors structure without real data?"
+          ],
+          "strong_answer_should_include": [
+            "Preference for synthetic data samples mirroring structure to avoid NDA issues.",
+            "Confirmation of redaction/sanitization process if ever applicable (and approvals if required).",
+            "Offer to demo workflow live using fake inputs."
+          ],
+          "confidence": "low",
+          "recommendation": "soften"
+        },
+        {
+          "claim": "Mapped CMMC v2 controls to NIST SP 800-171 and explained assessment implications.",
+          "where": "application answers (education/prep Q)",
+          "likely_questions": [
+            "Give an example mapping from a CMMC v2 practice to its NIST 800-171 requirement and assessment objectives.",
+            "How would you document objective evidence for a monitoring or access control requirement?",
+            "What changed from CMMC v1 to v2 that affects self-assessment and POA&M usage?"
+          ],
+          "strong_answer_should_include": [
+            "A concrete mapping example with assessment objectives and objective evidence.",
+            "Discussion of evidence types (configs, logs, procedures) and how to verify.",
+            "High-level summary of v2 simplifications and implications for self-assessment."
+          ],
+          "confidence": "high",
+          "recommendation": "keep"
+        },
+        {
+          "claim": "Turned technical vulnerability findings into actionable summaries that decision-makers could use to prioritize remediation.",
+          "where": "resume: Dillard's bullet 2; application answers (vuln assessment Q, why fit Q)",
+          "likely_questions": [
+            "Show how you translated a specific technical finding into a management-ready recommendation.",
+            "How did you balance severity, exploitability, and business impact in prioritization?",
+            "How did you present ownership and timelines to drive action?"
+          ],
+          "strong_answer_should_include": [
+            "Example with rule ID, impacted repo, risk narrative, and remediation guidance.",
+            "Prioritization that considers exposure and asset criticality, not just CVSS.",
+            "Ownership mapping, proposed SLA, and status tracking in the report."
+          ],
+          "confidence": "high",
+          "recommendation": "keep"
+        },
+        {
+          "claim": "CompTIA Security+ certified (2025-12).",
+          "where": "resume: Certifications",
+          "likely_questions": [
+            "Which Security+ domains have you applied directly in your projects?",
+            "Any labs or hands-on exercises from Security+ that informed your internship work?"
+          ],
+          "strong_answer_should_include": [
+            "Tie domains like identity and access, risk, and secure architecture to your MFA and reporting projects.",
+            "A brief example of applied concepts (e.g., least privilege, incident response fundamentals)."
+          ],
+          "confidence": "high",
+          "recommendation": "keep"
+        }
+      ],
+      "claims_to_soften_or_remove": [
+        {
+          "claim": "Normalized severities across GitLab SAST, Invicti, and ACS; deduped by rule id/path/line; tracked first-seen and regressions (framed as Dillard's workflow).",
+          "where": "outreach_hiring_manager body",
+          "why": "Specifics (multi-tool normalization, first-seen tracking) are not explicitly tied to the Dillard's internship in the profile and ACS is undefined.",
+          "suggested_action": "Soften and clarify: note that cross-tool normalization and dedup were done in a separate project; define ACS explicitly or replace with the actual tool name."
+        },
+        {
+          "claim": "Can share a redacted sample workbook from internship work.",
+          "where": "outreach_hiring_manager closing paragraph",
+          "why": "Sharing redacted internship artifacts can violate confidentiality; safer to provide synthetic data.",
+          "suggested_action": "Soften to: \u201cI can share a synthetic sample workbook and a one-page overview of the workflow\u201d or \u201clive demo with mock data.\u201d"
+        },
+        {
+          "claim": "Designed automation for vulnerability discovery and remediation tracking with structured logs and alerting.",
+          "where": "resume: Security Automation Projects bullet 1; application answers (why fit; education/prep)",
+          "why": "Interviewers will probe data sources and alert logic; details are not specified in the materials.",
+          "suggested_action": "Move to interview study only: prepare concrete examples of sources, schema, alert thresholds, and gating; keep wording as-is in materials."
+        },
+        {
+          "claim": "Can share a sanitized mockup of vulnerability reporting format and approval-gate pattern next week.",
+          "where": "cover letter final paragraph",
+          "why": "Good claim but should explicitly state it uses synthetic data to avoid any NDA concern.",
+          "suggested_action": "Soften to: \u201cI can share a synthetic mockup of the reporting format and walk through the approval-gate pattern.\u201d"
+        }
+      ],
+      "prompt_version": "claim_stress_test@v1",
+      "model": "gpt-5"
+    }
+  }
+}

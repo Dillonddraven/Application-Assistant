@@ -1,0 +1,62 @@
+{
+  "company": "LVT",
+  "role_title": "Information Security Analyst (GRC)",
+  "source_url": "https://job-boards.greenhouse.io/liveviewtechnologiesinc/jobs/5192885008",
+  "source_confidence": "high",
+  "source_confidence_reason": "direct ATS board (greenhouse.io)",
+  "role_category": "GRC / Compliance",
+  "fit_score": 38,
+  "fit_breakdown": {
+    "skills_match": 0,
+    "preferred_skills_match": 0,
+    "cert_match": 100,
+    "experience_match": 80,
+    "location_match": 55,
+    "industry_filter": "ok"
+  },
+  "industry_filter": "ok",
+  "apply_recommendation": "skip",
+  "apply_reason": "blocked: 1 HIGH QA, 0 fabrication block(s)",
+  "top_match_reasons": [
+    "Execute control testing and evidence collection to verify security controls are effective",
+    "Communicate effectively with stakeholders including customers and auditors to support GRC processes"
+  ],
+  "top_gaps": [
+    "No evidence found of executing quarterly user access reviews or similar access control review processes."
+  ],
+  "unsupported_claims_count": 0,
+  "softened_claims_count": 5,
+  "fabrication_blocks_count": 0,
+  "qa_high_count": 1,
+  "qa_medium_count": 2,
+  "qa_low_count": 1,
+  "resume_page_count": 0,
+  "ats_safety_status": "missing",
+  "cover_letter_quality": "fair",
+  "qa_polish": "needs_work",
+  "outreach_risk": "high",
+  "portal_complexity": "low",
+  "manual_review_required_fields": [
+    "desired_salary",
+    "sponsorship_visa",
+    "relocation",
+    "shift_availability",
+    "start_date",
+    "custom_long_answers",
+    "legal_acknowledgements",
+    "demographic_or_disability_or_veteran",
+    "final_submit"
+  ],
+  "never_auto_answer_fields": [
+    "demographic_identity",
+    "disability_status",
+    "veteran_status",
+    "criminal_background",
+    "legal_attestation"
+  ],
+  "estimated_user_review_time_minutes": 20,
+  "final_status": "needs_patch",
+  "run_id": "c58f3956",
+  "slug": "lvt_information-security-analyst-grc",
+  "id": 3
+}

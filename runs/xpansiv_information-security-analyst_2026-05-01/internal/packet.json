@@ -1,0 +1,852 @@
+{
+  "job_id": "bfad0445f7c8",
+  "slug": "xpansiv_information-security-analyst",
+  "run_id": "f1632301",
+  "tailored": {
+    "summary": "Security analyst focused on monitoring and vulnerability reporting, with hands-on SAST-to-report workflows, centralized logging and alerting, and SMS MFA design for stronger access control.",
+    "skills_emphasis": [
+      "Python",
+      "Security automation",
+      "Vulnerability management",
+      "SAST report ingestion and analysis",
+      "Graylog",
+      "rsyslog",
+      "NXLog",
+      "Wireshark",
+      "Twilio Verify",
+      "SMS MFA",
+      "Excel / XLSX automation",
+      "Risk assessment"
+    ],
+    "bullets": [
+      {
+        "source_id": "experience.security_automation_projects.b1",
+        "text": "Designed security automation workflows for vulnerability discovery and remediation tracking using structured logs, alerting, and approval gates to improve visibility across automated systems."
+      },
+      {
+        "source_id": "experience.security_automation_projects.b2",
+        "text": "Built monitoring and approval-gate workflows that detect automation failures, flag risky actions, and route remediation steps through human review."
+      },
+      {
+        "source_id": "experience.dillards_intern.b1",
+        "text": "Helped build a GitLab SAST reporting workflow that converted raw scanner output into clean Excel reports with severity breakdowns, team and repository views, and visual summaries for stakeholders."
+      },
+      {
+        "source_id": "experience.dillards_intern.b2",
+        "text": "Correlated vulnerability details such as severity and logging dates to clarify remediation priorities."
+      },
+      {
+        "source_id": "experience.dillards_intern.b4",
+        "text": "Translated technical vulnerability findings into actionable reporting for decision-makers."
+      },
+      {
+        "source_id": "experience.nonprofit_health_consultant.b3",
+        "text": "Designed a low-cost SMS MFA workflow with Twilio Verify, tokenized links, and database-backed forms to strengthen access control."
+      },
+      {
+        "source_id": "experience.accurate_interpretations_intern.b2",
+        "text": "Performed onsite network traffic analysis with Wireshark to identify anomalies, support troubleshooting, and strengthen secure network operations."
+      }
+    ],
+    "cover_letter_paragraphs": [
+      {
+        "source_id": "general",
+        "text": "I am applying for the Information Security Analyst role at Xpansiv. My work centers on turning scanner findings and log signals into clear, prioritized actions, and on practical access controls that raise security without adding friction."
+      },
+      {
+        "source_id": "experience.dillards_intern",
+        "text": "At Dillard's I focused on the layer between raw SAST output and the people who have to act on it. The reporting made it easier for stakeholders to see where risk concentrated, who owned it, and what should move first, which cut time spent sifting through scanner output and helped drive remediation conversations."
+      },
+      {
+        "source_id": "experience.security_automation_projects",
+        "text": "On security automation projects I built monitoring and alerting with human review points so that risky or failed actions were surfaced quickly and routed for approval. That approach improved triage by separating routine events from items that required immediate attention."
+      },
+      {
+        "source_id": "experience.nonprofit_health_consultant",
+        "text": "For a nonprofit healthcare client, I helped design an SMS MFA access path that fit a tight budget while improving control over sensitive information. The goal was to make the right action the easy one, so staff could keep working while access risks dropped."
+      },
+      {
+        "source_id": "general",
+        "text": "I can share a sanitized sample or mockup of the vulnerability reporting format and a brief walkthrough of the alert logic from my Graylog lab. If it helps, I can meet Wednesday or Thursday between 1 and 4 pm CT."
+      }
+    ],
+    "application_answers": [
+      {
+        "question": "How has your education and project work prepared you for this role?",
+        "source_id": "reusable_answers.how_coursework_prepared_me",
+        "answer": "My coursework targeted what entry-level analysts do day to day. In an incident-response course I built a playbook that started from a business impact analysis, identified sales as the client's essential function, and sequenced infrastructure-restoration steps so sales-supporting systems came back online first. I also designed a tiered cloud backup schedule that placed frequently accessed data in fast-retrieval storage and infrequently accessed data in cheaper archival tiers, balancing recovery time against ongoing cost. Combined with my Dillard's internship work on SAST ingestion and vulnerability reporting, my Graylog and OpenSearch centralized logging lab with rsyslog and NXLog forwarding and alerts, Wireshark-based traffic analysis from the Accurate Interpretations role, and CMMC v2 and NIST SP 800-171 documentation work, I am ready to monitor events, triage findings, and escalate when needed."
+      },
+      {
+        "question": "Describe your experience with security logs and SIEM.",
+        "source_id": "reusable_answers.security_logs_experience",
+        "answer": "I configured log forwarding from Linux and Windows endpoints into a centralized logging environment, validated event ingestion, reviewed authentication activity, and troubleshot cases where expected events were not appearing. I also built a Python script to classify log entries into clearer categories, which improved visibility into system activity and made it easier to identify security-relevant patterns. That work covered the full monitoring flow, from generating events and forwarding logs to classifying activity and using the results to support investigation."
+      },
+      {
+        "question": "Describe your experience with vulnerability assessment and remediation tracking.",
+        "source_id": "reusable_answers.vulnerability_assessment_experience",
+        "answer": "I built reporting that turned vulnerability data into remediation guidance. During my information security internship, I helped build a SAST reporting workflow that ingested findings from GitLab repositories and converted raw scan output into clean Excel reports with severity breakdowns, team and repository views, and visual summaries. The value was making vulnerabilities understandable so stakeholders could prioritize remediation based on severity, ownership, and visibility instead of sorting through raw scanner output."
+      },
+      {
+        "question": "Are you authorized to work in the United States?",
+        "source_id": "reusable_answers.authorized_to_work",
+        "answer": "Yes, US citizen, no sponsorship required."
+      },
+      {
+        "question": "What is your experience level?",
+        "source_id": "reusable_answers.years_of_experience",
+        "answer": "Internship-level plus project-heavy. Finishing a BS in Computer Information Systems and an MS in Cybersecurity at the University of Tulsa."
+      }
+    ]
+  },
+  "rendered": {
+    "employer": {
+      "tailored_resume_pdf": "employer/tailored_resume.pdf",
+      "tailored_resume_docx": "employer/tailored_resume.docx",
+      "cover_letter_pdf": "employer/cover_letter.pdf",
+      "cover_letter_docx": "employer/cover_letter.docx"
+    },
+    "internal": {
+      "tailored_resume_md": "internal/tailored_resume.md",
+      "cover_letter_md": "internal/cover_letter.md",
+      "application_answers_md": "internal/application_answers.md",
+      "outreach_recruiter_md": "internal/outreach_recruiter.md",
+      "outreach_hiring_manager_md": "internal/outreach_hiring_manager.md",
+      "linkedin_dm_md": "internal/linkedin_dm.md",
+      "match_report_md": "internal/match_report.md"
+    }
+  },
+  "emails": {
+    "recruiter": {
+      "subject": "Information Security Analyst - SAST reporting",
+      "body_paragraphs": [
+        {
+          "source_id": "",
+          "text": "Applied for the Information Security Analyst role at Xpansiv, and the focus on \"Monitor, investigate, and respond to security alerts and incidents\" stood out."
+        },
+        {
+          "source_id": "dillards_intern.b1",
+          "text": "At Dillard's, I helped build a SAST reporting workflow that converted raw scanner output into management-ready summaries."
+        },
+        {
+          "source_id": "",
+          "text": "Happy to share a one-page SAST workflow summary, open to a 15-minute call next Tuesday or Wednesday afternoon; are you the right contact for this role or could you point me to the right person?\n\nBest,\nDillon Stinson"
+        }
+      ],
+      "cited_items": [
+        "dillards_intern.b1"
+      ],
+      "_model": "gpt-5"
+    },
+    "hiring_manager": {
+      "subject": "Information Security Analyst at Xpansiv - Graylog alerting lab",
+      "body_paragraphs": [
+        {
+          "source_id": "projects.proj_centralized_logging_lab",
+          "text": "For the Information Security Analyst role, your posting calls for someone to \"monitor, investigate, and respond to security alerts and incidents,\" which maps to my Centralized Logging Lab where I deployed Graylog with OpenSearch/MongoDB and built sudo/auth and Windows failed logon alerts using rsyslog and NXLog."
+        },
+        {
+          "source_id": "projects.proj_centralized_logging_lab",
+          "text": "I chose GELF UDP for Windows so event fields stayed structured end to end, then normalized timestamps to UTC to avoid false correlations from Proxmox clock drift. To cut noise, I used Graylog event definitions to aggregate 5 failed logons per user in 3 minutes before firing, which reduced alert storms but still caught brute attempts."
+        },
+        {
+          "source_id": "projects.proj_centralized_logging_lab",
+          "text": "I can share the Docker Compose file, NXLog and rsyslog configs, and the alert definition as a one-page lab writeup; worth 20 minutes Tuesday 10:30-10:50 am CT next week to walk through it?"
+        }
+      ],
+      "cited_items": [
+        "projects.proj_centralized_logging_lab"
+      ],
+      "_model": "gpt-5"
+    },
+    "linkedin_dm": {
+      "text": "Information Security Analyst fit to Perform regular vulnerability assessments, patch verification, and risk remediation tracking. At Dillard's I built a GitLab SAST reporting workflow that turned scanner output into management-ready summaries. Is your team still hiring for this?",
+      "cited_items": [
+        "dillards_intern.b1"
+      ],
+      "_model": "gpt-5"
+    }
+  },
+  "validation": {
+    "fabrication_blocks": [],
+    "fabrication_warnings": [],
+    "schema_ok": true,
+    "qa": {
+      "issues": [
+        {
+          "category": "internal_metadata",
+          "severity": "high",
+          "where": "Top of packet",
+          "snippet": "JD_ANALYSIS:\n  [0] Monitor, investigate, and respond to security alerts and incidents across systems, networks, and cloud environments\n  ...\n  Pain points to leave OUT (no supporting evidence):\n    - pain_point[2]: No direct evidence of implementing secure configurations, code reviews, or cloud security best practices in collaboration with IT, DevOps, and engineering teams.\n    - pain_point[3]: No direct evidence of conducting access reviews or supporting formal audit and compliance efforts beyond coursework and presentations.",
+          "fix_suggestion": "Remove the JD_ANALYSIS block and any internal notes before sending. Only include candidate-facing materials (resume, cover letter, answers). Keep internal mapping in a separate file not shared with employers."
+        },
+        {
+          "category": "internal_metadata",
+          "severity": "medium",
+          "where": "Section separators throughout packet",
+          "snippet": "=== tailored_resume ===\n=== cover_letter ===\n=== application_answers ===\n=== outreach_recruiter ===\n=== outreach_hiring_manager ===\n=== linkedin_dm ===",
+          "fix_suggestion": "Delete internal section markers from the files/emails you send. Present each document (resume, cover letter, messages) as clean, standalone content without developer/authoring scaffolding."
+        },
+        {
+          "category": "overclaiming",
+          "severity": "medium",
+          "where": "tailored_resume \u2014 Summary",
+          "snippet": "Security analyst focused on monitoring and vulnerability reporting, with hands-on SAST-to-report workflows, centralized logging and alerting, and SMS MFA design for stronger access control.",
+          "fix_suggestion": "Soften the title to reflect experience level (e.g., 'Aspiring/Entry-level security analyst' or 'Early-career security professional'). Briefly indicate internships and projects that back up the skills to avoid implying longer professional tenure."
+        },
+        {
+          "category": "evidence_gap",
+          "severity": "medium",
+          "where": "application_answers \u2014 'How has your education and project work prepared you for this role?' and overall materials",
+          "snippet": "Combined with my Dillard's internship work on SAST ingestion and vulnerability reporting, my Graylog and OpenSearch centralized logging lab with rsyslog and NXLog forwarding and alerts, Wireshark-based traffic analysis ..., and CMMC v2 and NIST SP 800-171 documentation work, I am ready to monitor events, triage findings, and escalate when needed.",
+          "fix_suggestion": "The JD asks for collaboration with IT/DevOps and support for audits/access reviews. You don't have direct, documented experience running formal access reviews or partnering on secure configuration/code review programs. Reframe as: emphasize stakeholder communication and coursework, call out any instances you worked with repo owners / admins (if true), or explicitly state you're experienced in monitoring and reporting and eager to apply those skills to cross-team secure-configuration and audit tasks."
+        },
+        {
+          "category": "tone",
+          "severity": "low",
+          "where": "linkedin_dm",
+          "snippet": "Information Security Analyst fit to Perform regular vulnerability assessments, patch verification, and risk remediation tracking. At Dillard's I built a GitLab SAST reporting workflow that turned scanner output into management-ready summaries. Is your team still hiring for this?",
+          "fix_suggestion": "The DM reads like pasted JD text and is slightly awkward. Make it shorter and more conversational (one line about fit + one question). Personalize the opener (name/company) and avoid title-case JD fragments."
+        }
+      ],
+      "overall_polish": "needs_work",
+      "prompt_version": "qa_check@v1",
+      "model": "gpt-5-mini"
+    }
+  },
+  "status": "draft",
+  "approval_log": [
+    {
+      "ts": "2026-05-01T17:58:23+00:00",
+      "action": "draft"
+    }
+  ],
+  "prompt_versions": {
+    "tailor": "tailor_resume@v1",
+    "recruiter": "write_email_recruiter@v2",
+    "hiring_manager": "write_email_hiring_manager@v2",
+    "linkedin_dm": "write_linkedin_dm@v2",
+    "jd_analysis": "extract_jd_analysis@v1",
+    "qa_check": "qa_check@v1",
+    "claim_stress_test": "claim_stress_test@v1",
+    "candidate_brief": "candidate_brief@v1"
+  },
+  "model": "gpt-5",
+  "jd_analysis": {
+    "pain_points": [
+      {
+        "text": "Monitor, investigate, and respond to security alerts and incidents across systems, networks, and cloud environments",
+        "jd_anchor": "Monitor, investigate, and respond to security alerts and incidents",
+        "stakes": "Effective monitoring and incident response are critical to quickly detect and mitigate security threats, minimizing potential damage to the organization."
+      },
+      {
+        "text": "Perform regular vulnerability assessments, patch verification, and risk remediation tracking",
+        "jd_anchor": "Perform regular vulnerability assessments, patch verification, and risk remediation tracking",
+        "stakes": "Regular vulnerability assessments and remediation tracking ensure that security weaknesses are identified and addressed promptly to reduce risk exposure."
+      },
+      {
+        "text": "Collaborate with IT, DevOps, and engineering teams to implement secure configurations, code reviews, and cloud security best practices",
+        "jd_anchor": "Collaborate with IT, DevOps, and engineering teams on security",
+        "stakes": "Cross-team collaboration is essential to embed security into development and operations processes, preventing vulnerabilities and ensuring secure deployments."
+      },
+      {
+        "text": "Support audit and compliance efforts including conducting access reviews and contributing to risk assessments and control testing",
+        "jd_anchor": "Conduct periodic access reviews and support audit and compliance efforts",
+        "stakes": "Supporting audit and compliance ensures the organization meets regulatory requirements and maintains a strong security posture."
+      },
+      {
+        "text": "Stay current on emerging threats, vulnerabilities, and regulatory requirements impacting the business",
+        "jd_anchor": "Stay current on emerging threats, vulnerabilities, and regulatory requirements",
+        "stakes": "Keeping up to date with evolving threats and regulations is vital to proactively adapt security controls and maintain compliance."
+      },
+      {
+        "text": "Manage endpoint security tools and identity/access management systems",
+        "jd_anchor": "Manage endpoint security tools and identity/access management",
+        "stakes": "Proper management of endpoint protection and access controls prevents unauthorized access and reduces attack surface."
+      }
+    ],
+    "evidence_map": [
+      {
+        "pain_point_index": 0,
+        "candidate_evidence": [
+          {
+            "source_id": "experience.security_automation_projects.b1",
+            "summary": "Designed security-focused automation workflows for vulnerability discovery and remediation tracking, using structured logs, alerting, and approval gates to improve visibility across automated systems.",
+            "match_strength": "strong"
+          },
+          {
+            "source_id": "experience.security_automation_projects.b2",
+            "summary": "Built security monitoring and approval-gate workflows to detect automation failures, flag risky actions, and route remediation steps through human review.",
+            "match_strength": "strong"
+          },
+          {
+            "source_id": "experience.accurate_interpretations_intern.b2",
+            "summary": "Performed onsite network traffic analysis with Wireshark to identify anomalies, support troubleshooting, and strengthen secure network operations.",
+            "match_strength": "adjacent"
+          },
+          {
+            "source_id": "projects.proj_centralized_logging_lab",
+            "summary": "Deployed Graylog stack with alert conditions for Linux sudo/auth activity and Windows failed-logon attempts, demonstrating monitoring and alerting capabilities.",
+            "match_strength": "strong"
+          }
+        ]
+      },
+      {
+        "pain_point_index": 1,
+        "candidate_evidence": [
+          {
+            "source_id": "experience.dillards_intern.b1",
+            "summary": "Helped build a SAST reporting workflow that ingested findings from GitLab repositories and converted raw scanner output into clean Excel reports with severity breakdowns and team views.",
+            "match_strength": "strong"
+          },
+          {
+            "source_id": "experience.dillards_intern.b2",
+            "summary": "Correlated vulnerability details such as severity and logging dates to improve visibility into remediation priorities.",
+            "match_strength": "strong"
+          },
+          {
+            "source_id": "projects.proj_sast_xlsx",
+            "summary": "Developed Python tooling to normalize severity, color-code findings, and build management-ready reports combining multiple vulnerability scanners.",
+            "match_strength": "strong"
+          }
+        ]
+      },
+      {
+        "pain_point_index": 2,
+        "candidate_evidence": [
+          {
+            "source_id": "experience.r1649_intern.b2",
+            "summary": "Supported software security operations by identifying potential risks and helping protect proprietary APIs and internal tools.",
+            "match_strength": "adjacent"
+          },
+          {
+            "source_id": "experience.nonprofit_health_consultant.b1",
+            "summary": "Mapped workflows and tech environment to security, privacy, and implementation risks during a planned migration, indicating collaboration with technical teams.",
+            "match_strength": "adjacent"
+          },
+          {
+            "source_id": "experience.nonprofit_health_consultant.b2",
+            "summary": "Presented migration risks and security considerations to technical and non-technical stakeholders, supporting cross-team communication.",
+            "match_strength": "adjacent"
+          }
+        ]
+      },
+      {
+        "pain_point_index": 3,
+        "candidate_evidence": [
+          {
+            "source_id": "projects.proj_cmmc_nist_docs",
+            "summary": "Coursework comparing CMMC v2 and NIST SP 800-171 controls, analyzing self-assessment implications, and writing assessment-objective explanations for monitoring controls and CUI handling.",
+            "match_strength": "adjacent"
+          },
+          {
+            "source_id": "experience.nonprofit_health_consultant.b2",
+            "summary": "Presented security risks and rollout recommendations to leadership, helping them understand vulnerabilities and escalation paths, relevant to compliance communication.",
+            "match_strength": "adjacent"
+          }
+        ]
+      },
+      {
+        "pain_point_index": 4,
+        "candidate_evidence": [
+          {
+            "source_id": "reusable_answers.security_logs_experience",
+            "summary": "Configured log forwarding and alerting in a centralized logging environment, gaining hands-on experience with event ingestion, classification, and investigation.",
+            "match_strength": "strong"
+          },
+          {
+            "source_id": "projects.proj_cmmc_nist_docs",
+            "summary": "Studied security frameworks and regulatory requirements, supporting knowledge of compliance and emerging standards.",
+            "match_strength": "adjacent"
+          },
+          {
+            "source_id": "experience.dillards_intern.b4",
+            "summary": "Translated technical vulnerability findings into actionable reporting for decision-makers, demonstrating awareness of evolving threats and communication.",
+            "match_strength": "adjacent"
+          }
+        ]
+      },
+      {
+        "pain_point_index": 5,
+        "candidate_evidence": [
+          {
+            "source_id": "experience.nonprofit_health_consultant.b3",
+            "summary": "Designed a low-cost SMS MFA workflow using Twilio Verify and tokenized links to strengthen access control, demonstrating experience with identity and access management.",
+            "match_strength": "strong"
+          },
+          {
+            "source_id": "experience.r1649_intern.b2",
+            "summary": "Supported software security operations including protecting proprietary APIs and internal tools, relevant to endpoint and access security.",
+            "match_strength": "adjacent"
+          }
+        ]
+      }
+    ],
+    "missing_evidence": [
+      {
+        "pain_point_index": 2,
+        "note": "No direct evidence of implementing secure configurations, code reviews, or cloud security best practices in collaboration with IT, DevOps, and engineering teams."
+      },
+      {
+        "pain_point_index": 3,
+        "note": "No direct evidence of conducting access reviews or supporting formal audit and compliance efforts beyond coursework and presentations."
+      }
+    ],
+    "prompt_version": "extract_jd_analysis@v1",
+    "model": "gpt-4.1-mini"
+  },
+  "blocked": true,
+  "block_reasons": {
+    "high_qa_issues": [
+      {
+        "category": "internal_metadata",
+        "where": "Top of packet",
+        "snippet": "JD_ANALYSIS:\n  [0] Monitor, investigate, and respond to security alerts and incidents across systems, networks, and cloud environments\n  ...\n  Pain points to leave OUT (no supporting evidence):\n    - pain_point[2]: No direct evidence of implementing secure configurations, code reviews, or cloud security best practices in collaboration with IT, DevOps, and engineering teams.\n    - pain_point[3]: No direct evidence of conducting access reviews or supporting formal audit and compliance efforts beyond coursework and presentations.",
+        "fix_suggestion": "Remove the JD_ANALYSIS block and any internal notes before sending. Only include candidate-facing materials (resume, cover letter, answers). Keep internal mapping in a separate file not shared with employers."
+      }
+    ],
+    "fabrication_blocks": []
+  },
+  "candidate_brief": {
+    "role_company_summary": "Xpansiv is a remote friendly company operating in energy and environmental commodities with fintech and SaaS elements, per the JD. This Information Security Analyst role sits in security operations and risk management, handling alerts, vulnerability assessment, endpoint and identity tooling, and support for audits and access reviews. If they run regulated market infrastructure, expect attention to control evidence, clear documentation, and collaboration with IT and engineering. Specific internal tools are not listed, so be ready to map your experience to whatever stack they use.",
+    "why_this_role_fits": "Your strongest proof points line up with their monitoring and vulnerability needs: you built a GitLab SAST to Excel reporting pipeline that turned scanner output into decisions, and you set up a Graylog lab with Linux sudo/auth and Windows failed logon alerts. You have hands-on IAM design through the Twilio Verify SMS MFA workflow, which shows practical access control judgment under budget limits. Your Python automation and stakeholder reporting experience fit their need for both investigation and communication. You will need a ramp on cloud and EDR, but you can credibly show the core SOC analyst muscles they want: signal capture, triage, prioritization, and clear escalation.",
+    "top_three_talking_points": [
+      "At Dillard's I helped build a Python and Excel based SAST reporting pipeline for GitLab repos that normalized severity, grouped findings by team, and produced stakeholder friendly summaries to drive remediation.",
+      "I deployed a Graylog stack with OpenSearch and MongoDB, forwarded Linux rsyslog and Windows NXLog events, and built alerts for sudo/auth and failed logon activity to practice real monitoring and triage.",
+      "I designed a Twilio Verify SMS MFA and tokenized link workflow as WordPress plugins with a MySQL backend to strengthen access control for a nonprofit healthcare client while staying budget conscious."
+    ],
+    "resume_emphasis": "The resume leads with monitoring, vulnerability reporting, and practical IAM because those map directly to the JD's alert response, vulnerability assessment, and access management. It showcases Python automation and Excel reporting to demonstrate you can turn noisy data into clear actions, plus the Graylog lab to show SIEM style thinking even if the exact platform differs. It avoids overstating enterprise EDR or cloud experience and is explicit that your cloud and formal audit exposure are developing.",
+    "cover_letter_emphasis": "The cover argues that your edge is converting scanner and log signals into prioritized actions and pairing that with friction aware access controls. It spotlights the SAST reporting pipeline and the SMS MFA workflow as concrete examples, and it offers to walk through a sanitized mockup of your reporting format and alert logic. It also implies you can collaborate across technical and non technical stakeholders without claiming formal audit ownership.",
+    "claims_to_be_ready_to_explain": [
+      {
+        "claim": "Helped build a GitLab SAST reporting workflow that normalized severity and produced team and repo level summaries.",
+        "where": "Dillard's internship bullets and project 'SAST Vulnerability Reporting + Excel Automation'.",
+        "supporting_detail": "Be ready to describe the scanners involved (GitLab SAST and combining Invicti and ACS reports), what fields you parsed, how you normalized severity, sample columns and visuals in the Excel output, who consumed the reports, and how often they ran."
+      },
+      {
+        "claim": "Deployed a Graylog stack and built alerts for Linux sudo/auth and Windows failed logons.",
+        "where": "Project 'Centralized Logging Lab (Graylog + OpenSearch + MongoDB)' and application answers.",
+        "supporting_detail": "Walk through the Docker Compose setup, inputs created (Syslog UDP and GELF), rsyslog and NXLog forwarding configs, how you validated ingestion, alert criteria you used, and how you handled false positives during testing."
+      },
+      {
+        "claim": "Designed a low cost SMS MFA workflow using Twilio Verify with tokenized links and database backed forms.",
+        "where": "Nonprofit Healthcare Project Consultant bullet and project 'WordPress Secure Access + SMS MFA + Monitor Workflow'.",
+        "supporting_detail": "Explain the end to end flow, how tokens were generated and expired, how you stored and validated state in MySQL, how you handled link misuse, and how the design aligned with privacy and access control considerations without claiming formal HIPAA compliance."
+      },
+      {
+        "claim": "Built security automation guardrails with human in the loop approval for risky actions.",
+        "where": "Security Automation Projects bullets and project 'Privileged Command Broker / Agent Guardrails'.",
+        "supporting_detail": "Detail the HMAC signed request pattern, allowlists, path normalization, never touch paths, TTL enforcement, and the approval queue and audit log. Emphasize project context and give one concrete example of a blocked action and review flow."
+      },
+      {
+        "claim": "Performed onsite network traffic analysis with Wireshark to identify anomalies and support troubleshooting.",
+        "where": "Accurate Interpretations internship bullet.",
+        "supporting_detail": "Share a specific packet capture scenario you investigated, what indicators you used, how you confirmed the issue, and what remediation or follow up you supported."
+      },
+      {
+        "claim": "CMMC v2 and NIST SP 800 171 control mapping and documentation.",
+        "where": "Project 'CMMC v2 / NIST SP 800-171 Documentation'.",
+        "supporting_detail": "Name a couple of specific controls or assessment objectives you documented, how you approached mapping broad CMMC language to 800 171 requirements, and how that translates to supporting evidence collection for audits like SOC 2 or ISO 27001."
+      }
+    ],
+    "weak_spots_or_gaps": [
+      {
+        "gap": "Minimum 3 years hands-on experience and completed degree requirements.",
+        "honest_answer": "I am early career with internship and project heavy experience while finishing my BS and MS. I have done the core workflows at project scale and in an internship setting, and I am looking for a place to apply those patterns with production volume under guidance. I ramp quickly and bring Security+ and Network+ fundamentals to shorten that runway."
+      },
+      {
+        "gap": "Cloud security experience on AWS, Azure, or GCP.",
+        "honest_answer": "No current evidence of hands-on cloud security operations. I am comfortable with logging, IAM concepts, and automation, and I am ready to translate that to a cloud stack. In my first month I would focus on access models, baseline logging, and alert review in your chosen cloud, following team runbooks."
+      },
+      {
+        "gap": "Experience with common EDR platforms.",
+        "honest_answer": "No current evidence with commercial EDR tooling. I have monitoring and event analysis experience from the Graylog lab and Wireshark work, and I am ready to learn your EDR console, triage flow, and containment steps quickly."
+      },
+      {
+        "gap": "Formal compliance audits such as SOC 2 or ISO 27001 and access reviews.",
+        "honest_answer": "Direct audit ownership is not in my background. I have coursework in CMMC and NIST 800 171 and supported PCI related training at Dillard's, so I understand control intent and evidence. I can contribute to access review checklists, ticketing, and documentation while learning your audit cadence."
+      }
+    ],
+    "thirty_second_interest_answer": "I like turning noisy security signals into clear actions, and this role does exactly that across alerts, vulnerabilities, and access. I have built a SAST reporting pipeline that helped stakeholders prioritize work, set up a Graylog lab with practical alerts, and designed an SMS MFA workflow that fit real world constraints. Xpansiv operates in regulated, high trust markets, which makes strong security operations meaningful. I want to bring my monitoring and reporting strengths to a production team and grow into cloud and EDR on your stack.",
+    "sixty_second_background_walkthrough": "I am finishing a BS in Computer Information Systems with a Cybersecurity minor and an MS in Cybersecurity at the University of Tulsa, and I hold CompTIA Network+ and Security+. In my Accurate Interpretations internship I maintained secure networks and used Wireshark for traffic analysis and anomaly detection. At R1649 I built a Python and JavaScript dashboard and supported software security operations around proprietary APIs. At Dillard's I helped build a GitLab SAST to Excel reporting pipeline that normalized severity and made remediation priorities clear for stakeholders. Alongside that, I ran a Graylog lab with OpenSearch and MongoDB, forwarding rsyslog and NXLog, and building alerts for sudo/auth and failed logons. I also designed a Twilio Verify SMS MFA workflow with tokenized links and a MySQL backend for a nonprofit healthcare client. I want to bring those monitoring, vulnerability reporting, and access control skills into a full time security operations role and ramp quickly on your cloud and EDR tools.",
+    "questions_to_ask": [
+      "What SIEM and EDR platforms are in use today, and what does a typical alert mix and daily case volume look like for the team?",
+      "In the first 60 to 90 days, what incidents or processes would you expect this role to own or co-own, and how will success be measured?",
+      "Which cloud providers and services are in scope, and what are the top two or three cloud security controls you want improved this year?",
+      "How do you handle vulnerability intake and remediation tracking across infrastructure and application code, and what tools and cadences are standard?",
+      "What is the on-call or after-hours expectation for this role, and how often do true priority one incidents occur?",
+      "Which compliance frameworks are most relevant for Xpansiv right now, and how does the security team support evidence collection and access reviews?",
+      "How does security collaborate with IT, DevOps, and engineering on secure configuration and code review, and where could automation help?",
+      "What dashboards or reporting do leadership rely on for security posture, and where could clearer metrics or visuals make decisions easier?"
+    ],
+    "prompt_version": "candidate_brief@v1",
+    "model": "gpt-5",
+    "stress_test": {
+      "stress_tests": [
+        {
+          "claim": "Helped build a GitLab SAST reporting workflow that produced Excel summaries by severity, team, and repo.",
+          "where": "resume Experience -> Dillard's bullet 1; outreach_recruiter email body; application_answers 'vulnerability assessment' response",
+          "likely_questions": [
+            "Which GitLab API endpoints or artifacts did you pull SAST findings from and in what format?",
+            "How did you map repositories to teams or owners and handle repos without a clear owner?",
+            "How did you normalize severity values and handle duplicate findings across branches or MRs?",
+            "What did the final Excel deliverable look like - tabs, pivots, charts, summary views?",
+            "How often did you generate the report and how was it delivered to stakeholders?"
+          ],
+          "strong_answer_should_include": [
+            "Specific GitLab endpoints or artifact downloads used and key JSON fields parsed",
+            "Team-repo mapping source and logic for unknown repos",
+            "De-duplication method and severity normalization approach",
+            "OpenPyXL workbook structure and visualization choices",
+            "Cadence of reporting and who consumed it for remediation planning"
+          ],
+          "confidence": "high",
+          "recommendation": "keep"
+        },
+        {
+          "claim": "Built a centralized logging lab with Graylog, OpenSearch, MongoDB, rsyslog and NXLog, with sudo/auth and failed-logon alerts.",
+          "where": "resume Summary; application_answers 'education and project work' response; outreach_hiring_manager email opening paragraph",
+          "likely_questions": [
+            "What services were in your Docker Compose and how did you configure Graylog inputs?",
+            "How did you configure rsyslog and NXLog to forward logs and in which formats?",
+            "What query conditions or rules did you use to detect Linux sudo/auth and Windows failed-logon activity?",
+            "How did you test alert fidelity and reduce noise or false positives?",
+            "How did you handle log retention and index sizes in the lab?"
+          ],
+          "strong_answer_should_include": [
+            "Compose services for Graylog, OpenSearch, MongoDB and configured input types",
+            "Concrete snippets for rsyslog and NXLog forwarding and chosen formats",
+            "Alert logic for sudo and failed logon detection and validation steps",
+            "Noise reduction tactics like aggregation or exclusions",
+            "Basic retention settings and index rotation choices in the lab"
+          ],
+          "confidence": "high",
+          "recommendation": "keep"
+        },
+        {
+          "claim": "Designed a low-cost SMS MFA workflow using Twilio Verify, tokenized links, and database-backed forms.",
+          "where": "resume Experience -> Nonprofit Healthcare Organization bullet; cover_letter paragraph 4",
+          "likely_questions": [
+            "How does the Twilio Verify flow work end to end in your design and which endpoints did you call?",
+            "How did tokenized links integrate with the verification step and what TTL or reuse rules applied?",
+            "What data did you store in the database and how did you protect PII and secrets?",
+            "How did you handle failure cases like code expiry, no signal, or lost phone?",
+            "What was the estimated per-verification cost and how did the design keep costs predictable?"
+          ],
+          "strong_answer_should_include": [
+            "Twilio Verify start and check call sequence and error handling",
+            "Token generation, TTL and one-time-use design tied to identity",
+            "DB schema at a high level and secret storage practices",
+            "Fallback and recovery flows to keep support load low",
+            "Rough cost model and levers to stay within budget"
+          ],
+          "confidence": "high",
+          "recommendation": "keep"
+        },
+        {
+          "claim": "Built monitoring and human-in-the-loop approval-gate workflows to catch automation failures and risky actions.",
+          "where": "resume Experience -> Security Automation Projects bullets; cover_letter paragraph 3",
+          "likely_questions": [
+            "What signals indicated an automation failure or risky action and how were they captured?",
+            "How did the approval queue work - where were requests stored and how were they signed or verified?",
+            "What audit logs did you keep for traceability and how could you replay or investigate events?",
+            "Give one example of a risky action that was blocked pending approval.",
+            "How did you prevent repeated or replayed commands after approval?"
+          ],
+          "strong_answer_should_include": [
+            "Specific event signals and structured logging approach",
+            "Approval queue mechanism and request signing or HMAC details",
+            "Audit log contents and how they support investigation",
+            "Concrete example of a flagged action and the approval path",
+            "Idempotency or nonce-based replay protection strategy"
+          ],
+          "confidence": "high",
+          "recommendation": "keep"
+        },
+        {
+          "claim": "Performed onsite Wireshark network traffic analysis to identify anomalies and support troubleshooting.",
+          "where": "resume Experience -> Accurate Interpretations bullet; application_answers 'education and project work' aggregation",
+          "likely_questions": [
+            "Describe a specific anomaly you identified and how you confirmed it.",
+            "What capture setup did you use and which display filters were most useful?",
+            "Which protocols did you focus on and why?",
+            "How did the analysis inform remediation or configuration changes?",
+            "How did you ensure you handled sensitive traffic appropriately during capture?"
+          ],
+          "strong_answer_should_include": [
+            "A concrete example of an anomaly and supporting packets",
+            "Filters and capture method used for clarity and scope control",
+            "Relevant protocol focus tied to the troubleshooting goal",
+            "Outcome of the analysis leading to a fix or config change",
+            "Brief note on handling sensitive data during packet capture"
+          ],
+          "confidence": "high",
+          "recommendation": "keep"
+        },
+        {
+          "claim": "Correlated vulnerability details such as severity and logging dates to clarify remediation priorities.",
+          "where": "resume Experience -> Dillard's bullet 2",
+          "likely_questions": [
+            "What did 'logging dates' refer to in your workflow and how did you capture them?",
+            "How did you sort or score items to highlight remediation priority?",
+            "How did you handle duplicate findings or stale entries over time?",
+            "What changes did teams make based on your prioritized views?"
+          ],
+          "strong_answer_should_include": [
+            "Clear definition of logging date and data source",
+            "Priority sorting by severity and age with rationale",
+            "De-duplication and staleness handling approach",
+            "Qualitative example of how the view guided remediation"
+          ],
+          "confidence": "high",
+          "recommendation": "keep"
+        },
+        {
+          "claim": "Can share a sanitized sample or mockup of the vulnerability report and a Graylog alert logic walkthrough.",
+          "where": "cover_letter final paragraph",
+          "likely_questions": [
+            "Do you have the samples ready now and what will they show specifically?",
+            "Can you confirm no proprietary data is included?",
+            "Can you include the Docker Compose and config snippets that power the lab?",
+            "When could you email the materials or screen share a walkthrough?"
+          ],
+          "strong_answer_should_include": [
+            "Confirmation that sanitized or mock data versions are prepared",
+            "List of included artifacts such as workbook, Compose, configs, screenshots",
+            "Assurance that all identifiers are scrubbed",
+            "A concrete timeline to send or demo"
+          ],
+          "confidence": "medium",
+          "recommendation": "study_before_sending"
+        },
+        {
+          "claim": "Chose GELF UDP for Windows so event fields stayed structured end to end.",
+          "where": "outreach_hiring_manager email body, paragraph 2",
+          "likely_questions": [
+            "Why did you choose GELF over Syslog for Windows events and what tradeoffs did you accept?",
+            "How did you configure NXLog to output GELF and which fields did you preserve?",
+            "Did you use Graylog extractors or pipelines to normalize fields after ingestion?",
+            "Did UDP versus TCP cause any packet loss issues in your lab and how did you validate?"
+          ],
+          "strong_answer_should_include": [
+            "Rationale for GELF choice to retain structure in Graylog",
+            "NXLog config specifics for GELF output and preserved fields",
+            "Post-ingestion normalization approach in Graylog",
+            "Acknowledgment of UDP tradeoffs and simple validation method"
+          ],
+          "confidence": "medium",
+          "recommendation": "study_before_sending"
+        },
+        {
+          "claim": "Normalized timestamps to UTC to avoid false correlations from Proxmox clock drift.",
+          "where": "outreach_hiring_manager email body, paragraph 2",
+          "likely_questions": [
+            "Where did you perform time normalization and which parsers or processors handled it?",
+            "How did you detect and measure clock drift across Proxmox VMs?",
+            "What NTP configuration or fixes did you apply to address drift at the source?",
+            "How did you confirm alerts were no longer mis-correlating after the change?"
+          ],
+          "strong_answer_should_include": [
+            "Exact place and method of normalization if done",
+            "Evidence of drift and steps taken to correct it",
+            "NTP or host clock configuration details",
+            "Before and after validation of correlation accuracy"
+          ],
+          "confidence": "low",
+          "recommendation": "remove"
+        },
+        {
+          "claim": "Aggregated 5 failed logons per user in 3 minutes before firing to cut noise.",
+          "where": "outreach_hiring_manager email body, paragraph 3",
+          "likely_questions": [
+            "Why did you pick 5 events in 3 minutes and how did you validate that threshold?",
+            "How did you implement per-user aggregation in Graylog event definitions?",
+            "How did you prevent alert storms from distributed attempts across hosts or accounts?",
+            "How did you tune to avoid suppressing legitimate signals?"
+          ],
+          "strong_answer_should_include": [
+            "Justification for thresholds tied to observed patterns",
+            "Description of correlation keying and time windowing in Graylog",
+            "Approach for handling distributed or multi-host attempts",
+            "Tuning process and results after adjustments"
+          ],
+          "confidence": "low",
+          "recommendation": "soften"
+        },
+        {
+          "claim": "Built a Python script to classify log entries into clearer categories to aid investigation.",
+          "where": "application_answers 'Describe your experience with security logs and SIEM' response",
+          "likely_questions": [
+            "What log sources and formats did your script ingest and how did you parse them?",
+            "What categories did you map to and what rules drove the classification?",
+            "How did you validate classification accuracy and measure any improvement?",
+            "How did this integrate with your centralized logging workflow?"
+          ],
+          "strong_answer_should_include": [
+            "Specific input format and parsing approach",
+            "Concrete category schema and mapping logic",
+            "Validation method and example misclassifications fixed",
+            "How outputs fed dashboards or alerts"
+          ],
+          "confidence": "low",
+          "recommendation": "remove"
+        },
+        {
+          "claim": "Designed security automation workflows for vulnerability discovery and remediation tracking using structured logs, alerting, and approval gates.",
+          "where": "resume Experience -> Security Automation Projects bullet 1",
+          "likely_questions": [
+            "What sources did you use for vulnerability discovery and how were findings structured?",
+            "What alerts did you set for changes in vulnerability state or ownership?",
+            "How did approval gates operate for risky remediation steps and where were decisions logged?",
+            "Can you walk through a sample end-to-end workflow from discovery to close?"
+          ],
+          "strong_answer_should_include": [
+            "Data sources for discovery and the schema used in logs",
+            "Trigger conditions for alerts tied to remediation state",
+            "Approval mechanism, audit logging details, and reviewer role",
+            "A concrete end-to-end example with artifacts"
+          ],
+          "confidence": "high",
+          "recommendation": "keep"
+        },
+        {
+          "claim": "Reporting at Dillard's reduced time sifting through scanner output and helped drive remediation conversations.",
+          "where": "cover_letter paragraph 2",
+          "likely_questions": [
+            "How did you measure time saved or improved clarity for stakeholders?",
+            "What changed in remediation meetings or ticket queues after your reporting?",
+            "Can you share an example where the report directly influenced prioritization?"
+          ],
+          "strong_answer_should_include": [
+            "Anecdotal or rough before-and-after comparisons or stakeholder feedback",
+            "Specific process changes or meeting outcomes",
+            "One concrete example showing prioritization improved by the report"
+          ],
+          "confidence": "medium",
+          "recommendation": "study_before_sending"
+        },
+        {
+          "claim": "Healthcare MFA design improved control over sensitive information without adding friction.",
+          "where": "cover_letter paragraph 4",
+          "likely_questions": [
+            "What evidence suggests improved control and reduced friction?",
+            "How did you handle edge cases like lost devices or code delivery failures?",
+            "What user experience choices reduced friction while maintaining security?"
+          ],
+          "strong_answer_should_include": [
+            "Qualitative UX feedback or pilot results and security control changes",
+            "Fallback flows for access recovery and failed SMS delivery",
+            "Design choices that made the secure path easy"
+          ],
+          "confidence": "medium",
+          "recommendation": "study_before_sending"
+        },
+        {
+          "claim": "Perform regular vulnerability assessments, patch verification, and remediation tracking.",
+          "where": "linkedin_dm opening sentence",
+          "likely_questions": [
+            "What tools or processes have you used for patch verification specifically?",
+            "How did you validate that patches were applied correctly across systems?",
+            "What metrics did you track for patch compliance?"
+          ],
+          "strong_answer_should_include": [
+            "Named tools and verification steps if actually performed",
+            "Method for confirming patch state at scale",
+            "Metrics or reporting cadence for patch status"
+          ],
+          "confidence": "low",
+          "recommendation": "soften"
+        },
+        {
+          "claim": "At Dillard's I built a GitLab SAST reporting workflow.",
+          "where": "linkedin_dm second sentence",
+          "likely_questions": [
+            "Which parts did you personally implement versus what the team owned?",
+            "How many repositories or teams were covered by your reporting?",
+            "What challenges did you hit integrating with GitLab and how did you solve them?"
+          ],
+          "strong_answer_should_include": [
+            "Clarification that you helped build and what components you owned",
+            "Scope covered and example outputs",
+            "A challenge and the fix you implemented"
+          ],
+          "confidence": "medium",
+          "recommendation": "soften"
+        },
+        {
+          "claim": "Can share Docker Compose, NXLog and rsyslog configs, and alert definition as a one-page lab writeup.",
+          "where": "outreach_hiring_manager email closing paragraph",
+          "likely_questions": [
+            "Do you have those files organized and ready to send now?",
+            "What versions and inputs are specified in your Compose and Graylog configuration?",
+            "Can you include a brief readme explaining how to run and test the lab?"
+          ],
+          "strong_answer_should_include": [
+            "Confirmation that artifacts are ready and sanitized",
+            "Exact components included and their versions or inputs",
+            "A short readme or steps to reproduce"
+          ],
+          "confidence": "medium",
+          "recommendation": "study_before_sending"
+        }
+      ],
+      "claims_to_soften_or_remove": [
+        {
+          "claim": "Normalized timestamps to UTC to avoid false correlations from Proxmox clock drift.",
+          "where": "outreach_hiring_manager email body, paragraph 2",
+          "why": "Specific technical detail about drift and normalization is not supported anywhere in the profile.",
+          "suggested_action": "Remove from employer materials."
+        },
+        {
+          "claim": "Aggregated 5 failed logons per user in 3 minutes before firing.",
+          "where": "outreach_hiring_manager email body, paragraph 3",
+          "why": "Exact thresholds are not evidenced and invite deep technical probing.",
+          "suggested_action": "Soften to 'aggregated multiple failed logons per user within a short window to reduce noise.'"
+        },
+        {
+          "claim": "Built a Python script to classify log entries into clearer categories.",
+          "where": "application_answers 'Describe your experience with security logs and SIEM' response",
+          "why": "No explicit project or experience in the profile mentions writing a log classification script.",
+          "suggested_action": "Remove from employer materials or replace with 'built Graylog alert conditions and basic dashboards to surface key authentication activity.'"
+        },
+        {
+          "claim": "Perform regular vulnerability assessments, patch verification, and risk remediation tracking.",
+          "where": "linkedin_dm opening sentence",
+          "why": "Patch verification experience is not present in the profile.",
+          "suggested_action": "Soften to 'vulnerability assessments and remediation tracking' and remove 'patch verification.'"
+        },
+        {
+          "claim": "At Dillard's I built a GitLab SAST reporting workflow.",
+          "where": "linkedin_dm second sentence",
+          "why": "Overstates ownership compared to 'helped build' in the resume and profile.",
+          "suggested_action": "Soften to 'helped build a GitLab SAST reporting workflow' and briefly note your owned components."
+        },
+        {
+          "claim": "Chose GELF UDP for Windows so event fields stayed structured end to end.",
+          "where": "outreach_hiring_manager email body, paragraph 2",
+          "why": "Specific config choice is plausible but will trigger detailed follow-ups; you need exact config snippets ready.",
+          "suggested_action": "Study before sending: review NXLog to GELF output config and Graylog input settings, or generalize to 'used structured logging inputs to retain fields.'"
+        },
+        {
+          "claim": "Reporting at Dillard's cut time spent sifting through scanner output and helped drive remediation conversations.",
+          "where": "cover_letter paragraph 2",
+          "why": "Qualitative impact is reasonable but you will be asked for concrete examples.",
+          "suggested_action": "Study before sending: prepare 1 to 2 specific anecdotes or before-after comparisons."
+        },
+        {
+          "claim": "Healthcare MFA design improved control without adding friction.",
+          "where": "cover_letter paragraph 4",
+          "why": "Impact and UX claims will prompt questions on evidence, fallback flows, and cost.",
+          "suggested_action": "Study before sending: outline user flow, fallback handling, and a brief cost estimate to discuss."
+        },
+        {
+          "claim": "Can share sanitized samples of reports and Graylog alert logic.",
+          "where": "cover_letter final paragraph; outreach_hiring_manager email closing paragraph",
+          "why": "You will be expected to produce artifacts quickly if asked.",
+          "suggested_action": "Prepare sanitized mockups and lab configs now or remove the offer to share in advance."
+        }
+      ],
+      "prompt_version": "claim_stress_test@v1",
+      "model": "gpt-5"
+    }
+  }
+}

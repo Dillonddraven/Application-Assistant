@@ -23,6 +23,7 @@ def run_tailor(
     deep: bool = False,
     llm: LLMClient | None = None,
     open_mail: bool = False,
+    mode: str = "production",   # "production" (with early-stop) | "benchmark" (full pipeline)
 ) -> tuple[dict[str, Any], str]:
     """Generate a packet for one analyzed job.
 
@@ -48,6 +49,77 @@ def run_tailor(
     job_text = rec.text
 
     client = llm or LLMClient()
+
+    # === Production-mode early-stop ===
+    # Skip the expensive employer-facing generation when fit is too low.
+    # Always still produce the JD analysis, candidate brief, scorecard, and
+    # skip_reason, so the user can see WHY we stopped and study any gaps.
+    fit = int(analyzed.get("fit_score") or 0)
+    sc = (analyzed.get("source_confidence") or "medium").lower()
+    industry_filter = analyzed.get("industry_filter") or "ok"
+    early_stop = False
+    early_stop_reason = ""
+    early_stop_mode = "full"   # "full" | "lightweight" | "skip"
+    if mode == "production":
+        if industry_filter == "avoid" and not force:
+            early_stop = True
+            early_stop_reason = (
+                f"industry filter set to AVOID (tags: {analyzed.get('industry_tags')}). "
+                f"Pass --force to override."
+            )
+            early_stop_mode = "skip"
+        elif fit < 50:
+            early_stop = True
+            early_stop_reason = (
+                f"fit score {fit} below production threshold of 50. "
+                f"Top gaps: {analyzed.get('top_gaps') or []}. "
+                f"Use --mode benchmark to generate the full packet anyway."
+            )
+            early_stop_mode = "skip"
+        elif 50 <= fit < 65:
+            # Lightweight: JD analysis + brief + scorecard, NO employer renders.
+            early_stop = True
+            early_stop_reason = (
+                f"fit score {fit} in 50-64 'maybe' band. Generating lightweight "
+                f"internal review packet only. Use --force to render employer "
+                f"PDFs or --mode benchmark for the full pipeline."
+            )
+            early_stop_mode = "lightweight"
+
+    # If we're in production-mode early-stop=skip, write a minimal record and exit.
+    if early_stop and early_stop_mode == "skip" and not force:
+        slug = state.packet_slug(analyzed.get("company") or "company",
+                                 analyzed.get("title") or "role")
+        out_dir = state.packet_dir(slug)
+        internal_dir = out_dir / "internal"
+        internal_dir.mkdir(parents=True, exist_ok=True)
+        skip_md = (
+            f"# Skipped — {analyzed.get('company')} ({analyzed.get('title')})\n\n"
+            f"**Production mode: skip.** {early_stop_reason}\n\n"
+            f"## Fit breakdown\n"
+            + "\n".join(f"- {k}: {v}" for k, v in (analyzed.get("fit_breakdown") or {}).items())
+            + "\n\n## Reasoning trace\n"
+            + "\n".join(f"- {r}" for r in (analyzed.get("apply_reasoning") or []))
+            + "\n\n## To override and generate a full packet\n"
+            + "- `job-apply tailor <job-id> --force --mode benchmark`\n"
+        )
+        (internal_dir / "skip_reason.md").write_text(skip_md)
+        packet = {
+            "job_id": job_id, "slug": slug,
+            "run_id": uuid.uuid4().hex[:8],
+            "tailored": {}, "rendered": {"internal": {"skip_reason_md": "internal/skip_reason.md"}},
+            "validation": {"fabrication_blocks": [], "fabrication_warnings": [],
+                           "schema_ok": True},
+            "status": "skipped",
+            "early_stop": True, "early_stop_reason": early_stop_reason,
+            "early_stop_mode": "skip",
+            "production_mode_decision": "skip",
+            "approval_log": [{"ts": state.now_iso(), "action": "early_stop_skip"}],
+            "prompt_versions": {}, "model": "n/a",
+            "blocked": False,
+        }
+        state.save_packet(slug, packet)
+        return packet, slug
 
     # Stage 1: extract JD pain points + map to candidate evidence (cheap pre-pass).
     try:
@@ -200,12 +272,14 @@ def run_tailor(
 
     # === GUARD ===
     # Any HIGH-severity QA issue OR any fabrication block blocks the
-    # employer-facing render and the Mail draft. Internal markdowns are still
-    # written for review, but no PDF/DOCX is produced and no employer Mail
-    # draft will be opened. Packet status flips to "blocked".
+    # employer-facing render and the Mail draft. Production lightweight mode
+    # also blocks render until the user approves with --force. Internal
+    # markdowns are still written for review.
     high_issues = [i for i in (qa.get("issues") or []) if i.get("severity") == "high"]
     fab_blocks = packet["validation"].get("fabrication_blocks") or []
-    is_blocked = bool(high_issues or fab_blocks)
+    qa_blocked = bool(high_issues or fab_blocks)
+    lightweight_blocked = (early_stop and early_stop_mode == "lightweight" and not force)
+    is_blocked = qa_blocked or lightweight_blocked
     packet["blocked"] = is_blocked
     packet["block_reasons"] = {
         "high_qa_issues": [
@@ -214,7 +288,18 @@ def run_tailor(
             for i in high_issues
         ],
         "fabrication_blocks": fab_blocks,
+        "lightweight_mode_pending_approval": (
+            early_stop_reason if lightweight_blocked else None
+        ),
     }
+    packet["early_stop"] = early_stop
+    packet["early_stop_reason"] = early_stop_reason
+    packet["early_stop_mode"] = early_stop_mode
+    packet["production_mode_decision"] = (
+        "skip" if (mode == "production" and fit < 50) else
+        "lightweight" if (mode == "production" and fit < 65) else
+        "full"
+    )
 
     # Render employer PDF + DOCX ONLY if the packet is not blocked.
     render_errors: list[str] = []

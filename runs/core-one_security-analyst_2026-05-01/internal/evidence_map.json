@@ -1,0 +1,151 @@
+{
+  "pain_points": [
+    {
+      "text": "Lead and support FedRAMP Moderate/High and IC ATO authorization processes",
+      "jd_anchor": "Lead and support FedRAMP Moderate/High and IC ATO authorization processes",
+      "stakes": "Successfully managing ATO authorization processes ensures that systems meet federal security standards and can operate securely within the Intelligence Community and FedRAMP frameworks."
+    },
+    {
+      "text": "Develop, review, and maintain security documentation including System Security Plans (SSP), Security Assessment Reports (SAR), and Plan of Action & Milestones (POA&M)",
+      "jd_anchor": "Develop, review, and maintain security documentation: System Security Plans (SSP), Security Assessment Reports (SAR), Plan of Action & Milestones (POA&M)",
+      "stakes": "Accurate and up-to-date security documentation is critical for compliance, audit readiness, and effective risk management."
+    },
+    {
+      "text": "Perform risk assessments, control assessments, and gap analyses to ensure compliance with NIST SP 800-53 / 800-37 RMF and FedRAMP baselines",
+      "jd_anchor": "Perform risk assessments, control assessments, and gap analyses",
+      "stakes": "Identifying and addressing security gaps and risks is essential to maintain compliance and protect sensitive systems from vulnerabilities."
+    },
+    {
+      "text": "Execute continuous monitoring strategies and reporting, including tracking and managing POA&M remediation activities",
+      "jd_anchor": "Execute continuous monitoring strategies and reporting",
+      "stakes": "Continuous monitoring enables timely detection and remediation of security issues, maintaining system integrity and compliance over time."
+    },
+    {
+      "text": "Support incident response and forensic analysis to investigate and mitigate security events",
+      "jd_anchor": "Support incident response and forensic analysis",
+      "stakes": "Effective incident response and forensic analysis minimize damage from security incidents and improve organizational resilience."
+    },
+    {
+      "text": "Utilize security tools such as Splunk, Sentinel, RSA Archer, and ServiceNow for monitoring, compliance, and reporting",
+      "jd_anchor": "Utilize security tools for monitoring and compliance: Splunk, Sentinel, Vulnerability management tools, RSA Archer, ServiceNow",
+      "stakes": "Proficiency with security tools is necessary to efficiently monitor security posture, automate compliance workflows, and support audit processes."
+    }
+  ],
+  "evidence_map": [
+    {
+      "pain_point_index": 0,
+      "candidate_evidence": [
+        {
+          "source_id": "proj_cmmc_nist_docs",
+          "summary": "Coursework comparing CMMC v1/v2 levels and mapping controls to NIST SP 800-171, demonstrating understanding of compliance frameworks and control mapping.",
+          "match_strength": "adjacent"
+        },
+        {
+          "source_id": "nonprofit_health_consultant.b1",
+          "summary": "Mapped workflows and tech environment to security and implementation risks during a planned migration, showing risk assessment and compliance awareness.",
+          "match_strength": "adjacent"
+        }
+      ]
+    },
+    {
+      "pain_point_index": 1,
+      "candidate_evidence": [
+        {
+          "source_id": "nonprofit_health_consultant.b2",
+          "summary": "Presented migration risks and security considerations to stakeholders, indicating experience with security documentation and communication.",
+          "match_strength": "adjacent"
+        },
+        {
+          "source_id": "proj_cmmc_nist_docs",
+          "summary": "Wrote assessment-objective explanations for monitoring controls and CUI handling, showing documentation skills aligned with compliance requirements.",
+          "match_strength": "adjacent"
+        }
+      ]
+    },
+    {
+      "pain_point_index": 2,
+      "candidate_evidence": [
+        {
+          "source_id": "nonprofit_health_consultant.b1",
+          "summary": "Performed risk assessment by mapping workflows and tech environment to security and privacy risks during migration planning.",
+          "match_strength": "strong"
+        },
+        {
+          "source_id": "dillards_intern.b1",
+          "summary": "Built SAST reporting workflow that normalized severity and correlated vulnerability details to improve remediation prioritization.",
+          "match_strength": "strong"
+        },
+        {
+          "source_id": "dillards_intern.b2",
+          "summary": "Correlated vulnerability details to improve visibility into remediation priorities, supporting risk assessment and management.",
+          "match_strength": "strong"
+        }
+      ]
+    },
+    {
+      "pain_point_index": 3,
+      "candidate_evidence": [
+        {
+          "source_id": "security_automation_projects.b1",
+          "summary": "Designed security automation workflows for vulnerability discovery and remediation tracking with alerting and approval gates.",
+          "match_strength": "strong"
+        },
+        {
+          "source_id": "security_automation_projects.b2",
+          "summary": "Built monitoring and approval-gate workflows to detect automation failures and route remediation through human review.",
+          "match_strength": "strong"
+        }
+      ]
+    },
+    {
+      "pain_point_index": 4,
+      "candidate_evidence": [
+        {
+          "source_id": "proj_ir_playbook_cloud_backup",
+          "summary": "Designed incident response playbook with business impact analysis and recovery prioritization, demonstrating incident response fundamentals.",
+          "match_strength": "adjacent"
+        },
+        {
+          "source_id": "accurate_interpretations_intern.b2",
+          "summary": "Performed network traffic analysis with Wireshark to identify anomalies and support troubleshooting, relevant to forensic analysis.",
+          "match_strength": "adjacent"
+        }
+      ]
+    },
+    {
+      "pain_point_index": 5,
+      "candidate_evidence": [
+        {
+          "source_id": "proj_centralized_logging_lab",
+          "summary": "Deployed Graylog stack with log forwarding and alert conditions for Linux and Windows events, showing experience with security monitoring tools.",
+          "match_strength": "adjacent"
+        },
+        {
+          "source_id": "dillards_intern.b1",
+          "summary": "Built SAST reporting workflow using Python and Excel automation to produce stakeholder-ready vulnerability reports.",
+          "match_strength": "adjacent"
+        }
+      ]
+    }
+  ],
+  "missing_evidence": [
+    {
+      "pain_point_index": 0,
+      "note": "No direct experience leading FedRAMP or IC ATO authorization processes; only adjacent coursework and risk assessment exposure."
+    },
+    {
+      "pain_point_index": 1,
+      "note": "No direct experience developing or maintaining formal SSP, SAR, or POA&M documentation; evidence limited to related presentations and coursework."
+    },
+    {
+      "pain_point_index": 4,
+      "note": "No direct incident response or forensic analysis in production environments; experience limited to coursework and network traffic analysis."
+    },
+    {
+      "pain_point_index": 5,
+      "note": "No direct experience with Splunk, Sentinel, RSA Archer, or ServiceNow; experience limited to Graylog and Python-based reporting tools."
+    }
+  ],
+  "prompt_version": "extract_jd_analysis@v1",
+  "model": "gpt-4.1-mini"
+}

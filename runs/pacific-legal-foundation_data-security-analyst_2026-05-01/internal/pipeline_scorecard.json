@@ -1,0 +1,64 @@
+{
+  "company": "Pacific Legal Foundation",
+  "role_title": "Data Security Analyst",
+  "source_url": "https://job-boards.greenhouse.io/pacificlegalfoundation/jobs/4183667009",
+  "source_confidence": "high",
+  "source_confidence_reason": "direct ATS board (greenhouse.io)",
+  "role_category": "GRC / Compliance",
+  "fit_score": 35,
+  "fit_breakdown": {
+    "skills_match": 0,
+    "preferred_skills_match": 0,
+    "cert_match": 100,
+    "experience_match": 80,
+    "location_match": 30,
+    "industry_filter": "ok"
+  },
+  "industry_filter": "ok",
+  "apply_recommendation": "skip",
+  "apply_reason": "blocked: 3 HIGH QA, 0 fabrication block(s)",
+  "top_match_reasons": [
+    "Provide primary IT support for DC office staff including troubleshooting and resolving general technical issues",
+    "Assist with onboarding and separation workflows including provisioning and deprovisioning system access and coordinating",
+    "Support monitoring activities to identify anomalies, inappropriate data access, or potential policy violations",
+    "Help maintain security documentation and incident response materials to support security operations"
+  ],
+  "top_gaps": [
+    "No direct evidence of managing IT hardware inventory and device lifecycle; closest is secure access workflow design but "
+  ],
+  "unsupported_claims_count": 0,
+  "softened_claims_count": 4,
+  "fabrication_blocks_count": 0,
+  "qa_high_count": 3,
+  "qa_medium_count": 1,
+  "qa_low_count": 2,
+  "resume_page_count": 0,
+  "ats_safety_status": "missing",
+  "cover_letter_quality": "fair",
+  "qa_polish": "needs_work",
+  "outreach_risk": "medium",
+  "portal_complexity": "low",
+  "manual_review_required_fields": [
+    "desired_salary",
+    "sponsorship_visa",
+    "relocation",
+    "shift_availability",
+    "start_date",
+    "custom_long_answers",
+    "legal_acknowledgements",
+    "demographic_or_disability_or_veteran",
+    "final_submit"
+  ],
+  "never_auto_answer_fields": [
+    "demographic_identity",
+    "disability_status",
+    "veteran_status",
+    "criminal_background",
+    "legal_attestation"
+  ],
+  "estimated_user_review_time_minutes": 18,
+  "final_status": "needs_patch",
+  "run_id": "6394ddb6",
+  "slug": "pacific-legal-foundation_data-security-analyst",
+  "id": 1
+}

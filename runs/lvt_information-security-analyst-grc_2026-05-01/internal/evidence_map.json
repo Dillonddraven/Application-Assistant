@@ -1,0 +1,123 @@
+{
+  "pain_points": [
+    {
+      "text": "Support LVT\u2019s annual SOC 2 audit, including facilitating communication with control owners and resolving audit concerns",
+      "jd_anchor": "Support LVT\u2019s annual SOC 2 audit",
+      "stakes": "Ensuring successful SOC 2 audits is critical for maintaining customer trust and regulatory compliance."
+    },
+    {
+      "text": "Execute control testing and evidence collection to verify security controls are effective",
+      "jd_anchor": "Execute control testing, including evidence collection and documentation",
+      "stakes": "Accurate control testing and evidence collection are essential to demonstrate compliance and identify gaps."
+    },
+    {
+      "text": "Develop and maintain security policies aligned with organizational standards",
+      "jd_anchor": "Develop LVT\u2019s security policies, submitting them for approval, and ensuring alignment with organizational standards",
+      "stakes": "Clear, up-to-date policies guide secure behavior and support audit readiness."
+    },
+    {
+      "text": "Maintain and update the risk register to track identified risks and mitigation status",
+      "jd_anchor": "Maintain and update the risk register",
+      "stakes": "An accurate risk register enables proactive risk management and informed decision-making."
+    },
+    {
+      "text": "Execute quarterly user access reviews to ensure appropriate access controls",
+      "jd_anchor": "Execute quarterly user access reviews",
+      "stakes": "Regular access reviews prevent unauthorized access and reduce insider risk."
+    },
+    {
+      "text": "Communicate effectively with stakeholders including customers and auditors to support GRC processes",
+      "jd_anchor": "Facilitate effective communication and coordination with internal SOC 2 control owners",
+      "stakes": "Clear communication ensures alignment, timely issue resolution, and smooth audit processes."
+    }
+  ],
+  "evidence_map": [
+    {
+      "pain_point_index": 0,
+      "candidate_evidence": [
+        {
+          "source_id": "experience.dillards_intern.b1",
+          "summary": "Helped build a SAST reporting workflow converting raw scanner output into clean reports for stakeholders, improving vulnerability visibility and prioritization.",
+          "match_strength": "adjacent"
+        },
+        {
+          "source_id": "experience.dillards_intern.b4",
+          "summary": "Translated technical vulnerability findings into actionable reporting for decision-makers, supporting communication between technical and non-technical stakeholders.",
+          "match_strength": "adjacent"
+        },
+        {
+          "source_id": "experience.nonprofit_health_consultant.b2",
+          "summary": "Presented migration risks and security considerations to technical and non-technical stakeholders, helping leadership understand vulnerabilities and escalation paths.",
+          "match_strength": "adjacent"
+        }
+      ]
+    },
+    {
+      "pain_point_index": 1,
+      "candidate_evidence": [
+        {
+          "source_id": "experience.dillards_intern.b1",
+          "summary": "Built a SAST reporting workflow that ingested findings from GitLab and converted raw scanner output into clean Excel reports with severity breakdowns and team views.",
+          "match_strength": "strong"
+        },
+        {
+          "source_id": "experience.dillards_intern.b2",
+          "summary": "Correlated vulnerability details such as severity and logging dates to improve visibility into remediation priorities.",
+          "match_strength": "strong"
+        }
+      ]
+    },
+    {
+      "pain_point_index": 2,
+      "candidate_evidence": [
+        {
+          "source_id": "experience.nonprofit_health_consultant.b1",
+          "summary": "Mapped workflows and tech environment to security, privacy, and implementation risks during a migration, demonstrating understanding of security policy implications.",
+          "match_strength": "adjacent"
+        },
+        {
+          "source_id": "experience.nonprofit_health_consultant.b2",
+          "summary": "Presented security considerations and rollout recommendations to stakeholders, supporting policy and process communication.",
+          "match_strength": "adjacent"
+        }
+      ]
+    },
+    {
+      "pain_point_index": 3,
+      "candidate_evidence": [
+        {
+          "source_id": "experience.nonprofit_health_consultant.b1",
+          "summary": "Mapped existing workflows and technology environment to potential security, privacy, and implementation risks, indicating risk identification and documentation skills.",
+          "match_strength": "adjacent"
+        }
+      ]
+    },
+    {
+      "pain_point_index": 4,
+      "candidate_evidence": []
+    },
+    {
+      "pain_point_index": 5,
+      "candidate_evidence": [
+        {
+          "source_id": "experience.nonprofit_health_consultant.b2",
+          "summary": "Presented migration risks and security considerations to technical and non-technical stakeholders, demonstrating effective communication skills.",
+          "match_strength": "strong"
+        },
+        {
+          "source_id": "experience.dillards_intern.b4",
+          "summary": "Translated technical vulnerability findings into actionable reporting for decision-makers, supporting clear communication with stakeholders.",
+          "match_strength": "strong"
+        }
+      ]
+    }
+  ],
+  "missing_evidence": [
+    {
+      "pain_point_index": 4,
+      "note": "No evidence found of executing quarterly user access reviews or similar access control review processes."
+    }
+  ],
+  "prompt_version": "extract_jd_analysis@v1",
+  "model": "gpt-4.1-mini"
+}

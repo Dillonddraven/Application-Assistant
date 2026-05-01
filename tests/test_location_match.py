@@ -59,20 +59,21 @@ def test_onsite_job_in_my_city_gets_100():
 
 
 def test_onsite_job_not_in_my_city_no_relocation_gets_low():
-    """The Soro bug: onsite San Diego, candidate in Tulsa, not relocating -> NOT 100."""
+    """Onsite, candidate in Tulsa, not relocating -> low score (was 25, now 30 in revised model)."""
     p = _profile(locations=["Tulsa, OK"], willing_to_relocate=False)
     s = job_analyzer.compute_fit_score(
         llm_fields=_llm("onsite", "San Diego, CA"), profile=p,
     )
-    assert s["fit_breakdown"]["location_match"] == 25
+    assert s["fit_breakdown"]["location_match"] == 30
 
 
 def test_onsite_job_not_in_my_city_with_relocation_gets_partial():
+    """Revised model gives 75 (was 65) since the user said developed metros are OK."""
     p = _profile(locations=["Tulsa, OK"], willing_to_relocate=True)
     s = job_analyzer.compute_fit_score(
         llm_fields=_llm("onsite", "San Diego, CA"), profile=p,
     )
-    assert s["fit_breakdown"]["location_match"] == 65
+    assert s["fit_breakdown"]["location_match"] == 75
 
 
 def test_hybrid_job_in_my_city_gets_100():
@@ -84,11 +85,12 @@ def test_hybrid_job_in_my_city_gets_100():
 
 
 def test_hybrid_job_not_in_my_city_no_relocation_gets_low():
+    """Revised model gives 45 (was 30) — less harsh on hybrid mismatch."""
     p = _profile(locations=["Tulsa, OK"], willing_to_relocate=False)
     s = job_analyzer.compute_fit_score(
         llm_fields=_llm("hybrid", "Boston, MA"), profile=p,
     )
-    assert s["fit_breakdown"]["location_match"] == 30
+    assert s["fit_breakdown"]["location_match"] == 45
 
 
 def test_unknown_remote_mode_with_intersect_gets_partial():
@@ -101,9 +103,32 @@ def test_unknown_remote_mode_with_intersect_gets_partial():
 
 
 def test_unknown_remote_mode_no_intersect_no_relocate_low():
-    """Soro analyzed as 'unknown' remote_mode -> previously got 100, now should be < 70."""
+    """Unknown mode + remote_ok candidate -> 70 in revised model (was 55).
+    Still below 100 because the posting is ambiguous."""
     p = _profile(locations=["Tulsa, OK"], willing_to_relocate=False, remote_ok=True)
     s = job_analyzer.compute_fit_score(
         llm_fields=_llm("unknown", "San Diego, CA"), profile=p,
     )
-    assert s["fit_breakdown"]["location_match"] < 70
+    assert s["fit_breakdown"]["location_match"] == 70
+
+
+def test_preferred_metro_score_with_unknown_remote_mode():
+    """A role with unknown remote_mode but in a preferred metro should score 90."""
+    from job_apply import profile_loader
+    data = {
+        "identity": {"full_name": "T", "citizenship": "US", "work_auth": "yes"},
+        "education": [{"id": "x", "school": "X", "degree": "BA CIS",
+                       "status": "in_progress"}],
+        "preferences": {
+            "target_roles": ["Security Analyst"], "industries_avoid": [],
+            "locations": ["Tulsa, OK"],
+            "preferred_metros": ["Tulsa", "Austin", "Denver", "Boston"],
+            "remote_ok": True, "hybrid_ok": True, "onsite_ok": True,
+            "willing_to_relocate": True,
+        },
+    }
+    p = profile_loader.Profile(data=data)
+    s = job_analyzer.compute_fit_score(
+        llm_fields=_llm("unknown", "Austin, TX"), profile=p,
+    )
+    assert s["fit_breakdown"]["location_match"] == 90

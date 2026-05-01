@@ -1,0 +1,124 @@
+{
+  "pain_points": [
+    {
+      "text": "Provide engineering, architecture design, assessment, and technical support for projects",
+      "jd_anchor": "provide engineering, architecture design, assessment, and technical support",
+      "stakes": "This role requires delivering expert technical solutions and assessments to ensure security projects are well-designed and effectively supported."
+    },
+    {
+      "text": "Run daily processes and tools for managing cybersecurity including Vulnerability Management, Security Logging, Monitoring, and Incident Response",
+      "jd_anchor": "run daily processes and tools for managing cybersecurity",
+      "stakes": "Effective daily management of cybersecurity tools and processes is critical to maintaining organizational security posture and timely incident detection and response."
+    },
+    {
+      "text": "Perform penetration testing, ethical hacking, and security assessments against Networks, Web Applications, API, Mobile Applications, IoT Devices, and Public Cloud Infrastructure",
+      "jd_anchor": "perform penetration testing, ethical hacking, and security assessments",
+      "stakes": "Identifying vulnerabilities through testing and assessments is essential to proactively protect systems and applications from attacks."
+    },
+    {
+      "text": "Collaborate in creation of technical collateral and provide training in your area of expertise",
+      "jd_anchor": "collaborate in the creation of technical collateral and provide training",
+      "stakes": "Sharing knowledge and producing clear documentation and training materials helps build team capability and supports organizational security awareness."
+    },
+    {
+      "text": "Write, review, and edit reports, use cases, and system documentation",
+      "jd_anchor": "write, review, and edit reports and system documentation",
+      "stakes": "Clear and accurate documentation and reporting are vital for communicating security findings and supporting decision-making."
+    }
+  ],
+  "evidence_map": [
+    {
+      "pain_point_index": 0,
+      "candidate_evidence": [
+        {
+          "source_id": "nonprofit_health_consultant.b1",
+          "summary": "Mapped workflows and tech environment to security risks during migration, demonstrating assessment and design skills.",
+          "match_strength": "strong"
+        },
+        {
+          "source_id": "r1649_intern.b2",
+          "summary": "Supported software security operations by identifying risks and helping protect proprietary APIs and internal tools.",
+          "match_strength": "adjacent"
+        }
+      ]
+    },
+    {
+      "pain_point_index": 1,
+      "candidate_evidence": [
+        {
+          "source_id": "dillards_intern.b1",
+          "summary": "Built a SAST reporting workflow ingesting findings and converting raw scanner output into clean reports for vulnerability management.",
+          "match_strength": "strong"
+        },
+        {
+          "source_id": "security_automation_projects.b1",
+          "summary": "Designed security automation workflows for vulnerability discovery and remediation tracking with alerting and approval gates.",
+          "match_strength": "strong"
+        },
+        {
+          "source_id": "security_automation_projects.b2",
+          "summary": "Built monitoring and approval-gate workflows to detect automation failures and route remediation through human review.",
+          "match_strength": "strong"
+        },
+        {
+          "source_id": "proj_centralized_logging_lab",
+          "summary": "Deployed centralized logging with alert conditions for Linux and Windows authentication events.",
+          "match_strength": "strong"
+        }
+      ]
+    },
+    {
+      "pain_point_index": 2,
+      "candidate_evidence": [
+        {
+          "source_id": "dillards_intern.b1",
+          "summary": "Helped build SAST reporting workflow converting raw scanner output into actionable reports, supporting vulnerability assessment.",
+          "match_strength": "strong"
+        },
+        {
+          "source_id": "r1649_intern.b2",
+          "summary": "Supported software security operations including risk identification and API protection, adjacent to penetration testing.",
+          "match_strength": "adjacent"
+        }
+      ]
+    },
+    {
+      "pain_point_index": 3,
+      "candidate_evidence": [
+        {
+          "source_id": "nonprofit_health_consultant.b2",
+          "summary": "Presented migration risks and security considerations to technical and non-technical stakeholders, demonstrating communication and training support.",
+          "match_strength": "strong"
+        },
+        {
+          "source_id": "dillards_intern.b3",
+          "summary": "Supported secure code training efforts to help developers meet PCI compliance expectations.",
+          "match_strength": "strong"
+        }
+      ]
+    },
+    {
+      "pain_point_index": 4,
+      "candidate_evidence": [
+        {
+          "source_id": "dillards_intern.b4",
+          "summary": "Translated technical vulnerability findings into actionable reporting for decision-makers.",
+          "match_strength": "strong"
+        },
+        {
+          "source_id": "nonprofit_health_consultant.b2",
+          "summary": "Presented findings and recommendations to leadership, improving understanding of security risks.",
+          "match_strength": "strong"
+        }
+      ]
+    }
+  ],
+  "missing_evidence": [
+    {
+      "pain_point_index": 2,
+      "note": "No direct evidence of performing penetration testing or ethical hacking; candidate has adjacent experience in risk identification and software security operations."
+    }
+  ],
+  "prompt_version": "extract_jd_analysis@v1",
+  "model": "gpt-4.1-mini"
+}
