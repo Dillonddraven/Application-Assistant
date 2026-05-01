@@ -68,6 +68,97 @@ _SOURCE_CONFIDENCE_LOW = [
 ]
 
 
+# Markers commonly found on JS-shell / cookie / error pages. If many of these
+# appear and the body is small, the ingest probably grabbed boilerplate.
+_SHELL_MARKERS = (
+    "we couldn't find the job", "job not found", "no longer available",
+    "page not found", "404", "accept cookies", "privacy policy",
+    "loading...", "please enable javascript", "you need to enable javascript",
+    "this job has expired", "the job you are looking for",
+)
+
+
+def posting_quality_gate(*, text: str, fields: dict[str, Any],
+                         expected_title_hint: str | None = None) -> dict[str, Any]:
+    """Decide whether a freshly-extracted posting is reliable enough to tailor.
+
+    Returns {"status": "ok"|"source_needs_review"|"ingest_failure",
+             "reasons": [...], "char_count": int, ...}.
+
+    Caller (tailor pipeline + benchmark harness) should refuse to run downstream
+    LLM-heavy stages when status is "ingest_failure", and warn loudly when
+    "source_needs_review".
+    """
+    reasons: list[str] = []
+    title = (fields.get("title") or "").strip()
+    company = (fields.get("company") or "").strip()
+    responsibilities = fields.get("responsibilities") or []
+    req_skills = fields.get("required_skills") or []
+    req_certs = fields.get("required_certifications") or []
+    requirements_count = len(req_skills) + len(req_certs)
+    char_count = len(text or "")
+
+    # Hard checks (any one of these is an ingest_failure)
+    hard_fail = False
+    if not title:
+        reasons.append("extracted job title is empty")
+        hard_fail = True
+    if not company:
+        reasons.append("extracted company is empty")
+        hard_fail = True
+    if char_count < 1500:
+        reasons.append(f"extracted text {char_count} chars < 1500 (hard floor)")
+        hard_fail = True
+
+    # Soft checks (multiple together → source_needs_review)
+    soft_count = 0
+    if char_count < 2000:
+        reasons.append(f"extracted text {char_count} chars < 2000 (soft floor)")
+        soft_count += 1
+    if len(responsibilities) < 3:
+        reasons.append(f"responsibilities count {len(responsibilities)} < 3")
+        soft_count += 1
+    if requirements_count < 3:
+        reasons.append(
+            f"required-skills+certs count {requirements_count} < 3"
+        )
+        soft_count += 1
+
+    text_lower = (text or "").lower()
+    shell_hits = sum(1 for m in _SHELL_MARKERS if m in text_lower)
+    if shell_hits >= 2 and char_count < 3000:
+        reasons.append(f"{shell_hits} shell/error-page markers in low-char content")
+        hard_fail = True
+
+    if expected_title_hint and title:
+        a = title.lower()
+        b = expected_title_hint.lower()
+        # Token overlap: at least 1 shared non-trivial word
+        a_tokens = {t for t in a.split() if len(t) > 3}
+        b_tokens = {t for t in b.split() if len(t) > 3}
+        if a_tokens and b_tokens and not (a_tokens & b_tokens):
+            reasons.append(
+                f"extracted title {title!r} doesn't share a word with expected {expected_title_hint!r}"
+            )
+            soft_count += 1
+
+    if hard_fail:
+        status = "ingest_failure"
+    elif soft_count >= 2:
+        status = "source_needs_review"
+    else:
+        status = "ok"
+
+    return {
+        "status": status,
+        "reasons": reasons,
+        "char_count": char_count,
+        "responsibilities_count": len(responsibilities),
+        "requirements_count": requirements_count,
+        "shell_marker_hits": shell_hits,
+    }
+
+
 def score_source_confidence(url: str | None) -> tuple[str, str]:
     """Return (confidence, reason). Confidence is 'high' | 'medium' | 'low'."""
     if not url:
@@ -356,6 +447,7 @@ def analyze_job(
     fetched_at: str,
     raw_text_path: str,
     llm: LLMClient | None = None,
+    expected_title_hint: str | None = None,
 ) -> dict[str, Any]:
     client = llm or LLMClient()
     user_prompt = (
@@ -375,6 +467,12 @@ def analyze_job(
     if not isinstance(fields, dict):
         raise RuntimeError(f"analyzer LLM returned non-object: {type(fields).__name__}")
 
+    # Posting-quality gate: detect thin-content hallucinations + ATS shell pages
+    # before we waste tokens on tailoring or pollute fit_score with garbage.
+    quality = posting_quality_gate(
+        text=text, fields=fields, expected_title_hint=expected_title_hint,
+    )
+
     industry_filter = compute_industry_filter(
         industry_tags=fields.get("industry_tags") or [],
         company=fields.get("company") or "",
@@ -390,6 +488,7 @@ def analyze_job(
         "source_url": source_url,
         "source_confidence": source_confidence,
         "source_confidence_reason": source_confidence_reason,
+        "posting_quality": quality,
         "fetched_at": fetched_at,
         "raw_text_path": raw_text_path,
         "company": fields.get("company") or "",
@@ -410,8 +509,25 @@ def analyze_job(
         "prompt_version": PROMPT_VERSION,
         "model": resp.model,
     }
-    score = compute_fit_score(llm_fields=merged, profile=profile)
-    merged.update(score)
+    # If the gate hard-failed, force fit_score to 0 so downstream consumers can
+    # treat this row as ingest_failure regardless of whatever the LLM produced.
+    if quality["status"] == "ingest_failure":
+        merged["fit_score"] = 0
+        merged["fit_breakdown"] = {
+            "skills_match": 0, "preferred_skills_match": 0, "cert_match": 0,
+            "experience_match": 0, "location_match": 0,
+            "location_confidence": "unknown",
+            "industry_filter": industry_filter,
+        }
+        merged["apply_reasoning"] = [
+            f"posting_quality.status = ingest_failure: {'; '.join(quality['reasons'])}",
+            "fit_score forced to 0 by quality gate."
+        ]
+        merged["top_reasons_for"] = []
+        merged["top_gaps"] = ["ingest_failure (see posting_quality.reasons)"]
+    else:
+        score = compute_fit_score(llm_fields=merged, profile=profile)
+        merged.update(score)
 
     errs = validate_analyzed(merged)
     if errs:

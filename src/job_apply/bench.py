@@ -232,6 +232,8 @@ def production_mode_would_have_done(analyzed: dict[str, Any]) -> str:
     """What production mode would have decided based on fit + industry filter alone.
     Used in benchmark scorecards to show 'this role would have early-stopped'."""
     fit = int(analyzed.get("fit_score") or 0)
+    if (analyzed.get("posting_quality") or {}).get("status") == "ingest_failure":
+        return "ingest_failure"
     if (analyzed.get("industry_filter") or "ok") == "avoid":
         return "skip"
     if fit < 50:
@@ -239,6 +241,83 @@ def production_mode_would_have_done(analyzed: dict[str, Any]) -> str:
     if fit < 65:
         return "lightweight"
     return "full"
+
+
+def derive_production_status(*, analyzed: dict[str, Any], packet: dict[str, Any]) -> str:
+    """One of: portal_ready / maybe_review / skip / ingest_failure / needs_patch.
+
+    portal_ready: not blocked, fit>=65, no HIGH issues, employer renders produced.
+    maybe_review: lightweight mode (50-64) — internal review packet only.
+    needs_patch: blocked by HIGH QA or fabrication; renders absent or stale.
+    skip: fit<50 or industry=avoid; production mode short-circuited.
+    ingest_failure: posting quality gate failed.
+    """
+    quality = analyzed.get("posting_quality") or {}
+    if quality.get("status") == "ingest_failure":
+        return "ingest_failure"
+    if (analyzed.get("industry_filter") or "ok") == "avoid":
+        return "skip"
+    blocked = bool(packet.get("blocked"))
+    qa = (packet.get("validation") or {}).get("qa") or {}
+    high = sum(1 for i in (qa.get("issues") or []) if i.get("severity") == "high")
+    fab = len((packet.get("validation") or {}).get("fabrication_blocks") or [])
+    fit = int(analyzed.get("fit_score") or 0)
+    if fit < 50:
+        return "skip"
+    if blocked or high or fab:
+        return "needs_patch"
+    if fit < 65:
+        return "maybe_review"
+    return "portal_ready"
+
+
+def derive_strategic_interest(
+    *, analyzed: dict[str, Any], packet: dict[str, Any], profile_target_roles: list[str],
+) -> tuple[str, str]:
+    """Returns (interest, reason_to_still_consider).
+    Interest is independent of production_status — a low-fit role can still be
+    strategically interesting (vulnerability management, target growth area, etc).
+    """
+    fit = int(analyzed.get("fit_score") or 0)
+    title = (analyzed.get("title") or "").lower()
+    jd = packet.get("jd_analysis") or {}
+    evidence_map = jd.get("evidence_map") or []
+    strong_count = sum(
+        1 for em in evidence_map
+        for ev in (em.get("candidate_evidence") or [])
+        if ev.get("match_strength") == "strong"
+    )
+    adjacent_count = sum(
+        1 for em in evidence_map
+        for ev in (em.get("candidate_evidence") or [])
+        if ev.get("match_strength") == "adjacent"
+    )
+
+    target_match = any(
+        any(t.lower() in title or title in t.lower()
+            for t in profile_target_roles)
+        for _ in [None]
+    ) or any(t.lower() in title for t in profile_target_roles)
+
+    if (analyzed.get("posting_quality") or {}).get("status") == "ingest_failure":
+        return "low", "ingest failure — content unreliable"
+
+    if fit >= 65 and strong_count >= 2:
+        return "high", ""
+
+    if fit >= 50 and (target_match or strong_count >= 1):
+        return "medium", "fit-band overlap with target roles"
+
+    if fit < 40 and target_match and adjacent_count >= 2:
+        return "medium", (
+            "below production fit threshold but target-role overlap "
+            "+ multiple adjacent matches — track for future"
+        )
+
+    if fit < 40:
+        return "low", ""
+
+    return "medium", "borderline fit; review individually"
 
 
 def build_scorecard(*, slug: str, run_dir: Path, analyzed: dict[str, Any],
@@ -306,17 +385,38 @@ def build_scorecard(*, slug: str, run_dir: Path, analyzed: dict[str, Any],
     # WOULD have early-stopped, surface that for the summary.
     early_stop_in_prod = prod_decision in ("skip", "lightweight")
 
+    # production_status / strategic_interest are now set on the packet by the
+    # tailor pipeline; the scorecard surfaces them. Older packets won't have
+    # them — derive on the fly for backward compatibility.
+    target_roles: list[str] = []  # only available via profile, not via analyzed
+    production_status = packet.get("production_status")
+    if not production_status:
+        production_status = derive_production_status(analyzed=analyzed, packet=packet)
+    strategic_interest = packet.get("strategic_interest")
+    reason_to_consider = packet.get("reason_to_still_consider", "")
+    if not strategic_interest:
+        strategic_interest, reason_to_consider = derive_strategic_interest(
+            analyzed=analyzed, packet=packet, profile_target_roles=target_roles,
+        )
+
+    posting_quality = analyzed.get("posting_quality") or {"status": "ok", "reasons": []}
+
     return {
         "company": analyzed.get("company") or "",
         "role_title": analyzed.get("title") or "",
         "source_url": analyzed.get("source_url") or "",
         "source_confidence": analyzed.get("source_confidence") or "medium",
         "source_confidence_reason": analyzed.get("source_confidence_reason") or "",
+        "posting_quality_status": posting_quality.get("status"),
+        "posting_quality_reasons": posting_quality.get("reasons") or [],
         "role_category": role_cat,
         "fit_score": analyzed.get("fit_score") or 0,
         "fit_breakdown": fit_breakdown,
         "location_confidence": location_confidence,
         "industry_filter": analyzed.get("industry_filter") or "ok",
+        "production_status": production_status,
+        "strategic_interest": strategic_interest,
+        "reason_to_still_consider": reason_to_consider,
         "apply_recommendation": apply_rec,
         "apply_reason": reason,
         "production_mode_decision": prod_decision,

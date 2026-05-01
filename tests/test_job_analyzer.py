@@ -58,13 +58,28 @@ def _civilian_payload() -> dict:
         "preferred_skills": ["AWS"],
         "min_years_experience": 1,
         "required_certifications": ["CompTIA Security+"],
-        "responsibilities": ["triage alerts", "run vuln scans"],
+        "responsibilities": ["triage alerts", "run vuln scans", "investigate phishing"],
         "keywords_extracted": ["soc", "siem", "python"],
         "industry_tags": ["cybersecurity", "saas"],
         "fit_rationale": "Cert and skills overlap.",
         "concerns": ["limited prior full-time experience"],
         "missing_quals": [],
     }
+
+
+# Long body so the posting quality gate doesn't hard-fail on text length.
+_LONG_BODY = (
+    "Acme Corp is hiring a Security Analyst to monitor our SOC environment. "
+    "The role involves triaging alerts from our SIEM, running weekly vulnerability "
+    "scans, investigating phishing emails reported by users, and writing clear "
+    "incident reports for engineering leads. The successful candidate will work "
+    "with Splunk, CrowdStrike, and an in-house Python automation toolchain. We "
+    "need someone with strong communication skills, Linux fundamentals, and the "
+    "ability to follow runbooks under time pressure. CompTIA Security+ is required; "
+    "Network+ is a plus. This is a hybrid role based in Tulsa, OK with two days "
+    "in-office expected per week. We offer competitive compensation, healthcare, "
+    "and a relaxed environment. We are an equal opportunity employer. " * 5
+)
 
 
 def _military_payload() -> dict:
@@ -77,7 +92,7 @@ def _military_payload() -> dict:
 def test_analyze_civilian_job(workspace: Path):
     _write_profile(workspace)
     rec = state.save_ingest(
-        job_id="job0civ", text="(posting body)", source_url="https://x.com/a", source_kind="url"
+        job_id="job0civ", text=_LONG_BODY, source_url="https://x.com/a", source_kind="url"
     )
     profile = profile_loader.load_profile()
     result = job_analyzer.analyze_job(
@@ -100,7 +115,7 @@ def test_analyze_civilian_job(workspace: Path):
 def test_analyze_military_job_flagged_avoid(workspace: Path):
     _write_profile(workspace)
     rec = state.save_ingest(
-        job_id="job0mil", text="defense systems work", source_url=None, source_kind="file"
+        job_id="job0mil", text=_LONG_BODY + " defense systems work", source_url=None, source_kind="file"
     )
     profile = profile_loader.load_profile()
     result = job_analyzer.analyze_job(
@@ -119,7 +134,7 @@ def test_analyze_military_job_flagged_avoid(workspace: Path):
 
 def test_analyze_idempotent_skips_existing(workspace: Path, monkeypatch):
     _write_profile(workspace)
-    state.save_ingest(job_id="aaaaaaaaaaaa", text="x", source_url=None, source_kind="file")
+    state.save_ingest(job_id="aaaaaaaaaaaa", text=_LONG_BODY, source_url=None, source_kind="file")
     fake = FakeLLM(_civilian_payload())
     monkeypatch.setattr(job_analyzer, "LLMClient", lambda: fake)
     r1 = job_analyzer.analyze_all()
@@ -139,7 +154,7 @@ def test_industry_filter_keyword_fallback_when_tags_silent(workspace: Path):
     payload = _civilian_payload()
     payload["company"] = "Northrop Grumman"
     payload["industry_tags"] = ["aerospace"]  # tags don't include 'defense'
-    rec = state.save_ingest(job_id="job0fb", text="x", source_url=None, source_kind="file")
+    rec = state.save_ingest(job_id="job0fb", text=_LONG_BODY, source_url=None, source_kind="file")
     profile = profile_loader.load_profile()
     result = job_analyzer.analyze_job(
         job_id=rec.job_id,
@@ -161,7 +176,7 @@ def test_industry_filter_keyword_in_title(workspace: Path):
     payload = _civilian_payload()
     payload["title"] = "Defense Systems Engineer"
     payload["industry_tags"] = ["aerospace"]
-    rec = state.save_ingest(job_id="jobtit", text="x", source_url=None, source_kind="file")
+    rec = state.save_ingest(job_id="jobtit", text=_LONG_BODY, source_url=None, source_kind="file")
     profile = profile_loader.load_profile()
     result = job_analyzer.analyze_job(
         job_id=rec.job_id, profile=profile, text=rec.text, source_url=None,

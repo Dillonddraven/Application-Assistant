@@ -48,6 +48,60 @@ def run_tailor(
         raise TailorError(f"raw posting for {job_id} not found.")
     job_text = rec.text
 
+    # === Posting quality gate (always-on, both modes) ===
+    # If the analyzer flagged ingest_failure, refuse to tailor. Write a
+    # diagnostic file so the user sees WHY and what to retry.
+    quality = analyzed.get("posting_quality") or {"status": "ok", "reasons": []}
+    if quality.get("status") == "ingest_failure" and not force:
+        slug = state.packet_slug(analyzed.get("company") or "company",
+                                 analyzed.get("title") or "role")
+        out_dir = state.packet_dir(slug)
+        internal_dir = out_dir / "internal"
+        internal_dir.mkdir(parents=True, exist_ok=True)
+        retry_advice = (
+            "## Retry options\n"
+            "- Run with `--refresh` to re-fetch the URL.\n"
+            "- Re-ingest after sourcing the JD elsewhere: `job-apply ingest path/to/jd.txt`\n"
+            "- Find the company's direct careers page (Greenhouse / Lever / Ashby / Workday) "
+            "and ingest that URL instead.\n"
+            "- For JS-rendered pages, the Playwright fallback is already automatic; "
+            "if it fails, the page may require login or be expired.\n"
+            "- Pass `--force` to override and tailor anyway (NOT RECOMMENDED — produces "
+            "hallucinated artifacts).\n"
+        )
+        ingest_md = (
+            f"# Ingest failure — {analyzed.get('company') or '?'} "
+            f"({analyzed.get('title') or '?'})\n\n"
+            f"The posting failed the quality gate. Tailoring was NOT run; no LLM tokens "
+            f"were spent on resume / cover letter / outreach generation.\n\n"
+            f"## Reasons\n"
+            + "\n".join(f"- {r}" for r in (quality.get("reasons") or []))
+            + f"\n\n## Source\n- URL: {analyzed.get('source_url') or '(local)'}\n"
+            + f"- Char count: {quality.get('char_count', '?')}\n"
+            + f"- Responsibilities extracted: {quality.get('responsibilities_count', '?')}\n"
+            + f"- Requirements extracted: {quality.get('requirements_count', '?')}\n"
+            + f"- Shell-marker hits: {quality.get('shell_marker_hits', '?')}\n\n"
+            + retry_advice
+        )
+        (internal_dir / "ingest_failure.md").write_text(ingest_md)
+        packet = {
+            "job_id": job_id, "slug": slug,
+            "run_id": uuid.uuid4().hex[:8],
+            "tailored": {},
+            "rendered": {"internal": {"ingest_failure_md": "internal/ingest_failure.md"}},
+            "validation": {"fabrication_blocks": [], "fabrication_warnings": [],
+                           "schema_ok": True},
+            "status": "ingest_failure",
+            "posting_quality": quality,
+            "production_status": "ingest_failure",
+            "strategic_interest": "low",
+            "approval_log": [{"ts": state.now_iso(), "action": "ingest_failure_short_circuit"}],
+            "prompt_versions": {}, "model": "n/a",
+            "blocked": True,
+        }
+        state.save_packet(slug, packet)
+        return packet, slug
+
     client = llm or LLMClient()
 
     # === Production-mode early-stop ===
@@ -92,7 +146,17 @@ def run_tailor(
                                  analyzed.get("title") or "role")
         out_dir = state.packet_dir(slug)
         internal_dir = out_dir / "internal"
+        employer_dir = out_dir / "employer"
         internal_dir.mkdir(parents=True, exist_ok=True)
+        # Clean stale employer artifacts from any prior benchmark / unblocked run,
+        # so a current "skip" packet doesn't leave hallucinated PDFs lying around.
+        if employer_dir.exists():
+            for stale in employer_dir.glob("*"):
+                if stale.is_file():
+                    try:
+                        stale.unlink()
+                    except OSError:
+                        pass
         skip_md = (
             f"# Skipped — {analyzed.get('company')} ({analyzed.get('title')})\n\n"
             f"**Production mode: skip.** {early_stop_reason}\n\n"
@@ -104,7 +168,10 @@ def run_tailor(
             + "- `job-apply tailor <job-id> --force --mode benchmark`\n"
         )
         (internal_dir / "skip_reason.md").write_text(skip_md)
-        packet = {
+        # Compute strategic_interest even for skipped roles — they may still be worth tracking.
+        from . import bench as _bench
+        target_roles = (profile.data.get("preferences") or {}).get("target_roles") or []
+        skip_packet = {
             "job_id": job_id, "slug": slug,
             "run_id": uuid.uuid4().hex[:8],
             "tailored": {}, "rendered": {"internal": {"skip_reason_md": "internal/skip_reason.md"}},
@@ -116,10 +183,20 @@ def run_tailor(
             "production_mode_decision": "skip",
             "approval_log": [{"ts": state.now_iso(), "action": "early_stop_skip"}],
             "prompt_versions": {}, "model": "n/a",
-            "blocked": False,
+            "blocked": True,    # nothing to render
+            "jd_analysis": {},  # not generated; let strategic_interest fall back to fit-only logic
         }
-        state.save_packet(slug, packet)
-        return packet, slug
+        skip_packet["production_status"] = _bench.derive_production_status(
+            analyzed=analyzed, packet=skip_packet,
+        )
+        interest, reason_consider = _bench.derive_strategic_interest(
+            analyzed=analyzed, packet=skip_packet, profile_target_roles=target_roles,
+        )
+        skip_packet["strategic_interest"] = interest
+        if reason_consider:
+            skip_packet["reason_to_still_consider"] = reason_consider
+        state.save_packet(slug, skip_packet)
+        return skip_packet, slug
 
     # Stage 1: extract JD pain points + map to candidate evidence (cheap pre-pass).
     try:
@@ -371,6 +448,19 @@ def run_tailor(
 
     # Now write match_report (after QA so it includes the QA section).
     (internal_dir / "match_report.md").write_text(render.render_match_report(analyzed, packet))
+
+    # Derive production_status + strategic_interest (independent of apply_recommendation).
+    from . import bench as _bench
+    target_roles = (profile.data.get("preferences") or {}).get("target_roles") or []
+    packet["production_status"] = _bench.derive_production_status(
+        analyzed=analyzed, packet=packet,
+    )
+    interest, reason_consider = _bench.derive_strategic_interest(
+        analyzed=analyzed, packet=packet, profile_target_roles=target_roles,
+    )
+    packet["strategic_interest"] = interest
+    if reason_consider:
+        packet["reason_to_still_consider"] = reason_consider
 
     state.save_packet(slug, packet)
 
