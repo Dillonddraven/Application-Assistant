@@ -159,6 +159,71 @@ def posting_quality_gate(*, text: str, fields: dict[str, Any],
     }
 
 
+import re as _re
+
+# Deterministic clearance / citizenship-restriction detector. Any hit forces
+# apply_recommendation = "skip" and short-circuits the tailor pipeline.
+# Designed to be a hard auto-skip independent of fit_score, since even a 100/100
+# fit on a clearance role is unactionable for Dillon.
+_CLEARANCE_PATTERNS: list[tuple[_re.Pattern, str]] = [
+    (_re.compile(r"\bTS/SCI\b", _re.I), "TS/SCI clearance required"),
+    (_re.compile(r"\btop\s*secret\s+(?:security\s+)?clearance\b", _re.I),
+     "Top Secret clearance required"),
+    (_re.compile(r"\bsecret\s+clearance\b", _re.I), "Secret clearance required"),
+    (_re.compile(r"\bDoD\s+secret\b", _re.I), "DoD Secret required"),
+    (_re.compile(r"\bpolygraph\b", _re.I), "polygraph required"),
+    (_re.compile(r"\bcounter-?intelligence\s+polygraph\b", _re.I),
+     "counterintelligence polygraph required"),
+    (_re.compile(r"\bfull[-\s]+scope\s+polygraph\b", _re.I),
+     "full-scope polygraph required"),
+    (_re.compile(r"\bmust\s+(?:hold|have|possess|maintain)\s+(?:an?\s+)?(?:active\s+|current\s+)?(?:U\.?S\.?\s+)?(?:government\s+)?(?:security\s+)?clearance\b", _re.I),
+     "active security clearance required"),
+    (_re.compile(r"\bactive\s+(?:U\.?S\.?\s+)?(?:government\s+)?(?:security\s+)?clearance\b", _re.I),
+     "active security clearance required"),
+    (_re.compile(r"\bable\s+to\s+(?:obtain|maintain)\s+(?:a\s+)?clearance\b", _re.I),
+     "ability to obtain clearance required"),
+    (_re.compile(r"\bclearance[\-\s]eligible\b", _re.I), "clearance-eligible required"),
+    (_re.compile(r"\bSF[-\s]?86\b", _re.I), "SF-86 process required (clearance)"),
+    # ITAR / EAR — export-controlled US-citizen-only roles
+    (_re.compile(r"\bITAR\b", _re.I), "ITAR-controlled role (US-person only)"),
+    (_re.compile(r"\bexport[-\s]controlled\b", _re.I), "export-controlled role"),
+]
+
+
+def detect_clearance_requirement(text: str, fields: dict[str, Any] | None = None) -> dict[str, Any]:
+    """Scan JD text + extracted fields for hard clearance / export-control
+    requirements. Returns {"required": bool, "matches": [{"pattern_name": str,
+    "snippet": str}, ...]}."""
+    if not text:
+        return {"required": False, "matches": []}
+    haystacks: list[str] = [text]
+    if fields:
+        for k in ("required_skills", "preferred_skills", "responsibilities",
+                  "keywords_extracted"):
+            v = fields.get(k)
+            if isinstance(v, list):
+                haystacks.append(" ".join(str(x) for x in v))
+    blob = "\n".join(haystacks)
+
+    matches: list[dict[str, str]] = []
+    for pat, label in _CLEARANCE_PATTERNS:
+        m = pat.search(blob)
+        if m:
+            start = max(0, m.start() - 60)
+            end = min(len(blob), m.end() + 60)
+            snippet = blob[start:end].replace("\n", " ").strip()
+            matches.append({"pattern": label, "snippet": snippet})
+    # Dedupe by pattern label
+    seen: set[str] = set()
+    out: list[dict[str, str]] = []
+    for mt in matches:
+        if mt["pattern"] in seen:
+            continue
+        seen.add(mt["pattern"])
+        out.append(mt)
+    return {"required": bool(out), "matches": out}
+
+
 def score_source_confidence(url: str | None) -> tuple[str, str]:
     """Return (confidence, reason). Confidence is 'high' | 'medium' | 'low'."""
     if not url:
@@ -487,12 +552,14 @@ def analyze_job(
     )
 
     source_confidence, source_confidence_reason = score_source_confidence(source_url)
+    clearance = detect_clearance_requirement(text, fields)
 
     merged: dict[str, Any] = {
         "id": job_id,
         "source_url": source_url,
         "source_confidence": source_confidence,
         "source_confidence_reason": source_confidence_reason,
+        "clearance_required": clearance,
         "posting_quality": quality,
         "fetched_at": fetched_at,
         "raw_text_path": raw_text_path,

@@ -150,6 +150,11 @@ def derive_apply_recommendation(*, analyzed: dict[str, Any], packet: dict[str, A
         return "skip", f"blocked: {high_qa} HIGH QA, {fab} fabrication block(s)"
     if industry_filter == "avoid":
         return "skip", "industry filter set to AVOID (military/defense)"
+    # Deterministic clearance / export-control auto-skip (independent of fit)
+    cr = analyzed.get("clearance_required") or {}
+    if cr.get("required"):
+        labels = [m.get("pattern", "?") for m in (cr.get("matches") or [])]
+        return "skip", f"clearance/export-control required: {'; '.join(labels[:2])}"
     if clearance:
         return "skip", "active security clearance required (Dillon does not have one)"
     if fit < 35:

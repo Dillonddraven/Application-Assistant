@@ -114,8 +114,17 @@ def run_tailor(
     early_stop = False
     early_stop_reason = ""
     early_stop_mode = "full"   # "full" | "lightweight" | "skip"
+    cr = analyzed.get("clearance_required") or {}
     if mode == "production":
-        if industry_filter == "avoid" and not force:
+        if cr.get("required") and not force:
+            labels = [m.get("pattern", "?") for m in (cr.get("matches") or [])]
+            early_stop = True
+            early_stop_reason = (
+                f"clearance/export-control required: {'; '.join(labels[:3])}. "
+                f"Auto-skipped (Dillon has no clearance). Pass --force to override."
+            )
+            early_stop_mode = "skip"
+        elif industry_filter == "avoid" and not force:
             early_stop = True
             early_stop_reason = (
                 f"industry filter set to AVOID (tags: {analyzed.get('industry_tags')}). "
