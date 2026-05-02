@@ -271,6 +271,88 @@ def _cmd_close_drafts(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_finder_run(args: argparse.Namespace) -> int:
+    """Poll curated company ATS boards, dedupe, score, write the review queue."""
+    from .finder import run_finder
+    from .profile_loader import load_profile
+    profile = load_profile()
+    result = run_finder(profile=profile, allow_stretch=args.allow_stretch)
+    print(f"polled: {result.polled_companies} compan(ies)")
+    print(f"  postings seen: {result.total_postings_seen}")
+    print(f"  after dedupe: {result.after_dedupe}")
+    print(f"  after filters: {result.after_filters}")
+    print(f"  dropped — clearance: {result.dropped_clearance}, "
+          f"stretch: {result.dropped_stretch}, low-fit: {result.dropped_low_fit}")
+    if result.errors:
+        print(f"  errors: {len(result.errors)}")
+        for e in result.errors[:5]:
+            print(f"    - {e.get('company')}: {e.get('error', '')[:120]}")
+    print(f"queue: {len(result.queue_rows)} row(s) -> runs/_finder_queue.xlsx")
+    return 0
+
+
+def _cmd_finder_review(args: argparse.Namespace) -> int:
+    """List queue rows, optionally filtered by recommended_action or review_status."""
+    from .finder import load_queue
+    rows = load_queue()
+    if args.action != "all":
+        rows = [r for r in rows if r.recommended_action == args.action]
+    if args.status != "all":
+        rows = [r for r in rows if r.review_status == args.status]
+    if not rows:
+        print("(no rows match)")
+        return 0
+    rows = sorted(rows, key=lambda r: -r.quick_fit)
+    cols = ("FIT", "ACTION", "STATUS", "ATS", "COMPANY", "TITLE", "LOCATION")
+    lines: list[tuple[str, ...]] = [cols]
+    for r in rows:
+        lines.append((
+            f"{r.quick_fit:3d}",
+            (r.recommended_action or "")[:14],
+            (r.review_status or "")[:9],
+            (r.ats or "")[:10],
+            (r.company or "")[:20],
+            (r.title or "")[:42],
+            (r.location or "")[:18],
+        ))
+    widths = [max(len(row[i]) for row in lines) for i in range(len(cols))]
+    out: list[str] = []
+    for i, row in enumerate(lines):
+        out.append("  ".join(c.ljust(widths[j]) for j, c in enumerate(row)))
+        if i == 0:
+            out.append("-" * len(out[-1]))
+    print("\n".join(out))
+    return 0
+
+
+def _cmd_finder_status(args: argparse.Namespace) -> int:
+    """Update review_status and/or review_notes on a queued row."""
+    from .finder import load_queue, save_queue
+    rows = load_queue()
+    target = None
+    for r in rows:
+        if (args.url and r.url == args.url) or \
+           (args.url and args.url in r.url) or \
+           (args.url and (args.url in r.title and args.url in r.company)):
+            target = r
+            break
+    if target is None:
+        # Try title substring match
+        for r in rows:
+            if args.url.lower() in (r.title or "").lower() and args.url.lower() in (r.company or "").lower():
+                target = r
+                break
+    if target is None:
+        print(f"finder-status: no queued row matching {args.url!r}", file=sys.stderr)
+        return 1
+    target.review_status = args.new_status
+    if args.notes:
+        target.review_notes = args.notes
+    save_queue(rows)
+    print(f"updated: {target.company} - {target.title} -> {target.review_status}")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
         prog="job-apply",
@@ -366,6 +448,34 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p_cd.add_argument("run_id")
     p_cd.set_defaults(func=_cmd_close_drafts)
+
+    p_fr = sub.add_parser(
+        "finder-run",
+        help="Poll curated company ATS boards (Greenhouse/Lever) and update the review queue.",
+    )
+    p_fr.add_argument("--allow-stretch", action="store_true",
+                      help="Keep senior/staff/principal postings tagged as 'stretch' instead of dropping them.")
+    p_fr.set_defaults(func=_cmd_finder_run)
+
+    p_frv = sub.add_parser(
+        "finder-review",
+        help="List queued postings (default sorted by quick_fit desc).",
+    )
+    p_frv.add_argument("--action", default="all",
+                       choices=["all", "run_packet", "save_for_later", "stretch", "skip"])
+    p_frv.add_argument("--status", default="all",
+                       choices=["all", "new", "reviewed", "approved", "ignored"])
+    p_frv.set_defaults(func=_cmd_finder_review)
+
+    p_fs = sub.add_parser(
+        "finder-status",
+        help="Update review_status / notes on a queued posting (match by URL substring or title+company).",
+    )
+    p_fs.add_argument("url", help="URL or substring matching a queued posting.")
+    p_fs.add_argument("new_status",
+                      choices=["new", "reviewed", "approved", "ignored"])
+    p_fs.add_argument("--notes", default="")
+    p_fs.set_defaults(func=_cmd_finder_status)
 
     return p
 

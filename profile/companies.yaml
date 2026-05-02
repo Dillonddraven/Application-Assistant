@@ -1,0 +1,51 @@
+# profile/companies.yaml — USER-EDITABLE.
+#
+# Curated company watchlist for `job-apply finder run`. Each company has:
+#   - name: human-readable label
+#   - ats: one of {greenhouse, lever}  (more sources later: ashby, workable, smartrecruiters)
+#   - slug: the company's identifier on that ATS (e.g. boards-api.greenhouse.io/v1/boards/<slug>/jobs)
+#   - tags: optional list of cyber-relevance markers (used to weight discoveries)
+#
+# Copy this to profile/companies.yaml and curate to taste. The system polls
+# only the companies you list. Recommendation: start with 30-50 mid-size cyber
+# companies whose stack you'd genuinely consider. Add/remove freely.
+
+companies:
+  # === Strong cyber-relevance ===
+  - {name: "Datadog",            ats: "greenhouse", slug: "datadog",           tags: [observability, sec-monitoring]}
+  - {name: "Cloudflare",          ats: "greenhouse", slug: "cloudflare",        tags: [network-sec, edge]}
+  - {name: "GitLab",              ats: "greenhouse", slug: "gitlab",            tags: [devops, sast, appsec]}
+  - {name: "1Password",           ats: "greenhouse", slug: "1password",         tags: [iam, security-product]}
+  - {name: "HashiCorp",           ats: "greenhouse", slug: "hashicorp",         tags: [iam, secrets, infra-sec]}
+  - {name: "Snyk",                ats: "lever",      slug: "snyk",              tags: [appsec, sast, security-product]}
+  - {name: "Tines",               ats: "lever",      slug: "tines",             tags: [soar, security-automation]}
+  - {name: "Dragos",              ats: "lever",      slug: "dragos",            tags: [ot-security, ics]}
+  - {name: "Sublime Security",    ats: "ashby",      slug: "sublimesecurity",   tags: [phishing, email-security]}
+  - {name: "Material Security",   ats: "ashby",      slug: "material",          tags: [phishing, email-security]}
+  - {name: "Push Security",       ats: "ashby",      slug: "pushsecurity",      tags: [iam, identity-security]}
+  - {name: "Wiz",                 ats: "greenhouse", slug: "wiz",               tags: [cloud-security]}
+  - {name: "Lacework",            ats: "greenhouse", slug: "lacework",          tags: [cloud-security]}
+  - {name: "Orca Security",       ats: "lever",      slug: "orcasecurity",      tags: [cloud-security]}
+  - {name: "Sysdig",              ats: "greenhouse", slug: "sysdig",            tags: [container-security]}
+  - {name: "JupiterOne",          ats: "lever",      slug: "jupiterone",        tags: [cspm, asset-inventory]}
+  - {name: "Tailscale",           ats: "greenhouse", slug: "tailscale",         tags: [network-sec, zero-trust]}
+  - {name: "PagerDuty",           ats: "greenhouse", slug: "pagerduty",         tags: [incident-response]}
+  - {name: "Okta",                ats: "greenhouse", slug: "okta",              tags: [iam]}
+  - {name: "Auth0",               ats: "greenhouse", slug: "auth0",             tags: [iam]}
+  - {name: "Twilio",              ats: "greenhouse", slug: "twilio",            tags: [communications, security-product]}
+
+  # === Mid-relevance: developer tools, fintech, SaaS often hire SOC/IT-security ===
+  - {name: "Stripe",              ats: "greenhouse", slug: "stripe",            tags: [fintech, soc]}
+  - {name: "Plaid",               ats: "greenhouse", slug: "plaid",             tags: [fintech]}
+  - {name: "Notion",              ats: "greenhouse", slug: "notionhq",          tags: [saas]}
+  - {name: "Asana",               ats: "greenhouse", slug: "asana",             tags: [saas]}
+  - {name: "Figma",               ats: "ashby",      slug: "figma",             tags: [saas]}
+  - {name: "Vercel",              ats: "greenhouse", slug: "vercel",            tags: [cloud, edge]}
+  - {name: "DigitalOcean",        ats: "greenhouse", slug: "digitalocean",      tags: [cloud]}
+  - {name: "Block",               ats: "greenhouse", slug: "square",            tags: [fintech]}
+  - {name: "Robinhood",           ats: "greenhouse", slug: "robinhood",         tags: [fintech]}
+  - {name: "Coinbase",            ats: "greenhouse", slug: "coinbase",          tags: [crypto, soc]}
+  - {name: "Reddit",              ats: "greenhouse", slug: "reddit",            tags: [saas]}
+  - {name: "Discord",             ats: "greenhouse", slug: "discord",           tags: [saas, trust-and-safety]}
+
+  # Add or remove freely. The finder polls only these.
