@@ -265,6 +265,8 @@ def compute_fit_score(*, llm_fields: dict[str, Any], profile: Profile) -> dict[s
     """
     reasoning: list[str] = []
 
+    from . import synonyms as _syn
+    clusters = _syn.load_clusters()
     req_skills = [s.lower() for s in llm_fields.get("required_skills") or []]
     pref_skills = [s.lower() for s in llm_fields.get("preferred_skills") or []]
     profile_skills = _flat_profile_skills(profile)
@@ -272,7 +274,10 @@ def compute_fit_score(*, llm_fields: dict[str, Any], profile: Profile) -> dict[s
     def overlap(needed: list[str]) -> tuple[int, int, int]:
         if not needed:
             return 100, 0, 0
-        hits = sum(1 for s in needed if any(s in ps or ps in s for ps in profile_skills))
+        # Synonym-aware match: catches SIEM<->Graylog, "phishing analysis"<->
+        # "Phishing recognition (lab)", etc., per profile/skill_synonyms.yaml.
+        hits = sum(1 for s in needed
+                   if _syn.matches_with_synonyms(s, profile_skills, clusters))
         return int(round(100 * hits / len(needed))), hits, len(needed)
 
     skills_match, skill_hits, skill_total = overlap(req_skills)

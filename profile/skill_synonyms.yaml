@@ -1,0 +1,100 @@
+# profile/skill_synonyms.yaml — USER-EDITABLE.
+#
+# Each top-level cluster is a list of equivalent terms. When a job posting
+# requires a skill that appears in any cluster, the system also matches against
+# every other term in that same cluster. Add or remove freely; this file ships
+# as an example, copy to profile/skill_synonyms.yaml to customize.
+#
+# Rules:
+#   - Match is case-insensitive substring (so "SIEM" matches "Microsoft Sentinel"
+#     because Sentinel is in the same cluster).
+#   - Order doesn't matter inside a cluster.
+#   - Keep the truth-safe convention: if you have lab-only exposure to a term,
+#     leave the explicit "(lab)" qualifier on your profile.skills entry —
+#     synonym matching will still find it.
+
+clusters:
+  # SIEM platforms / centralized logging / SOC tooling
+  - [SIEM, log monitoring, centralized logging, Graylog, OpenSearch, ELK,
+     Splunk, Microsoft Sentinel, Azure Sentinel, Elastic SIEM, Sumo Logic,
+     log aggregation]
+
+  # Log forwarding / collection
+  - [log forwarding, syslog, rsyslog, NXLog, fluentd, fluent bit, vector,
+     filebeat, winlogbeat]
+
+  # Vulnerability reporting + tooling
+  - [vulnerability reporting, vulnerability dashboards, vulnerability summaries,
+     SAST reports, SAST reporting, GitLab SAST, OpenPyXL severity reports,
+     remediation tracking, vuln severity reporting]
+
+  # Application security scanning
+  - [application security scanning, SAST, DAST, IAST, GitLab SAST, Invicti,
+     ACS, Checkmarx, Veracode, Fortify, Snyk]
+
+  # Vulnerability management / scanners
+  - [vulnerability management, vulnerability assessment, vulnerability scanning,
+     Nessus, Qualys, Tenable, OpenVAS, Rapid7, Nexpose]
+
+  # Phishing / email security (lab-level exposure ok; profile entries should
+  # keep the "(lab)" qualifier to stay truth-safe)
+  - [phishing analysis, phishing recognition, phishing triage,
+     phishing indicator analysis, suspicious email review,
+     email header review, email security, security awareness,
+     social engineering recognition, Security+ labs]
+
+  # Network traffic analysis / packet inspection
+  - [network traffic analysis, packet analysis, packet capture,
+     Wireshark, tcpdump, ngrep, Zeek, Bro]
+
+  # Network discovery / scanning
+  - [network scanning, network discovery, Nmap, masscan, port scanning]
+
+  # Endpoint detection / EDR
+  - [endpoint detection, EDR, CrowdStrike, SentinelOne, Defender for Endpoint,
+     Carbon Black, Tanium, Red Canary, Limacharlie]
+
+  # Incident response
+  - [incident response, IR, incident handling, security incident management,
+     SIRT, CSIRT, incident triage, incident escalation]
+
+  # Forensics
+  - [digital forensics, forensic triage, memory forensics, disk forensics,
+     Autopsy, FTK, Volatility, EnCase]
+
+  # Compliance / governance / audits (GRC)
+  - [SOC 2, ISO 27001, NIST 800-53, NIST 800-171, CMMC, FedRAMP, HIPAA,
+     PCI DSS, control testing, control mapping, evidence collection,
+     risk register, GRC, governance risk compliance]
+
+  # IAM
+  - [IAM, identity and access management, access reviews, provisioning,
+     SSO, Okta, SailPoint, ForgeRock, Azure AD, Active Directory]
+
+  # MFA / authentication
+  - [MFA, multi-factor authentication, two-factor authentication, 2FA,
+     Twilio Verify, Duo, authenticator apps, FIDO2, WebAuthn]
+
+  # Cloud security
+  - [cloud security, AWS security, Azure security, GCP security,
+     CSPM, CIEM, cloud posture management]
+
+  # Containers / orchestration
+  - [container security, Kubernetes security, Docker security,
+     image scanning, runtime protection]
+
+  # Scripting / automation
+  - [Python, scripting, automation, Bash, PowerShell, shell scripting,
+     workflow automation]
+
+  # Linux / Unix
+  - [Linux, Unix, RHEL, Ubuntu, CentOS, Linux administration,
+     Linux troubleshooting]
+
+  # Windows / endpoints
+  - [Windows, Windows Server, Active Directory, Group Policy,
+     Windows Event Logs]
+
+  # Communication / soft
+  - [stakeholder communication, technical communication, executive briefing,
+     security risk communication, technical writing]

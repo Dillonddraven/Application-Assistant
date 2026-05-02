@@ -1,0 +1,132 @@
+[
+  {
+    "company": "Pacific Legal Foundation",
+    "old_fit": 35,
+    "new_fit": 49,
+    "delta": 14,
+    "old_production_status": "needs_patch",
+    "new_production_status": "skip",
+    "old_strategic_interest": null,
+    "new_strategic_interest": "medium",
+    "reason_to_still_consider": "borderline fit; review individually",
+    "passes_threshold_50": false,
+    "passes_threshold_45": true,
+    "would_change_with_45_threshold": true,
+    "phish_evidence_surfaced": [
+      {
+        "source_id": "reusable_answers.phishing_experience_safe",
+        "match_strength": "adjacent",
+        "summary": "Lab-based exposure to phishing analysis and security awareness concepts through coursework and Security+ labs."
+      }
+    ],
+    "missing_evidence_count": 2,
+    "fit_breakdown": {
+      "skills_match": 12,
+      "preferred_skills_match": 8,
+      "cert_match": 100,
+      "experience_match": 100,
+      "location_match": 80,
+      "location_confidence": "neutral",
+      "industry_filter": "ok"
+    },
+    "apply_reasoning": [
+      "required-skill overlap: 1/8 = 12",
+      "\u22642 years required + internships present -> exp_match=100",
+      "hybrid role + willing_to_relocate -> 80 (worth considering)",
+      "weighted total = 0.40*skills(12) + 0.15*pref(8) + 0.20*cert(100) + 0.15*exp(100) + 0.10*loc(80) - industry(0) = 49"
+    ]
+  },
+  {
+    "company": "UltraViolet Cyber",
+    "old_fit": 52,
+    "new_fit": 55,
+    "delta": 3,
+    "old_production_status": "needs_patch",
+    "new_production_status": "maybe_review",
+    "old_strategic_interest": null,
+    "new_strategic_interest": "medium",
+    "reason_to_still_consider": "fit-band overlap with target roles",
+    "passes_threshold_50": true,
+    "passes_threshold_45": true,
+    "would_change_with_45_threshold": false,
+    "phish_evidence_surfaced": [],
+    "missing_evidence_count": 0,
+    "fit_breakdown": {
+      "skills_match": 18,
+      "preferred_skills_match": 20,
+      "cert_match": 100,
+      "experience_match": 100,
+      "location_match": 100,
+      "location_confidence": "strong",
+      "industry_filter": "ok"
+    },
+    "apply_reasoning": [
+      "required-skill overlap: 2/11 = 18",
+      "\u22642 years required + internships present -> exp_match=100",
+      "remote role + remote_ok=true -> location_match=100",
+      "weighted total = 0.40*skills(18) + 0.15*pref(20) + 0.20*cert(100) + 0.15*exp(100) + 0.10*loc(100) - industry(0) = 55"
+    ]
+  },
+  {
+    "company": "PurpleBox",
+    "old_fit": 47,
+    "new_fit": 49,
+    "delta": 2,
+    "old_production_status": "needs_patch",
+    "new_production_status": "skip",
+    "old_strategic_interest": null,
+    "new_strategic_interest": "medium",
+    "reason_to_still_consider": "borderline fit; review individually",
+    "passes_threshold_50": false,
+    "passes_threshold_45": true,
+    "would_change_with_45_threshold": true,
+    "phish_evidence_surfaced": [],
+    "missing_evidence_count": 1,
+    "fit_breakdown": {
+      "skills_match": 14,
+      "preferred_skills_match": 8,
+      "cert_match": 100,
+      "experience_match": 100,
+      "location_match": 70,
+      "location_confidence": "neutral",
+      "industry_filter": "ok"
+    },
+    "apply_reasoning": [
+      "required-skill overlap: 3/21 = 14",
+      "\u22642 years required + internships present -> exp_match=100",
+      "unknown remote_mode but candidate is flexible -> 70",
+      "weighted total = 0.40*skills(14) + 0.15*pref(8) + 0.20*cert(100) + 0.15*exp(100) + 0.10*loc(70) - industry(0) = 49"
+    ]
+  },
+  {
+    "company": "Xpansiv",
+    "old_fit": 46,
+    "new_fit": 53,
+    "delta": 7,
+    "old_production_status": "needs_patch",
+    "new_production_status": "maybe_review",
+    "old_strategic_interest": null,
+    "new_strategic_interest": "medium",
+    "reason_to_still_consider": "fit-band overlap with target roles",
+    "passes_threshold_50": true,
+    "passes_threshold_45": true,
+    "would_change_with_45_threshold": false,
+    "phish_evidence_surfaced": [],
+    "missing_evidence_count": 2,
+    "fit_breakdown": {
+      "skills_match": 20,
+      "preferred_skills_match": 25,
+      "cert_match": 100,
+      "experience_match": 75,
+      "location_match": 100,
+      "location_confidence": "strong",
+      "industry_filter": "ok"
+    },
+    "apply_reasoning": [
+      "required-skill overlap: 3/15 = 20",
+      "3 years required (within stretch range for early-career) -> exp_match=75",
+      "remote role + remote_ok=true -> location_match=100",
+      "weighted total = 0.40*skills(20) + 0.15*pref(25) + 0.20*cert(100) + 0.15*exp(75) + 0.10*loc(100) - industry(0) = 53"
+    ]
+  }
+]
