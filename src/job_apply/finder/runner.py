@@ -106,13 +106,35 @@ def run_finder(
         except Exception as e:
             errors.append({"company": c.get("name"), "error": str(e), "fatal": True})
 
-    # Dedupe by URL (Greenhouse + Lever each give canonical URLs)
-    dedup: dict[str, dict[str, Any]] = {}
+    # Dedupe in two passes:
+    # 1) URL dedupe across sources (same posting indexed twice).
+    # 2) (company, normalized_title) collapse — same role posted to multiple
+    #    locations. We keep the first one and stash the others' locations on it
+    #    so the queue row reads "Remote / Toronto / Mexico City" instead of
+    #    being three separate rows.
+    url_dedup: dict[str, dict[str, Any]] = {}
     for p in raw_postings:
-        key = p.get("url") or f"{p.get('company')}|{p.get('title')}"
-        if key not in dedup:
-            dedup[key] = p
-    after_dedupe = list(dedup.values())
+        url_key = p.get("url") or f"{p.get('company')}|{p.get('title')}"
+        if url_key not in url_dedup:
+            url_dedup[url_key] = p
+    title_groups: dict[tuple[str, str], list[dict[str, Any]]] = {}
+    for p in url_dedup.values():
+        company = (p.get("company") or "").strip().lower()
+        title = (p.get("title") or "").strip().lower()
+        title_groups.setdefault((company, title), []).append(p)
+    after_dedupe: list[dict[str, Any]] = []
+    for group in title_groups.values():
+        # Keep the first posting; merge other postings' locations into it.
+        primary = group[0]
+        if len(group) > 1:
+            extra_locs = sorted({(p.get("location") or "").strip()
+                                  for p in group if (p.get("location") or "").strip()})
+            primary = dict(primary)
+            primary["location"] = " / ".join(extra_locs[:5])
+            if len(extra_locs) > 5:
+                primary["location"] += f" (+{len(extra_locs) - 5} more)"
+            primary["__multi_location_count"] = len(group)
+        after_dedupe.append(primary)
 
     # Filter + score
     queue_rows: list[queue.FinderQueueRow] = []

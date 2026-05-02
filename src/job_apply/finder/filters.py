@@ -25,11 +25,24 @@ DEFAULT_TITLE_TARGETS = [
     "security automation",
     "cloud security analyst",
     "it security analyst",
-    "technical support engineer", "support engineer",  # security-flavored
     "security engineer i", "associate security engineer", "junior security engineer",
     "associate soc",
     "data security analyst",
+    "security assurance analyst", "security risk analyst",
+    "threat detection",
 ]
+
+# Titles that match ONLY when the JD body also contains a security keyword.
+# Prevents generic "Technical Support Engineer" or "Software Engineer" matches
+# from dominating the queue.
+CONDITIONAL_TITLE_TARGETS = [
+    "technical support engineer", "support engineer",
+    "software engineer",
+]
+SECURITY_KEYWORDS = re.compile(
+    r"\b(security|cybersecurity|soc|incident response|vulnerability|"
+    r"siem|siem ?platform|threat|appsec|infosec|compliance|iam|"
+    r"penetration test|phishing|forensic|malware|risk assessment)\b", re.I)
 
 SENIOR_TITLE_MARKERS = [
     "senior", "staff", "principal", "lead", "manager", "director",
@@ -39,12 +52,19 @@ SENIOR_TITLE_MARKERS = [
 STRETCH_YEARS_RE = re.compile(r"\b(\d+)\+?\s*(?:to\s*\d+\s*)?years?\b", re.I)
 
 
-def title_matches_targets(title: str, targets: list[str] | None = None) -> bool:
+def title_matches_targets(title: str, targets: list[str] | None = None,
+                          jd_text: str = "") -> bool:
+    """Direct match against strict targets, OR conditional match (broad title +
+    security keyword in JD body)."""
     if not title:
         return False
     title_lc = title.lower()
     candidates = (targets or []) + DEFAULT_TITLE_TARGETS
-    return any(t.lower() in title_lc for t in candidates)
+    if any(t.lower() in title_lc for t in candidates):
+        return True
+    if any(t in title_lc for t in CONDITIONAL_TITLE_TARGETS):
+        return bool(jd_text and SECURITY_KEYWORDS.search(jd_text))
+    return False
 
 
 def is_senior_title(title: str) -> bool:
@@ -79,7 +99,7 @@ def quick_fit(*, posting: dict[str, Any], profile_skills: list[str],
     reasons: list[str] = []
     stretch_flags: list[str] = []
 
-    title_pts = 40 if title_matches_targets(title, target_roles) else 10
+    title_pts = 40 if title_matches_targets(title, target_roles, jd_text=text) else 10
     if title_pts == 40:
         reasons.append(f"title matches target list: {title!r}")
     else:

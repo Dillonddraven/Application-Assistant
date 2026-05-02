@@ -309,6 +309,129 @@ def _flat_profile_skills(profile: Profile) -> set[str]:
     return out
 
 
+# Evidence-strength weights per source type. A skill backed by an internship
+# bullet (real work product) outranks the same skill listed only in a flat
+# `skills` block (which carries no evidence on its own). The fit-score lookup
+# uses MAX-across-sources so a single strong source dominates weaker ones.
+_SOURCE_WEIGHTS = {
+    "internship": 1.00,
+    "senior_project_capstone": 0.90,
+    "contract": 0.85,
+    "self_directed_project": 0.85,
+    "leadership": 0.65,
+    "academic_lab": 0.65,
+    "coursework_lab": 0.65,
+    "certification_lab": 0.65,
+    "default_project": 0.80,    # project entry with no explicit evidence_strength
+    "flat_skill_only": 0.60,    # listed in skills.* but no supporting bullet/project
+    "learnable_concept": 0.30,  # explicit study-only marker; rarely employer-facing
+}
+
+# Map textual evidence_strength labels (used in profile.projects[].evidence_strength)
+# to the corresponding weight.
+_EVIDENCE_STRENGTH_TO_WEIGHT = {
+    "strong": 0.95, "moderate": 0.70, "weak": 0.40,
+}
+
+
+def build_skill_strength_index(profile: Profile) -> dict[str, float]:
+    """Build {skill_lc: max_strength} from every supporting source in the profile.
+
+    Walks experience bullets (weighted by role_type), projects (weighted by
+    explicit evidence_strength field or default), and the flat skills block
+    (lowest weight, since these aren't backed by a citation).
+
+    Returns: lowercase skill -> [0.0, 1.0] strength weight.
+    """
+    weights: dict[str, float] = {}
+
+    def upsert(skill: str, w: float) -> None:
+        s = (skill or "").lower().strip()
+        if not s:
+            return
+        if w > weights.get(s, 0.0):
+            weights[s] = w
+
+    p = profile.data
+
+    # Experience bullets
+    for exp in p.get("experience") or []:
+        if not isinstance(exp, dict):
+            continue
+        role_type = (exp.get("role_type") or "").lower()
+        w = _SOURCE_WEIGHTS.get(role_type, 0.75)   # unknown role_type -> mid-tier
+        for b in exp.get("bullets") or []:
+            if not isinstance(b, dict):
+                continue
+            for sk in b.get("skills_demonstrated") or []:
+                if isinstance(sk, str):
+                    upsert(sk, w)
+
+    # Projects
+    for proj in p.get("projects") or []:
+        if not isinstance(proj, dict):
+            continue
+        es = (proj.get("evidence_strength") or "").lower()
+        if es in _EVIDENCE_STRENGTH_TO_WEIGHT:
+            w = _EVIDENCE_STRENGTH_TO_WEIGHT[es]
+        else:
+            # No explicit field — map by source_type if present, else default project
+            st = (proj.get("source_type") or "").lower()
+            w = _SOURCE_WEIGHTS.get(st, _SOURCE_WEIGHTS["default_project"])
+        # Self-directed projects with at least one artifact get a small bump
+        if proj.get("artifacts") and w < _SOURCE_WEIGHTS["self_directed_project"]:
+            w = max(w, _SOURCE_WEIGHTS["self_directed_project"])
+        for sk in proj.get("skills") or []:
+            if isinstance(sk, str):
+                upsert(sk, w)
+
+    # Certifications — count cert names themselves as skill-supporting evidence
+    # at certification-lab strength
+    for cert in p.get("certifications") or []:
+        if isinstance(cert, dict):
+            n = cert.get("name")
+            if isinstance(n, str):
+                upsert(n, _SOURCE_WEIGHTS["certification_lab"])
+
+    # Top-level skills.* block — lowest weight unless promoted by a source above
+    for tier_v in (p.get("skills") or {}).values():
+        if isinstance(tier_v, list):
+            for sk in tier_v:
+                if isinstance(sk, str):
+                    upsert(sk, _SOURCE_WEIGHTS["flat_skill_only"])
+
+    return weights
+
+
+def evidence_weighted_match(
+    needed: str, profile_skills_with_weights: dict[str, float],
+    clusters: list[list[str]] | None = None,
+) -> float:
+    """Returns the strongest evidence weight (0.0-1.0) supporting a JD-required
+    skill. 0.0 means no match. Uses synonym-aware lookup so SIEM matches
+    Graylog-tagged skills."""
+    from . import synonyms as _syn
+    needed_lc = (needed or "").lower().strip()
+    if not needed_lc:
+        return 0.0
+    best = 0.0
+    # Direct match path
+    for skill_lc, w in profile_skills_with_weights.items():
+        if needed_lc in skill_lc or skill_lc in needed_lc:
+            best = max(best, w)
+    # Synonym path
+    if best < 1.0:
+        if clusters is None:
+            clusters = _syn.load_clusters()
+        for cluster in clusters:
+            if not _syn._term_matches_cluster(needed_lc, cluster):
+                continue
+            for skill_lc, w in profile_skills_with_weights.items():
+                if _syn._term_matches_cluster(skill_lc, cluster):
+                    best = max(best, w)
+    return best
+
+
 def _profile_cert_names(profile: Profile) -> set[str]:
     return {
         c.get("name", "").lower()
@@ -335,15 +458,26 @@ def compute_fit_score(*, llm_fields: dict[str, Any], profile: Profile) -> dict[s
     req_skills = [s.lower() for s in llm_fields.get("required_skills") or []]
     pref_skills = [s.lower() for s in llm_fields.get("preferred_skills") or []]
     profile_skills = _flat_profile_skills(profile)
+    skill_weights = build_skill_strength_index(profile)
 
     def overlap(needed: list[str]) -> tuple[int, int, int]:
         if not needed:
             return 100, 0, 0
-        # Synonym-aware match: catches SIEM<->Graylog, "phishing analysis"<->
-        # "Phishing recognition (lab)", etc., per profile/skill_synonyms.yaml.
-        hits = sum(1 for s in needed
-                   if _syn.matches_with_synonyms(s, profile_skills, clusters))
-        return int(round(100 * hits / len(needed))), hits, len(needed)
+        # Evidence-weighted match: each hit contributes its source-strength
+        # weight (1.0 = internship bullet, 0.65-0.85 = project/cert/lab, 0.60 =
+        # flat skills entry only). A skill matched only by a learnable-concept
+        # listing scores low; one matched by a real internship deliverable
+        # scores high. Synonym matcher still applies.
+        weight_sum = 0.0
+        hit_count = 0
+        for s in needed:
+            w = evidence_weighted_match(s, skill_weights, clusters)
+            if w > 0:
+                weight_sum += w
+                hit_count += 1
+        # Total possible = len(needed) * 1.0; report as percentage of that ceiling.
+        score = int(round(100 * weight_sum / max(len(needed), 1)))
+        return score, hit_count, len(needed)
 
     skills_match, skill_hits, skill_total = overlap(req_skills)
     pref_skills_match, _, _ = overlap(pref_skills)
