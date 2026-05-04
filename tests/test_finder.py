@@ -305,6 +305,209 @@ def test_runner_polls_filters_and_persists(tmp_path: Path,
     assert result.dropped_stretch >= 1
 
 
+# -------------------- diversified ranking & grouping --------------------
+
+def _row(company: str, title: str, score: int, *, slug: str = "",
+          stretch: str = "") -> FinderQueueRow:
+    return FinderQueueRow(
+        company=company, title=title,
+        url=f"https://x/{company.lower()}/{title.lower().replace(' ', '-')}",
+        ats="greenhouse", quick_fit=score, stretch_flags=stretch,
+        recommended_action="run_packet" if score >= 65 else "save_for_later",
+        recommended_next_action="run_packet" if score >= 65 else "save_for_later",
+        company_group_id=slug or company.lower(),
+        review_status="new", discovered_date="2026-05-01",
+    )
+
+
+def test_diversify_round_robin_interleaves_companies():
+    """Best-of-A, best-of-B, best-of-C, then second-best-of-A, ..."""
+    rows = [
+        _row("Acme", "SOC Analyst",       80),
+        _row("Acme", "Cybersecurity Eng", 75),
+        _row("Beta", "GRC Analyst",       70),
+        _row("Beta", "IAM Analyst",       60),
+        _row("Cog",  "SecOps Analyst",    50),
+    ]
+    out = queue.diversify(rows)
+    # First three rows = top of each company in score order
+    assert out[0].company == "Acme" and out[0].title == "SOC Analyst"
+    assert out[1].company == "Beta" and out[1].title == "GRC Analyst"
+    assert out[2].company == "Cog"
+    # Then second-tier rows
+    assert out[3].company == "Acme" and out[3].title == "Cybersecurity Eng"
+    assert out[4].company == "Beta" and out[4].title == "IAM Analyst"
+
+
+def test_diversify_assigns_company_and_role_ranks():
+    rows = [
+        _row("Acme", "SOC Analyst",       80),
+        _row("Acme", "Cybersecurity Eng", 75),
+        _row("Beta", "GRC Analyst",       70),
+    ]
+    out = queue.diversify(rows)
+    by = {(r.company, r.title): r for r in out}
+    assert by[("Acme", "SOC Analyst")].company_rank == 1
+    assert by[("Acme", "SOC Analyst")].role_rank_within_company == 1
+    assert by[("Acme", "Cybersecurity Eng")].role_rank_within_company == 2
+    assert by[("Beta", "GRC Analyst")].company_rank == 2
+    assert by[("Beta", "GRC Analyst")].role_rank_within_company == 1
+
+
+def test_diversify_marks_company_outreach_needed_for_multi_role():
+    rows = [
+        _row("Acme", "SOC Analyst",       80),
+        _row("Acme", "Cybersecurity Eng", 75),
+        _row("Beta", "GRC Analyst",       70),     # only one role
+    ]
+    out = queue.diversify(rows)
+    by = {(r.company, r.title): r for r in out}
+    assert by[("Acme", "SOC Analyst")].company_outreach_needed == "y"
+    assert by[("Acme", "Cybersecurity Eng")].company_outreach_needed == "y"
+    assert by[("Beta", "GRC Analyst")].company_outreach_needed == ""
+
+
+def test_runner_populates_v1_columns(tmp_path: Path,
+                                       monkeypatch: pytest.MonkeyPatch,
+                                       workspace: Path):
+    """End-to-end: runner sets role_category, strategic_interest,
+    company_rank, company_group_id, apply_url, source_url, etc."""
+    (workspace / "profile" / "master_profile.yaml").write_text(yaml.safe_dump({
+        "identity": {"full_name": "T", "citizenship": "US", "work_auth": "yes"},
+        "education": [{"id": "x", "school": "X", "degree": "BA CIS",
+                       "status": "in_progress"}],
+        "skills": {"technical": ["Python"], "security": ["Graylog"]},
+        "preferences": {"target_roles": ["SOC Analyst", "Cybersecurity Analyst"],
+                        "industries_avoid": []},
+    }))
+    companies_path = workspace / "profile" / "companies.yaml"
+    companies_path.write_text(yaml.safe_dump({
+        "companies": [
+            {"name": "Acme", "ats": "greenhouse", "slug": "acme"},
+            {"name": "Beta", "ats": "greenhouse", "slug": "beta"},
+        ],
+    }))
+    def fake_dispatch(*, ats, slug):
+        if slug == "acme":
+            return [
+                {"company": "Acme", "title": "SOC Analyst", "location": "Remote",
+                 "url": "https://x/acme/soc", "ats": "greenhouse", "ats_slug": "acme",
+                 "department": "Security",
+                 "raw_text": "Required: Python, Graylog, log monitoring, incident response.",
+                 "external_id": "1", "discovered_at": "now"},
+                {"company": "Acme", "title": "Cybersecurity Analyst", "location": "Remote",
+                 "url": "https://x/acme/cyber", "ats": "greenhouse", "ats_slug": "acme",
+                 "department": "Security",
+                 "raw_text": "Required: Python, Splunk, SIEM, vulnerability management.",
+                 "external_id": "2", "discovered_at": "now"},
+            ]
+        if slug == "beta":
+            return [{"company": "Beta", "title": "SOC Analyst", "location": "Remote",
+                      "url": "https://x/beta/soc", "ats": "greenhouse", "ats_slug": "beta",
+                      "department": "Security",
+                      "raw_text": "Required: Python, log monitoring, Linux.",
+                      "external_id": "3", "discovered_at": "now"}]
+        return []
+    monkeypatch.setattr(runner.sources, "fetch_for_company", fake_dispatch)
+    monkeypatch.setattr(runner.queue, "QUEUE_PATH", tmp_path / "q.xlsx")
+
+    profile = profile_loader.load_profile()
+    result = runner.run_finder(profile=profile, allow_stretch=False,
+                                companies_path=companies_path)
+    rows = result.queue_rows
+    assert len(rows) == 3
+    by_url = {r.url: r for r in rows}
+
+    acme_soc = by_url["https://x/acme/soc"]
+    assert acme_soc.role_category == "core_security"
+    assert acme_soc.strategic_interest in {"high", "medium", "low"}
+    assert acme_soc.production_status_estimate in {"portal_ready", "maybe_review", "skip"}
+    assert acme_soc.company_group_id == "acme"
+    assert acme_soc.apply_url == "https://x/acme/soc"
+    assert acme_soc.source_url == "https://x/acme/soc"
+    assert acme_soc.company_rank >= 1
+    assert acme_soc.role_rank_within_company >= 1
+    assert acme_soc.why_matched   # non-empty
+
+    # Acme has 2 matched roles -> company_outreach_needed='y' on both
+    acme_cyber = by_url["https://x/acme/cyber"]
+    assert acme_soc.company_outreach_needed == "y"
+    assert acme_cyber.company_outreach_needed == "y"
+    # Beta's single role: company_outreach_needed not set
+    beta = by_url["https://x/beta/soc"]
+    assert beta.company_outreach_needed == ""
+
+
+def test_promote_bundle_actions_when_two_roles_run_packet():
+    """When a single company has 2+ rows queued for run_packet, promote them
+    to bundle_with_company so the user does one company-bundle pack."""
+    rows = [
+        _row("Acme", "SOC Analyst",       80),    # run_packet (score >= 65)
+        _row("Acme", "Cybersecurity Eng", 75),    # run_packet
+        _row("Beta", "GRC Analyst",       70),    # run_packet, but only one
+    ]
+    rows = queue.diversify(rows)
+    runner._promote_bundle_actions(rows)
+    by = {(r.company, r.title): r for r in rows}
+    assert by[("Acme", "SOC Analyst")].recommended_next_action == "bundle_with_company"
+    assert by[("Acme", "Cybersecurity Eng")].recommended_next_action == "bundle_with_company"
+    assert by[("Beta", "GRC Analyst")].recommended_next_action == "run_packet"
+
+
+def test_propagate_outreach_groups_only_for_multi_role():
+    rows = [
+        _row("Acme", "SOC Analyst",       80),
+        _row("Acme", "Cybersecurity Eng", 75),
+        _row("Beta", "GRC Analyst",       70),
+    ]
+    rows = queue.diversify(rows)
+    runner._propagate_outreach_groups(rows)
+    by = {(r.company, r.title): r for r in rows}
+    assert by[("Acme", "SOC Analyst")].outreach_group_id == "acme"
+    assert by[("Acme", "Cybersecurity Eng")].outreach_group_id == "acme"
+    assert by[("Beta", "GRC Analyst")].outreach_group_id == ""
+
+
+def test_runner_preserves_user_approval_columns(tmp_path: Path,
+                                                  monkeypatch: pytest.MonkeyPatch,
+                                                  workspace: Path):
+    """If the user marked a row approved_for_packet=y, a re-run shouldn't reset it."""
+    (workspace / "profile" / "master_profile.yaml").write_text(yaml.safe_dump({
+        "identity": {"full_name": "T", "citizenship": "US", "work_auth": "yes"},
+        "education": [{"id": "x", "school": "X", "degree": "BA CIS",
+                       "status": "in_progress"}],
+        "skills": {"technical": ["Python"]},
+        "preferences": {"target_roles": ["SOC Analyst"], "industries_avoid": []},
+    }))
+    companies_path = workspace / "profile" / "companies.yaml"
+    companies_path.write_text(yaml.safe_dump({
+        "companies": [{"name": "Acme", "ats": "greenhouse", "slug": "acme"}],
+    }))
+    def fake_dispatch(*, ats, slug):
+        return [{"company": "Acme", "title": "SOC Analyst", "location": "Remote",
+                 "url": "https://x/acme/soc", "ats": "greenhouse", "ats_slug": "acme",
+                 "department": "Security",
+                 "raw_text": "Required: Python, log monitoring.",
+                 "external_id": "1", "discovered_at": "now"}]
+    monkeypatch.setattr(runner.sources, "fetch_for_company", fake_dispatch)
+    monkeypatch.setattr(runner.queue, "QUEUE_PATH", tmp_path / "q.xlsx")
+
+    profile = profile_loader.load_profile()
+    runner.run_finder(profile=profile, companies_path=companies_path)
+    # Simulate the user editing the queue
+    rows = queue.load_queue(tmp_path / "q.xlsx")
+    rows[0].approved_for_packet = "y"
+    rows[0].user_notes = "looks great"
+    rows[0].review_status = "reviewed"
+    queue.save_queue(rows, tmp_path / "q.xlsx")
+    # Re-run
+    runner.run_finder(profile=profile, companies_path=companies_path)
+    rows2 = queue.load_queue(tmp_path / "q.xlsx")
+    assert rows2[0].approved_for_packet == "y"
+    assert rows2[0].user_notes == "looks great"
+    assert rows2[0].review_status == "reviewed"
+
+
 def test_runner_allow_stretch_keeps_senior(tmp_path: Path,
                                              monkeypatch: pytest.MonkeyPatch,
                                              workspace: Path):
