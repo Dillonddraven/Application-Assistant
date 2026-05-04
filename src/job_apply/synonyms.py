@@ -16,11 +16,25 @@ from .config import PROFILE_DIR
 
 _DEFAULT_PATH = PROFILE_DIR / "skill_synonyms.yaml"
 
+# (path_str, mtime_ns) -> already-normalized clusters. Reading + parsing this
+# YAML on every match call (which `quick_fit` does ~1000x per posting x 2500
+# postings = 2.5M times in a single finder-run) was the dominant cost; mtime
+# keying invalidates the cache when the user edits the file.
+_CLUSTER_CACHE: dict[tuple[str, int], list[list[str]]] = {}
+
 
 def load_clusters(path: Path | None = None) -> list[list[str]]:
     p = path or _DEFAULT_PATH
     if not p.exists():
         return []
+    try:
+        mtime = p.stat().st_mtime_ns
+    except OSError:
+        mtime = 0
+    key = (str(p), mtime)
+    cached = _CLUSTER_CACHE.get(key)
+    if cached is not None:
+        return cached
     raw = yaml.safe_load(p.read_text()) or {}
     clusters = raw.get("clusters") or []
     out: list[list[str]] = []
@@ -31,6 +45,7 @@ def load_clusters(path: Path | None = None) -> list[list[str]]:
         terms = [t for t in terms if t]
         if len(terms) >= 2:
             out.append(terms)
+    _CLUSTER_CACHE[key] = out
     return out
 
 
@@ -58,14 +73,21 @@ def _normalize_clusters(clusters: list[list[str]]) -> list[list[str]]:
     return out
 
 
+def _resolve_clusters(clusters: list[list[str]] | None) -> list[list[str]]:
+    """Cached path returns already-normalized clusters; caller-provided ones
+    get normalized once. Avoids the per-call YAML reparse + re-normalize that
+    used to dominate finder-run runtime."""
+    if clusters is None:
+        return load_clusters()
+    return _normalize_clusters(clusters)
+
+
 def expand_with_synonyms(
     profile_skills: Iterable[str], clusters: list[list[str]] | None = None,
 ) -> set[str]:
     """For each profile skill that hits any cluster, also include every other
     term in that cluster. Returns the expanded lowercased set."""
-    if clusters is None:
-        clusters = load_clusters()
-    clusters = _normalize_clusters(clusters)
+    clusters = _resolve_clusters(clusters)
     base = {s.lower() for s in profile_skills if s}
     expanded = set(base)
     for cluster in clusters:
@@ -85,9 +107,7 @@ def matches_with_synonyms(
       2. If `needed` falls in a cluster AND any profile skill falls in the
          same cluster, that's a match too.
     """
-    if clusters is None:
-        clusters = load_clusters()
-    clusters = _normalize_clusters(clusters)
+    clusters = _resolve_clusters(clusters)
     needed_lc = needed.lower().strip()
     if not needed_lc:
         return False
@@ -111,9 +131,7 @@ def matches_with_synonyms(
 def cluster_for_term(term: str, clusters: list[list[str]] | None = None) -> list[str]:
     """Return the cluster a term belongs to, or [] if it doesn't belong to one.
     Useful for explainability — the scorecard can say WHY a synonym matched."""
-    if clusters is None:
-        clusters = load_clusters()
-    clusters = _normalize_clusters(clusters)
+    clusters = _resolve_clusters(clusters)
     for cluster in clusters:
         if _term_matches_cluster(term, cluster):
             return list(cluster)
