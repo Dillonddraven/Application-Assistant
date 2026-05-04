@@ -325,6 +325,234 @@ def _cmd_finder_review(args: argparse.Namespace) -> int:
     return 0
 
 
+# ---------- V1 usage-upgrade commands: set-status, pack, pack-company,
+# finder-approve, email, email-company ----------
+
+def _cmd_set_status(args: argparse.Namespace) -> int:
+    """Update applications.xlsx submitted_status state machine. New schema's
+    counterpart to the legacy `track-status`."""
+    from . import tracker
+    try:
+        row = tracker.set_status(
+            ident=args.ident, new_status=args.status, notes=args.notes,
+        )
+    except tracker.TrackerError as e:
+        print(f"set-status failed: {e}", file=sys.stderr)
+        return 1
+    print(f"updated {row['slug']}: submitted_status -> {row['submitted_status']}, "
+          f"next_action -> {row['next_action']}")
+    return 0
+
+
+def _resolve_packet_for_pack(ident: str):
+    """Resolve `ident` (slug or job_id) -> (slug, packet, analyzed). Raises
+    on miss with a useful message."""
+    from . import state
+    pkt = state.load_packet(ident)
+    if pkt is not None:
+        analyzed = state.load_analyzed(pkt.get("job_id", "")) or {}
+        return ident, pkt, analyzed
+    # Maybe it's a job_id
+    for cand in state.list_packets():
+        if cand.get("job_id") == ident:
+            slug = cand.get("slug") or cand.get("job_id")
+            analyzed = state.load_analyzed(cand.get("job_id", "")) or {}
+            return slug, cand, analyzed
+    raise SystemExit(f"pack: no packet found for {ident!r} (run `job-apply tailor` first)")
+
+
+def _cmd_pack(args: argparse.Namespace) -> int:
+    """Single-role packet finishing: README_APPLY.md + apply_url.txt +
+    email_to_dillon.md (and optional Mail.app draft). Assumes
+    `job-apply tailor <id>` already ran."""
+    from . import packet_artifacts, email_to_self, profile_loader, tracker
+    slug, packet, analyzed = _resolve_packet_for_pack(args.ident)
+    apply_url = (args.apply_url or analyzed.get("source_url")
+                 or packet.get("apply_url") or "")
+
+    packet_artifacts.write_apply_url(slug, apply_url=apply_url)
+    readme = packet_artifacts.write_readme_apply(
+        slug=slug, packet=packet, analyzed=analyzed, apply_url=apply_url,
+    )
+    print(f"wrote {readme.relative_to(readme.parents[2])}")
+
+    secrets = profile_loader.load_secrets()
+    draft = email_to_self.prepare_single_role_email(
+        slug=slug, packet=packet, analyzed=analyzed, apply_url=apply_url,
+        to_addr=args.to or "", secrets=secrets,
+    )
+    print(f"wrote {draft.md_path.relative_to(draft.md_path.parents[2])}")
+    print(f"  to: {draft.to_addr}")
+    print(f"  attachments: {len(draft.attachments)}")
+
+    # Stamp tracker state once the apply checklist exists.
+    if args.update_tracker:
+        try:
+            tracker.upsert(packet=packet, analyzed=analyzed)
+            tr_row = tracker.mark_email_created(slug, mode="single")
+            if tr_row:
+                print(f"  tracker: {tr_row['submitted_status']} -> {tr_row['next_action']}")
+        except Exception as e:
+            print(f"  tracker update skipped: {e}")
+
+    if args.mail:
+        try:
+            email_to_self.open_in_mail(draft)
+            print(f"opened Mail.app draft (run id: {draft.run_id or 'n/a'})")
+            print("(NOT sent. Review and click Send when ready.)")
+        except Exception as e:
+            print(f"mail draft failed (use --md-only to suppress): {e}", file=sys.stderr)
+            return 1
+    return 0
+
+
+def _cmd_pack_company(args: argparse.Namespace) -> int:
+    """Bundle all approved roles at one company into a single outreach
+    packet + bundle email draft."""
+    from .finder import load_queue
+    from . import packet_artifacts, email_to_self, profile_loader, state
+
+    rows = load_queue()
+    company_key = args.company.strip().lower()
+    matches = [r for r in rows
+                if r.company_group_id == company_key
+                or (r.company or "").strip().lower() == company_key]
+    if not matches:
+        print(f"pack-company: no queue rows for {args.company!r}", file=sys.stderr)
+        return 1
+    # Filter to approved rows unless --include-unapproved
+    if not args.include_unapproved:
+        approved = [r for r in matches if (r.approved_for_packet or "").lower() == "y"]
+        if not approved:
+            print(f"pack-company: no approved_for_packet=y rows for {args.company!r}. "
+                  f"Set approved_for_packet=y in the queue or pass --include-unapproved.",
+                  file=sys.stderr)
+            return 1
+        matches = approved
+
+    company_name = matches[0].company or args.company
+    company_slug = matches[0].company_group_id or company_key
+
+    # For each row, find matching packet on disk via analyzed.source_url
+    all_analyzed = state.list_analyzed()
+    by_url = {a.get("source_url"): a for a in all_analyzed}
+    by_id = {p.get("job_id"): p for p in state.list_packets()}
+
+    role_data = []   # list of (slug, packet, analyzed, apply_url)
+    missing_urls = []
+    for r in matches:
+        ana = by_url.get(r.url)
+        if not ana:
+            missing_urls.append(r.url)
+            continue
+        pkt = by_id.get(ana.get("id"))
+        if not pkt:
+            missing_urls.append(r.url)
+            continue
+        slug = pkt.get("slug") or ana.get("id")
+        apply_url = r.direct_apply_url or r.apply_url or r.url
+        role_data.append((slug, pkt, ana, apply_url))
+
+    if missing_urls:
+        print(f"pack-company: {len(missing_urls)} approved row(s) have no packet built yet:",
+              file=sys.stderr)
+        for u in missing_urls[:5]:
+            print(f"  - {u}", file=sys.stderr)
+        if not role_data:
+            print("Run `job-apply ingest` + `analyze` + `tailor` for each first.",
+                  file=sys.stderr)
+            return 1
+        print("Continuing with the rest.", file=sys.stderr)
+
+    # Write the deterministic outreach .md
+    outreach = packet_artifacts.write_company_outreach(
+        company=company_name, company_slug=company_slug,
+        roles=[{"title": a.get("title"), "apply_url": u,
+                "location": a.get("location"), "fit_score": p.get("fit_score") or a.get("fit_score")}
+                for (s, p, a, u) in role_data],
+        profile_data=profile_loader.load_profile().data,
+    )
+    print(f"wrote {outreach.relative_to(outreach.parents[2])}")
+
+    # Build the bundle email draft
+    secrets = profile_loader.load_secrets()
+    role_slugs = [s for (s, p, a, u) in role_data]
+    role_packets = [p for (s, p, a, u) in role_data]
+    role_analyzed = {s: a for (s, p, a, u) in role_data}
+    role_apply_urls = {s: u for (s, p, a, u) in role_data}
+
+    draft = email_to_self.prepare_company_bundle_email(
+        company=company_name, company_slug=company_slug,
+        role_packets=role_packets, role_analyzed=role_analyzed,
+        role_slugs=role_slugs, role_apply_urls=role_apply_urls,
+        to_addr=args.to or "", secrets=secrets,
+    )
+    print(f"wrote {draft.md_path.relative_to(draft.md_path.parents[2])}")
+    print(f"  to: {draft.to_addr}")
+    print(f"  attachments: {len(draft.attachments)} ({len(role_data)} role(s))")
+
+    if args.mail:
+        try:
+            email_to_self.open_in_mail(draft)
+            print("opened Mail.app bundle draft.")
+            print("(NOT sent. Review and click Send when ready.)")
+        except Exception as e:
+            print(f"mail draft failed: {e}", file=sys.stderr)
+            return 1
+    return 0
+
+
+def _cmd_finder_approve(args: argparse.Namespace) -> int:
+    """Mark a queue row approved_for_packet=y (and review_status=approved).
+    Match the row by URL substring OR title+company substring."""
+    from .finder import load_queue, save_queue
+    rows = load_queue()
+    needle = args.ident.lower()
+    target = None
+    for r in rows:
+        hay = f"{r.url} {r.company} {r.title}".lower()
+        if needle in hay:
+            target = r
+            break
+    if target is None:
+        print(f"finder-approve: no queue row matching {args.ident!r}", file=sys.stderr)
+        return 1
+    target.approved_for_packet = "y"
+    target.review_status = "approved"
+    if args.notes:
+        target.user_notes = (target.user_notes + " | " + args.notes).strip(" |")
+    save_queue(rows)
+    print(f"approved: {target.company} - {target.title}")
+    print(f"  url: {target.url}")
+    return 0
+
+
+def _cmd_email(args: argparse.Namespace) -> int:
+    """Open Mail.app draft (or write only the email_to_dillon.md) for a
+    single packet. Lighter-weight than `pack`: skips README_APPLY /
+    apply_url generation."""
+    from . import email_to_self, profile_loader
+    slug, packet, analyzed = _resolve_packet_for_pack(args.ident)
+    apply_url = (args.apply_url or analyzed.get("source_url")
+                 or packet.get("apply_url") or "")
+    secrets = profile_loader.load_secrets()
+    draft = email_to_self.prepare_single_role_email(
+        slug=slug, packet=packet, analyzed=analyzed, apply_url=apply_url,
+        to_addr=args.to or "", secrets=secrets,
+    )
+    print(f"wrote {draft.md_path.relative_to(draft.md_path.parents[2])}")
+    if args.md_only:
+        return 0
+    try:
+        email_to_self.open_in_mail(draft)
+        print(f"opened Mail.app draft to {draft.to_addr}")
+        print("(NOT sent. Review and click Send when ready.)")
+    except Exception as e:
+        print(f"mail draft failed (use --md-only to skip): {e}", file=sys.stderr)
+        return 1
+    return 0
+
+
 def _cmd_finder_status(args: argparse.Namespace) -> int:
     """Update review_status and/or review_notes on a queued row."""
     from .finder import load_queue, save_queue
@@ -476,6 +704,70 @@ def build_parser() -> argparse.ArgumentParser:
                       choices=["new", "reviewed", "approved", "ignored"])
     p_fs.add_argument("--notes", default="")
     p_fs.set_defaults(func=_cmd_finder_status)
+
+    # ---- V1 usage-upgrade subcommands ----
+    p_setst = sub.add_parser(
+        "set-status",
+        help="Update applications.xlsx submitted_status (V1 schema).",
+    )
+    p_setst.add_argument("--ident", required=True,
+                          help="Application id (a-XXXXXX), packet slug, or 12-char job id.")
+    p_setst.add_argument("--status", required=True,
+                          choices=["not_started", "packet_ready", "emailed_to_dillon",
+                                   "submitted", "follow_up_needed", "interview",
+                                   "rejected", "archived", "skipped"])
+    p_setst.add_argument("--notes", default="")
+    p_setst.set_defaults(func=_cmd_set_status)
+
+    p_pack = sub.add_parser(
+        "pack",
+        help="Finish a packet for submission: README_APPLY.md + apply_url.txt + email_to_dillon.md.",
+    )
+    p_pack.add_argument("ident", help="Packet slug or 12-char job id.")
+    p_pack.add_argument("--apply-url", default="",
+                         help="Override apply URL (default: analyzed.source_url).")
+    p_pack.add_argument("--to", default="",
+                         help="Override email recipient (default: secrets.yaml.email).")
+    p_pack.add_argument("--mail", action="store_true",
+                         help="Also open a Mail.app draft (macOS).")
+    p_pack.add_argument("--update-tracker", action="store_true", default=True,
+                         help=argparse.SUPPRESS)
+    p_pack.add_argument("--no-update-tracker", dest="update_tracker", action="store_false",
+                         help="Skip stamping email_created in applications.xlsx.")
+    p_pack.set_defaults(func=_cmd_pack)
+
+    p_pc = sub.add_parser(
+        "pack-company",
+        help="Bundle all approved roles at one company into a single outreach packet + email draft.",
+    )
+    p_pc.add_argument("company",
+                       help="Company name or company_group_id (== ats_slug).")
+    p_pc.add_argument("--include-unapproved", action="store_true",
+                       help="Include all matched roles, not just approved_for_packet=y rows.")
+    p_pc.add_argument("--to", default="",
+                       help="Override email recipient (default: secrets.yaml.email).")
+    p_pc.add_argument("--mail", action="store_true",
+                       help="Also open a Mail.app bundle draft (macOS).")
+    p_pc.set_defaults(func=_cmd_pack_company)
+
+    p_fa = sub.add_parser(
+        "finder-approve",
+        help="Mark a queue row approved_for_packet=y (also flips review_status=approved).",
+    )
+    p_fa.add_argument("ident", help="URL substring OR title+company substring.")
+    p_fa.add_argument("--notes", default="")
+    p_fa.set_defaults(func=_cmd_finder_approve)
+
+    p_em = sub.add_parser(
+        "email",
+        help="Open Mail.app draft (or write only the email_to_dillon.md) for a single packet.",
+    )
+    p_em.add_argument("ident", help="Packet slug or 12-char job id.")
+    p_em.add_argument("--apply-url", default="")
+    p_em.add_argument("--to", default="")
+    p_em.add_argument("--md-only", action="store_true",
+                       help="Write the .md only; don't open Mail.app.")
+    p_em.set_defaults(func=_cmd_email)
 
     return p
 
