@@ -33,113 +33,151 @@ def _analyzed(**overrides) -> dict:
 
 
 def test_upsert_creates_xlsx_and_row(workspace: Path):
-    row = tracker.upsert(packet=_packet(), analyzed=_analyzed(), status="waiting")
-    assert row["status"] == "waiting"
+    """Default upsert (no status arg) lands in 'packet_ready' state."""
+    row = tracker.upsert(packet=_packet(), analyzed=_analyzed())
+    assert row["submitted_status"] == "packet_ready"
     assert row["company"] == "Acme Corp"
     assert row["applied_date"] == date.today().isoformat()
-    expected_followup = (date.today() + timedelta(days=7)).isoformat()
-    assert row["next_followup_date"] == expected_followup
-    # File written
+    assert row["application_id"].startswith("a-")
     assert tracker.TRACKER_PATH.exists()
 
 
+def test_upsert_legacy_status_translates_to_submitted(workspace: Path):
+    """Legacy status='waiting' translates to submitted_status='submitted'."""
+    row = tracker.upsert(packet=_packet(), analyzed=_analyzed(), status="waiting")
+    assert row["submitted_status"] == "submitted"
+
+
 def test_upsert_idempotent(workspace: Path):
-    tracker.upsert(packet=_packet(), analyzed=_analyzed(), status="waiting")
-    tracker.upsert(packet=_packet(), analyzed=_analyzed(), status="waiting")
+    tracker.upsert(packet=_packet(), analyzed=_analyzed())
+    tracker.upsert(packet=_packet(), analyzed=_analyzed())
     rows = tracker.list_rows()
     assert len(rows) == 1
 
 
-def test_set_status_flips_and_recomputes_followup(workspace: Path):
-    tracker.upsert(packet=_packet(), analyzed=_analyzed(), status="waiting")
-    row = tracker.set_status(ident="acme_security-analyst", new_status="interview_pending")
-    assert row["status"] == "interview_pending"
-    expected = (date.today() + timedelta(days=14)).isoformat()
-    assert row["next_followup_date"] == expected
+def test_upsert_preserves_user_edits_on_reupsert(workspace: Path):
+    tracker.upsert(packet=_packet(), analyzed=_analyzed())
+    tracker.set_status(
+        ident="acme_security-analyst", new_status="interview",
+        notes="phone screen Wed",
+    )
+    # Re-running upsert (e.g., re-tailor) shouldn't downgrade the manual interview state
+    row = tracker.upsert(packet=_packet(), analyzed=_analyzed())
+    assert row["submitted_status"] == "interview"
+    assert "phone screen Wed" in row["notes"]
+
+
+def test_set_status_flips_submitted_status(workspace: Path):
+    tracker.upsert(packet=_packet(), analyzed=_analyzed())
+    row = tracker.set_status(
+        ident="acme_security-analyst", new_status="submitted",
+    )
+    assert row["submitted_status"] == "submitted"
+    assert row["submitted_date"] == date.today().isoformat()
 
 
 def test_set_status_terminal_clears_followup(workspace: Path):
-    tracker.upsert(packet=_packet(), analyzed=_analyzed(), status="waiting")
+    tracker.upsert(packet=_packet(), analyzed=_analyzed())
     row = tracker.set_status(ident="acme_security-analyst", new_status="rejected")
-    assert row["status"] == "rejected"
+    assert row["submitted_status"] == "rejected"
     assert row["next_followup_date"] == ""
+    assert row["next_action"] == "skip"
 
 
 def test_set_status_appends_notes(workspace: Path):
-    tracker.upsert(packet=_packet(), analyzed=_analyzed(), status="waiting")
+    tracker.upsert(packet=_packet(), analyzed=_analyzed())
     row = tracker.set_status(
-        ident="acme_security-analyst", new_status="interview_pending",
+        ident="acme_security-analyst", new_status="interview",
         notes="phone screen Tue 10am",
     )
     assert "phone screen Tue 10am" in row["notes"]
 
 
 def test_set_status_unknown_raises(workspace: Path):
-    tracker.upsert(packet=_packet(), analyzed=_analyzed(), status="waiting")
+    tracker.upsert(packet=_packet(), analyzed=_analyzed())
     with pytest.raises(tracker.TrackerError, match="unknown status"):
         tracker.set_status(ident="acme_security-analyst", new_status="ghosted")
 
 
 def test_set_status_missing_raises(workspace: Path):
-    tracker.upsert(packet=_packet(), analyzed=_analyzed(), status="waiting")
+    tracker.upsert(packet=_packet(), analyzed=_analyzed())
     with pytest.raises(tracker.TrackerError, match="no application"):
         tracker.set_status(ident="not-a-real-slug", new_status="rejected")
 
 
-def test_list_rows_filter_by_status(workspace: Path):
-    tracker.upsert(packet=_packet(slug="a_x"), analyzed=_analyzed(), status="waiting")
+def test_set_status_accepts_application_id(workspace: Path):
+    """set_status should also work when given the short application_id."""
+    row = tracker.upsert(packet=_packet(), analyzed=_analyzed())
+    aid = row["application_id"]
+    updated = tracker.set_status(ident=aid, new_status="submitted")
+    assert updated["submitted_status"] == "submitted"
+
+
+def test_list_rows_filter_by_submitted_status(workspace: Path):
+    tracker.upsert(packet=_packet(slug="a_x"), analyzed=_analyzed())
     tracker.upsert(packet=_packet(job_id="bbbbbbbbbbbb", slug="b_y"),
-                   analyzed=_analyzed(company="Beta"), status="waiting")
+                   analyzed=_analyzed(company="Beta"))
     tracker.set_status(ident="b_y", new_status="rejected")
-    waiting = tracker.list_rows(status="waiting")
+    packet_ready = tracker.list_rows(status="packet_ready")
     rejected = tracker.list_rows(status="rejected")
-    assert {r["slug"] for r in waiting} == {"a_x"}
+    assert {r["slug"] for r in packet_ready} == {"a_x"}
     assert {r["slug"] for r in rejected} == {"b_y"}
 
 
-def test_due_followups_today(workspace: Path):
-    tracker.upsert(packet=_packet(), analyzed=_analyzed(), status="waiting")
-    rows = tracker.due_followups(by=date.today() + timedelta(days=8))
-    assert len(rows) == 1
-    rows_now = tracker.due_followups(by=date.today())
-    assert rows_now == []
-
-
 def test_due_followups_excludes_terminal(workspace: Path):
-    tracker.upsert(packet=_packet(), analyzed=_analyzed(), status="waiting")
+    tracker.upsert(packet=_packet(), analyzed=_analyzed())
     tracker.set_status(ident="acme_security-analyst", new_status="rejected")
     rows = tracker.due_followups(by=date.today() + timedelta(days=99))
     assert rows == []
 
 
 def test_status_cell_has_color_fill(workspace: Path):
-    tracker.upsert(packet=_packet(), analyzed=_analyzed(), status="waiting")
+    tracker.upsert(packet=_packet(), analyzed=_analyzed())
     wb = openpyxl.load_workbook(str(tracker.TRACKER_PATH))
     ws = wb["applications"]
-    # row 2 is the data row; "status" is column 11
-    cell = ws.cell(row=2, column=tracker.COLUMNS.index("status") + 1)
-    assert cell.fill.fgColor.value.upper().endswith("FFF7D6")  # waiting yellow
+    cell = ws.cell(row=2, column=tracker.COLUMNS.index("submitted_status") + 1)
+    # packet_ready blue
+    assert cell.fill.fgColor.value.upper().endswith("DDE8F7")
 
 
-def test_render_table_shows_headers(workspace: Path):
-    tracker.upsert(packet=_packet(), analyzed=_analyzed(), status="waiting")
+def test_render_table_shows_new_columns(workspace: Path):
+    tracker.upsert(packet=_packet(), analyzed=_analyzed())
     out = tracker.render_table(tracker.list_rows())
-    assert "STATUS" in out and "FIT" in out and "Acme Corp" in out
+    assert "STATUS" in out and "NEXT" in out and "Acme Corp" in out
 
 
 def test_render_table_empty(workspace: Path):
     assert tracker.render_table([]) == "(no applications tracked yet)"
 
 
-def test_approve_auto_logs_to_tracker(workspace: Path, tmp_path: Path):
-    """approval_queue.approve should populate tracker automatically."""
+def test_approve_auto_logs_to_tracker(workspace: Path):
+    """approval_queue.approve should populate tracker with the new schema."""
     from job_apply import approval_queue
-    # Set up an analyzed job + draft packet
     state.save_analyzed("abc123def456", _analyzed())
     state.save_packet("acme_security-analyst", _packet())
     pkt = approval_queue.approve("acme_security-analyst")
     assert pkt["status"] == "approved"
     rows = tracker.list_rows()
     assert len(rows) == 1
-    assert rows[0]["status"] == "waiting"
+    # The legacy 'waiting' status from approve flows through translate -> 'submitted'
+    assert rows[0]["submitted_status"] == "submitted"
     assert rows[0]["company"] == "Acme Corp"
+    assert rows[0]["application_id"].startswith("a-")
+
+
+def test_mark_email_created_advances_state(workspace: Path):
+    tracker.upsert(packet=_packet(), analyzed=_analyzed())
+    row = tracker.mark_email_created("acme_security-analyst", mode="single")
+    assert row is not None
+    assert row["submitted_status"] == "emailed_to_dillon"
+    assert "single" in row["email_created"]
+    assert row["next_action"] == "submit_portal"
+
+
+def test_mark_email_created_does_not_downgrade(workspace: Path):
+    """If the user already marked it 'submitted', email_created shouldn't reset that."""
+    tracker.upsert(packet=_packet(), analyzed=_analyzed())
+    tracker.set_status(ident="acme_security-analyst", new_status="submitted")
+    row = tracker.mark_email_created("acme_security-analyst", mode="company-bundle")
+    assert row["submitted_status"] == "submitted"   # not downgraded
+    assert "company-bundle" in row["email_created"]
