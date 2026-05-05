@@ -527,6 +527,43 @@ def _cmd_finder_approve(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_contacts(args: argparse.Namespace) -> int:
+    """Generate ethical-OSINT contact-research artifacts for a packet:
+    contacts.json + contacts.md under outputs/<slug>/internal/.
+
+    Pulls company / role / department from the packet's analyzed file by
+    default; --company / --role / --department override.
+
+    Email-pattern guesses appear when --known-email + --known-name are
+    paired (use one real example from the company to detect their pattern)
+    AND --target-name is given for at least one prospect.
+    """
+    from . import contact_research
+    slug, packet, analyzed = _resolve_packet_for_pack(args.ident)
+    company = args.company or analyzed.get("company") or ""
+    role = args.role or analyzed.get("title") or ""
+    department = args.department or ""
+    art = contact_research.build_artifact(
+        company=company, role_title=role, department=department,
+        company_domain=args.company_domain or "",
+        seed_email=args.known_email or "",
+        seed_name=args.known_name or "",
+        target_names=args.target_name or [],
+    )
+    json_path, md_path = contact_research.write_artifact(slug=slug, art=art)
+    print(f"wrote {md_path.relative_to(md_path.parents[2])}")
+    print(f"wrote {json_path.relative_to(json_path.parents[2])}")
+    if art.detected_pattern:
+        print(f"  detected email pattern: {art.detected_pattern}")
+    if art.candidate_emails_by_target:
+        for name, cands in art.candidate_emails_by_target.items():
+            top = ", ".join(c["address"] for c in cands[:3])
+            print(f"  {name}: {top}{' ...' if len(cands) > 3 else ''}")
+    if not company:
+        print("  ⚠ no company resolved -- search URLs will be empty. Pass --company.")
+    return 0
+
+
 def _cmd_email(args: argparse.Namespace) -> int:
     """Open Mail.app draft (or write only the email_to_dillon.md) for a
     single packet. Lighter-weight than `pack`: skips README_APPLY /
@@ -757,6 +794,27 @@ def build_parser() -> argparse.ArgumentParser:
     p_fa.add_argument("ident", help="URL substring OR title+company substring.")
     p_fa.add_argument("--notes", default="")
     p_fa.set_defaults(func=_cmd_finder_approve)
+
+    p_co = sub.add_parser(
+        "contacts",
+        help="Generate ethical-OSINT contact-research artifacts (search URLs + email-pattern guesses) for a packet.",
+    )
+    p_co.add_argument("ident", help="Packet slug or 12-char job id.")
+    p_co.add_argument("--company", default="",
+                       help="Override company name (default: from analyzed.company).")
+    p_co.add_argument("--role", default="",
+                       help="Override role title (default: from analyzed.title).")
+    p_co.add_argument("--department", default="",
+                       help="Department / team (e.g. 'Security').")
+    p_co.add_argument("--company-domain", default="",
+                       help="Company email domain (e.g. asana.com). Inferred from --known-email if omitted.")
+    p_co.add_argument("--known-email", default="",
+                       help="One real email at the company (e.g. alice.smith@asana.com) used to detect the email pattern.")
+    p_co.add_argument("--known-name", default="",
+                       help="Full name corresponding to --known-email (e.g. 'Alice Smith').")
+    p_co.add_argument("--target-name", action="append", default=[],
+                       help="Full name of a prospect to generate email guesses for. Repeatable.")
+    p_co.set_defaults(func=_cmd_contacts)
 
     p_em = sub.add_parser(
         "email",
