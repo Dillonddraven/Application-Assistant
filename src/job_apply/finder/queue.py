@@ -49,6 +49,19 @@ COLUMNS = [
     "outreach_group_id",            # company_group_id once bundled
     "company_outreach_needed",      # y if company has 2+ matched roles
     "user_notes",
+    # Ranking (added v1.1)
+    "ranking_score",                # 0-100 weighted (35/25/20/10/10)
+    "ranking_category",             # Strong Target | Target | Reach | Too Senior | Blocker
+    "experience_level",             # entry | junior | target | mid | senior | unknown
+    "salary_bucket",                # target | reach | mid_senior | senior | below_target | unknown
+    "role_family_label",            # target | adjacent | security_other | off-target
+    "blockers_summary",             # short string of blocker.kind:detail; empty if none
+    "biggest_reason",
+    "biggest_risk",
+    "resume_angle",
+    "outreach_angle",
+    "tailor_resume",                # y | n
+    "final_recommendation",         # Apply | Maybe apply | Skip
     # Misc
     "discovered_date", "review_notes", "external_id",
 ]
@@ -105,6 +118,19 @@ class FinderQueueRow:
     discovered_date: str = ""
     review_notes: str = ""
     external_id: str = ""
+    # Ranking (v1.1)
+    ranking_score: int = 0
+    ranking_category: str = ""
+    experience_level: str = ""
+    salary_bucket: str = ""
+    role_family_label: str = ""
+    blockers_summary: str = ""
+    biggest_reason: str = ""
+    biggest_risk: str = ""
+    resume_angle: str = ""
+    outreach_angle: str = ""
+    tailor_resume: str = ""           # "y" | "n"
+    final_recommendation: str = ""
 
     def as_dict(self) -> dict[str, Any]:
         return {col: getattr(self, col) for col in COLUMNS}
@@ -208,6 +234,18 @@ def load_queue(path: Path | None = None) -> list[FinderQueueRow]:
             discovered_date=str(vals.get("discovered_date") or ""),
             review_notes=str(vals.get("review_notes") or ""),
             external_id=str(vals.get("external_id") or ""),
+            ranking_score=int(vals.get("ranking_score") or 0),
+            ranking_category=str(vals.get("ranking_category") or ""),
+            experience_level=str(vals.get("experience_level") or ""),
+            salary_bucket=str(vals.get("salary_bucket") or ""),
+            role_family_label=str(vals.get("role_family_label") or ""),
+            blockers_summary=str(vals.get("blockers_summary") or ""),
+            biggest_reason=str(vals.get("biggest_reason") or ""),
+            biggest_risk=str(vals.get("biggest_risk") or ""),
+            resume_angle=str(vals.get("resume_angle") or ""),
+            outreach_angle=str(vals.get("outreach_angle") or ""),
+            tailor_resume=str(vals.get("tailor_resume") or ""),
+            final_recommendation=str(vals.get("final_recommendation") or ""),
         ))
     return out
 

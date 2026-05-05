@@ -11,7 +11,7 @@ import yaml
 
 from ..config import PROFILE_DIR
 from ..profile_loader import Profile
-from . import filters, queue, sources
+from . import filters, queue, ranking, sources
 
 COMPANIES_PATH = PROFILE_DIR / "companies.yaml"
 
@@ -85,6 +85,7 @@ def run_finder(
         s.lower() for s in
         (profile.data.get("preferences") or {}).get("industries_avoid") or []
     ]
+    preferred_metros = (profile.data.get("preferences") or {}).get("preferred_metros") or []
 
     polled = 0
     seen = 0
@@ -190,6 +191,17 @@ def run_finder(
             action = "skip"
             next_action = "skip"
 
+        # New ranking layer (v1.1): produces score, category, blockers,
+        # resume/outreach angle. Uses 35/25/20/10/10 weighting.
+        rank = ranking.score_role(
+            posting=p, profile_skills=profile_skills,
+            certs_needed_match=certs_match, target_roles=target_roles,
+            preferred_metros=preferred_metros,
+        )
+        blockers_str = "; ".join(
+            f"{b.kind}:{b.detail}" for b in rank.breakdown.blockers
+        )
+
         url = p.get("url") or ""
         row = queue.FinderQueueRow(
             company=p.get("company") or "",
@@ -213,6 +225,18 @@ def run_finder(
             discovered_date=_dt.date.today().isoformat(),
             review_notes="",
             external_id=p.get("external_id") or "",
+            ranking_score=rank.score,
+            ranking_category=rank.category,
+            experience_level=rank.breakdown.experience_level,
+            salary_bucket=rank.breakdown.salary_bucket,
+            role_family_label=rank.breakdown.role_family_label,
+            blockers_summary=blockers_str,
+            biggest_reason=rank.biggest_reason,
+            biggest_risk=rank.biggest_risk,
+            resume_angle=rank.resume_angle,
+            outreach_angle=rank.outreach_angle,
+            tailor_resume="y" if rank.tailor_resume else "n",
+            final_recommendation=rank.recommendation,
         )
         queue_rows.append(row)
 
