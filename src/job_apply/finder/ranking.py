@@ -27,15 +27,35 @@ TARGET_FAMILIES = [
     "cybersecurity analyst", "security analyst", "soc analyst",
     "vulnerability management analyst", "vulnerability analyst",
     "grc analyst", "security compliance analyst", "compliance analyst",
-    "risk analyst", "risk and compliance analyst",
+    "risk and compliance analyst",
     "it security analyst",
     "cloud security analyst", "cloud security associate",
     "threat intelligence analyst",
-    "trust & safety operations", "trust and safety operations",
-    "fraud risk analyst", "fraud analyst",
     "security operations analyst", "secops analyst",
     "application security analyst", "appsec analyst",
     "information security analyst", "infosec analyst",
+]
+
+# Fraud / identity / trust & safety / risk family -- distinct from generic
+# "security_other" because Dillon's transferable experience (cybersecurity
+# labs, internship investigations, SAST reporting / evidence review,
+# centralized logging, PCI audit) maps DIRECTLY to these roles' core work
+# (event review, suspicious-activity pattern recognition, evidence
+# collection, risk-based decisioning). Per Dillon's 2026-05-05 directive.
+FRAUD_RISK_FAMILIES = [
+    "fraud investigator", "fraud analyst", "fraud risk analyst",
+    "fraud & identity", "fraud and identity", "fraud specialist",
+    "trust & safety analyst", "trust and safety analyst",
+    "trust & safety operations", "trust and safety operations",
+    "trust & safety associate", "trust and safety associate",
+    "identity verification analyst", "identity analyst",
+    "account security analyst", "account security specialist",
+    "account takeover", "abuse analyst",
+    "risk analyst",          # standalone "Risk Analyst" -- not "compliance analyst"
+    "risk operations analyst", "risk operations associate",
+    "platform risk", "payments risk", "credit risk analyst",
+    "kyc analyst", "aml analyst",
+    "investigations analyst",
 ]
 
 # Adjacent families -- earn partial credit when paired with security-domain
@@ -44,7 +64,7 @@ ADJACENT_FAMILIES = [
     "security engineer", "security engineer i",
     "associate security engineer", "junior security engineer",
     "security operations engineer",
-    "data security analyst", "iam analyst", "identity analyst",
+    "data security analyst", "iam analyst",
     "privacy analyst", "audit analyst",
 ]
 
@@ -59,7 +79,7 @@ class FitBreakdown:
     blockers: list[Blocker] = field(default_factory=list)
     experience_level: str = "unknown"
     salary_bucket: str = "unknown"
-    role_family_label: str = "off-target"   # "target" | "adjacent" | "security_other" | "off-target"
+    role_family_label: str = "off-target"   # "target" | "fraud_risk" | "adjacent" | "security_other" | "off-target"
 
 
 @dataclass
@@ -108,14 +128,29 @@ def _role_family_score(*, title: str, jd_text: str,
     title_lc = (title or "").lower()
     if not title_lc:
         return 0.0, "off-target"
+
+    # Fraud / identity / trust & safety / risk family is checked FIRST so
+    # specific titles like "Account Security Analyst" don't accidentally
+    # match the broader "security analyst" target family. Dillon's
+    # transferable cyber + internship + lab experience maps directly to
+    # these roles' investigation / event-review / risk-decisioning core
+    # work, so we score them as 'target'-tier (95) rather than dumping
+    # them into generic security_other.
+    for fam in FRAUD_RISK_FAMILIES:
+        if fam in title_lc:
+            return 95.0, "fraud_risk"
+
+    # First-class targets: Cybersecurity Analyst, GRC Analyst, etc.
     for fam in (target_families or TARGET_FAMILIES):
         if fam in title_lc:
             return 100.0, "target"
+
     # Adjacent families (security_engineer etc.) only if JD body mentions security
     has_sec_signal = bool(jd_text and filters.SECURITY_KEYWORDS.search(jd_text))
     for fam in ADJACENT_FAMILIES:
         if fam in title_lc:
             return (60.0 if has_sec_signal else 40.0), "adjacent"
+
     # Generic "security X" or "compliance X" or "risk X" titles
     if any(w in title_lc for w in ("security", "compliance", "risk", "audit",
                                     "fraud", "trust", "safety")):
@@ -177,6 +212,22 @@ def score_role(*, posting: dict[str, Any], profile_skills: list[str],
         title=title, jd_text=body,
         target_families=profile_target_families,
     )
+
+    # Transferable-experience boost for fraud/identity/trust/risk roles.
+    # Dillon has ~1.5 yrs of transferable fraud/identity/account-security/
+    # investigation-relevant experience across academic cyber labs, the
+    # Dillard's IT/InfoSec internship (PCI audit evidence + SAST reporting),
+    # an RJ internship, and applied security projects (centralized logging,
+    # phishing labs, evidence review). For these roles we treat his profile
+    # as roughly junior-level rather than entry/unknown -- the JDs care
+    # about transferable investigation/analysis ability, not formal
+    # fraud-job tenure.
+    if role_label == "fraud_risk":
+        # Lift unknown/entry to junior-equivalent (90); leave higher signals alone.
+        if exp.level in ("unknown", "entry"):
+            exp_score = max(exp_score, 80.0)
+        elif exp.level == "junior":
+            exp_score = max(exp_score, 90.0)
 
     # Skills (reuse the existing quick_fit synonym matcher)
     fit = filters.quick_fit(
@@ -298,7 +349,25 @@ def _format_biggest_risk(blockers: list[Blocker], level: str,
 
 def _resume_angle(role_label: str, title: str) -> str:
     title_lc = (title or "").lower()
-    if "compliance" in title_lc or "grc" in title_lc or "risk" in title_lc or "audit" in title_lc:
+    # Fraud / identity / trust & safety / risk roles get a dedicated angle:
+    # frame the cyber + internship + lab work as transferable investigation /
+    # event-review / evidence-collection / risk-decisioning experience,
+    # NOT compliance-heavy.
+    if role_label == "fraud_risk":
+        return (
+            "Lead with investigation workflows + event/log review + evidence "
+            "collection + risk-based decision-making. Pull from SAST reporting "
+            "(suspicious-finding triage), centralized logging lab (auth / "
+            "access event review in Graylog/OpenSearch), Dillard's PCI audit "
+            "evidence support, academic phishing-analysis labs (suspicious-"
+            "activity pattern recognition), and the nonprofit healthcare risk-"
+            "mapping engagement. Frame as ~1.5 yrs transferable fraud / "
+            "identity / account-security / investigation experience across "
+            "labs, internships, and applied security projects -- NOT formal "
+            "fraud-specialist tenure. Mention compliance / control mapping as "
+            "secondary, not primary."
+        )
+    if "compliance" in title_lc or "grc" in title_lc or "audit" in title_lc:
         return ("Lead with PCI audit evidence support + ISO 27001 / NIST 800-53 "
                 "coursework + control mapping. Subtle FedRAMP ConMon lab line.")
     if "soc" in title_lc or "security operations" in title_lc or "incident" in title_lc:
@@ -307,9 +376,6 @@ def _resume_angle(role_label: str, title: str) -> str:
     if "vulnerability" in title_lc:
         return ("Lead with SAST workflow + severity normalization + Wireshark/Nmap "
                 "vulnerability scanning lab + remediation tracking.")
-    if "fraud" in title_lc or "trust" in title_lc or "safety" in title_lc:
-        return ("Lead with PCI compliance experience + technical-to-stakeholder "
-                "translation + risk-mapping in nonprofit healthcare engagement.")
     if "cloud" in title_lc:
         return ("Lead with security-control awareness + lab-based system hardening "
                 "+ NIST cybersecurity coursework. Note: limited production cloud.")
@@ -319,6 +385,16 @@ def _resume_angle(role_label: str, title: str) -> str:
 
 
 def _outreach_angle(role_label: str) -> str:
+    if role_label == "fraud_risk":
+        return (
+            "Use the fraud/identity/trust/risk outreach variant. Frame "
+            "yourself as targeting fraud, identity, trust & safety, risk, "
+            "and account-security roles where your cybersecurity background, "
+            "internship, and investigation-style project work transfer well. "
+            "Cite ~1.5 yrs transferable from labs + internships + applied "
+            "security projects (Dillard's PCI audit evidence + SAST "
+            "reporting + centralized logging lab + phishing analysis labs)."
+        )
     if role_label == "target":
         return ("Lead with internship + GRC coursework; ask for 15-min intro. "
                 "Mention specific role family (analyst / GRC / etc.).")
