@@ -123,23 +123,27 @@ def render_resume(*, profile: Profile, tailored: dict[str, Any], secrets: Secret
             lines.append(f"- {s}")
         lines.append("")
 
-    # Experience: only experiences cited by tailored bullets get rendered, in profile order.
-    # Tolerate both "experience.foo.b1" and "foo.b1" — the LLM is inconsistent about the prefix.
+    # Experience and Projects: only entries cited by tailored bullets get
+    # rendered, in profile order. Tolerate both "experience.foo.b1" and
+    # "foo.b1" -- the LLM is inconsistent about the prefix.
     exp_id_set = {e.get("id") for e in (p.get("experience") or []) if isinstance(e, dict)}
+    proj_id_set = {pj.get("id") for pj in (p.get("projects") or []) if isinstance(pj, dict)}
     cited_exp_ids: set[str] = set()
+    cited_proj_ids: set[str] = set()
     bullets_by_exp: dict[str, list[str]] = {}
+    bullets_by_proj: dict[str, list[str]] = {}
     for b in tailored.get("bullets") or []:
         sid = b.get("source_id", "")
         parts = sid.split(".")
-        # Try parts[0] then parts[1] — first part that resolves to an experience wins.
-        exp_id = None
         for candidate in parts[:2]:
             if candidate in exp_id_set:
-                exp_id = candidate
+                cited_exp_ids.add(candidate)
+                bullets_by_exp.setdefault(candidate, []).append(b.get("text", ""))
                 break
-        if exp_id:
-            cited_exp_ids.add(exp_id)
-            bullets_by_exp.setdefault(exp_id, []).append(b.get("text", ""))
+            if candidate in proj_id_set:
+                cited_proj_ids.add(candidate)
+                bullets_by_proj.setdefault(candidate, []).append(b.get("text", ""))
+                break
 
     if cited_exp_ids:
         lines += ["## Experience"]
@@ -157,6 +161,16 @@ def render_resume(*, profile: Profile, tailored: dict[str, Any], secrets: Secret
                 meta_bits.append(location)
             lines.append(" • ".join(meta_bits))
             for txt in bullets_by_exp.get(exp.get("id"), []):
+                lines.append(f"- {_scrub_source_ids(txt, known)}")
+            lines.append("")
+
+    if cited_proj_ids:
+        lines += ["## Projects"]
+        for pj in p.get("projects") or []:
+            if pj.get("id") not in cited_proj_ids:
+                continue
+            lines.append(f"### {pj.get('name', '')}")
+            for txt in bullets_by_proj.get(pj.get("id"), []):
                 lines.append(f"- {_scrub_source_ids(txt, known)}")
             lines.append("")
 

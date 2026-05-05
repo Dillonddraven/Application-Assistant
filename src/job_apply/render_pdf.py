@@ -72,19 +72,25 @@ def _resume_html(profile: Profile, tailored: dict[str, Any], secrets: Secrets) -
         parts.append("</ul>")
 
     exp_id_set = {e.get("id") for e in (p.get("experience") or []) if isinstance(e, dict)}
+    proj_id_set = {pj.get("id") for pj in (p.get("projects") or []) if isinstance(pj, dict)}
     cited_exp_ids: set[str] = set()
+    cited_proj_ids: set[str] = set()
     bullets_by_exp: dict[str, list[str]] = {}
+    bullets_by_proj: dict[str, list[str]] = {}
     for b in tailored.get("bullets") or []:
         sid = b.get("source_id", "")
         bits = sid.split(".")
-        exp_id = None
         for candidate in bits[:2]:
             if candidate in exp_id_set:
-                exp_id = candidate
+                cited_exp_ids.add(candidate)
+                bullets_by_exp.setdefault(candidate, []).append(
+                    _scrub_source_ids(b.get("text", ""), known))
                 break
-        if exp_id:
-            cited_exp_ids.add(exp_id)
-            bullets_by_exp.setdefault(exp_id, []).append(_scrub_source_ids(b.get("text", ""), known))
+            if candidate in proj_id_set:
+                cited_proj_ids.add(candidate)
+                bullets_by_proj.setdefault(candidate, []).append(
+                    _scrub_source_ids(b.get("text", ""), known))
+                break
 
     if cited_exp_ids:
         parts.append("<h2>Experience</h2>")
@@ -101,6 +107,17 @@ def _resume_html(profile: Profile, tailored: dict[str, Any], secrets: Secrets) -
                 parts.append(f'<div class="role-meta"><span class="right">{right}</span></div>')
             parts.append('<ul class="bullets">')
             for txt in bullets_by_exp.get(exp.get("id"), []):
+                parts.append(f"<li>{_h(txt)}</li>")
+            parts.append("</ul>")
+
+    if cited_proj_ids:
+        parts.append("<h2>Projects</h2>")
+        for pj in p.get("projects") or []:
+            if pj.get("id") not in cited_proj_ids:
+                continue
+            parts.append(f"<h3>{_h(pj.get('name') or '')}</h3>")
+            parts.append('<ul class="bullets">')
+            for txt in bullets_by_proj.get(pj.get("id"), []):
                 parts.append(f"<li>{_h(txt)}</li>")
             parts.append("</ul>")
 

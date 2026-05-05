@@ -162,19 +162,25 @@ def render_resume_docx(*, profile: Profile, tailored: dict[str, Any],
                 _set_run(r2, size_pt=10, color=INK)
 
     exp_id_set = {e.get("id") for e in (profile.data.get("experience") or []) if isinstance(e, dict)}
+    proj_id_set = {pj.get("id") for pj in (profile.data.get("projects") or []) if isinstance(pj, dict)}
     cited_exp_ids: set[str] = set()
+    cited_proj_ids: set[str] = set()
     bullets_by_exp: dict[str, list[str]] = {}
+    bullets_by_proj: dict[str, list[str]] = {}
     for b in tailored.get("bullets") or []:
         sid = b.get("source_id", "")
         bits = sid.split(".")
-        exp_id = None
         for candidate in bits[:2]:
             if candidate in exp_id_set:
-                exp_id = candidate
+                cited_exp_ids.add(candidate)
+                bullets_by_exp.setdefault(candidate, []).append(
+                    _scrub_source_ids(b.get("text", ""), known))
                 break
-        if exp_id:
-            cited_exp_ids.add(exp_id)
-            bullets_by_exp.setdefault(exp_id, []).append(_scrub_source_ids(b.get("text", ""), known))
+            if candidate in proj_id_set:
+                cited_proj_ids.add(candidate)
+                bullets_by_proj.setdefault(candidate, []).append(
+                    _scrub_source_ids(b.get("text", ""), known))
+                break
 
     if cited_exp_ids:
         _section_header(doc, "Experience")
@@ -200,6 +206,18 @@ def render_resume_docx(*, profile: Profile, tailored: dict[str, Any],
                 r3 = p.add_run(right_meta)
                 _set_run(r3, size_pt=9.5, color=GREY)
             for txt in bullets_by_exp.get(exp.get("id"), []):
+                _bullet(doc, txt)
+
+    if cited_proj_ids:
+        _section_header(doc, "Projects")
+        for pj in profile.data.get("projects") or []:
+            if pj.get("id") not in cited_proj_ids:
+                continue
+            p = doc.add_paragraph()
+            _set_para_spacing(p, before_pt=8, after_pt=1)
+            r1 = p.add_run(pj.get("name") or "")
+            _set_run(r1, size_pt=11, color=INK, bold=True)
+            for txt in bullets_by_proj.get(pj.get("id"), []):
                 _bullet(doc, txt)
 
     edu = profile.data.get("education") or []
