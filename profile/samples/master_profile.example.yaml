@@ -3,7 +3,7 @@
 # Every "id" field is a stable source identifier referenced by tailored output.
 
 identity:
-  full_name: "Draven <LastName>"        # ← edit
+  full_name: "Jane Doe"                  # ← edit
   pronouns: "he/him"                     # optional
   citizenship: "US Citizen"
   work_auth: "Authorized to work in the US, no sponsorship required"

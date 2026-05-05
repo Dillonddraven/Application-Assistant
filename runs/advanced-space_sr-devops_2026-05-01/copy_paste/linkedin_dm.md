@@ -1,1 +1,0 @@
-Sr. DevOps at Advanced Space, my strongest match is scalable logging and alerting; I deployed Graylog and built sudo and failed logon alerts in lab. I know the spec is Sr. DevOps (8-12 yrs), but I bring practical security automation and monitoring you can plug in fast. Are you the right person to talk to about this?

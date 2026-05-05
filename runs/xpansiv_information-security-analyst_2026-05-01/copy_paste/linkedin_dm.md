@@ -1,1 +1,0 @@
-Information Security Analyst fit to Perform regular vulnerability assessments, patch verification, and risk remediation tracking. At Dillard's I built a GitLab SAST reporting workflow that turned scanner output into management-ready summaries. Is your team still hiring for this?

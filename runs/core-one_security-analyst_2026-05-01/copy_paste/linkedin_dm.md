@@ -1,1 +1,0 @@
-Security Analyst role at Core One; I can Perform risk assessments, control assessments, and gap analyses. In a nonprofit healthcare capstone I mapped workflows and tech environment to security and privacy risks during a migration, and I hold CompTIA Security+. Open to a 15-min chat next week?

@@ -1,15 +1,33 @@
-# Real data — keep local only
+# --- USER DATA (never commit) ---
+# Profile + secrets -- your real career history and PII
 profile/master_profile.yaml
 profile/secrets.yaml
+profile/companies.yaml
+profile/skill_synonyms.yaml
+
+# Job postings + analyzed + tailored packets
 jobs/raw_posts/
 jobs/analyzed/
 outputs/
+
+# Tracker spreadsheet + dashboard reports
 applications.xlsx
+MORNING_REVIEW.md
+RANKED_TODAY.md
 
-# Env / secrets
+# One-off driver scripts + run logs (often contain real URLs / data)
+runs/
+
+# Finder review queue
+runs/_finder_queue.xlsx
+
+# --- ENV / SECRETS ---
 .env
+.env.local
+*.env
+!.env.example
 
-# Python
+# --- PYTHON ---
 __pycache__/
 *.py[cod]
 *.egg-info/
@@ -18,10 +36,11 @@ venv/
 build/
 dist/
 
-# Tooling caches
+# --- TOOLING CACHES ---
 .pytest_cache/
 .ruff_cache/
 .mypy_cache/
 
-# OS
+# --- OS ---
 .DS_Store
+Thumbs.db
