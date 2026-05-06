@@ -21,9 +21,11 @@ dependencies = [
 [project.optional-dependencies]
 dev = ["pytest>=8.0", "pypdf>=4.0"]
 anthropic = ["anthropic>=0.40"]
+ui = ["streamlit>=1.39"]
 
 [project.scripts]
 job-apply = "job_apply.cli:main"
+job-apply-ui = "job_apply.ui.entry:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

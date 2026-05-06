@@ -205,6 +205,58 @@ Hard blockers cap the score and force category=`Blocker`:
 
 Copy a sample → fill it in → it's automatically gitignored from then on.
 
+## Web UI (for non-technical users)
+
+A single-page Streamlit app wraps the CLI: profile editor, LLM provider
+config, "paste a URL", run pipeline, browse the ranked queue, download
+artifacts. No terminal needed after the initial install.
+
+### Run locally
+
+```bash
+pip install -e .[ui]
+job-apply-ui                # opens http://localhost:8501
+```
+
+### Run in Docker (zero-Python install on the host)
+
+```bash
+docker build -t job-apply-ui .
+docker run -p 8501:8501 -v $PWD/profile:/app/profile job-apply-ui
+# then open http://localhost:8501
+```
+
+### Deploy to a server (so a friend can use it from a browser)
+
+**Fly.io (free tier eligible):**
+
+```bash
+brew install flyctl
+fly auth signup
+fly launch --no-deploy           # accepts the bundled fly.toml
+fly secrets set LLM_PROVIDER=deepseek DEEPSEEK_API_KEY=sk-...
+fly volumes create job_apply_data --size 1 --region ord
+fly deploy
+fly open                          # opens https://<your-app>.fly.dev
+```
+
+**Streamlit Community Cloud (free):** push your fork to GitHub, then go
+to <https://share.streamlit.io>, point it at `src/job_apply/ui/streamlit_app.py`,
+and add your API key as a secret. **Note:** the app reads / writes
+profile YAML on the local filesystem; on Streamlit Cloud each restart
+wipes that. Fine for a personal demo, not for daily use. Use Fly /
+Render / a VPS for persistent storage.
+
+**Anywhere else (VPS, Render, Railway):** the Dockerfile is generic.
+Run with the volume mounted at `/app/profile`.
+
+### Multi-user warning
+
+The current UI is **single-user.** It reads / writes one `profile/` and
+one `.env` file. If you want to host it for several friends, run a
+separate container per friend (each with its own volume + secrets), or
+fork the app to add per-user directories.
+
 ## Development
 
 ```bash
