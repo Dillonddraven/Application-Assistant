@@ -38,13 +38,27 @@ def _user_root() -> Path:
     return auth.user_dir(_logged_in_user() or "_invalid")
 
 
+_LLM_SECRET_VARS = (
+    "OPENAI_API_KEY", "DEEPSEEK_API_KEY", "ANTHROPIC_API_KEY", "LLM_API_KEY",
+    "LLM_BASE_URL", "LLM_PROVIDER",
+    "JOB_APPLY_MODEL_EXTRACT", "JOB_APPLY_MODEL_TAILOR", "JOB_APPLY_MODEL_DEEP",
+)
+
+
 def _user_env() -> dict[str, str]:
     """Env vars to pass to subprocess so the CLI scopes to this user's dir.
 
-    Includes JOB_APPLY_ROOT plus any LLM provider config that's set via
-    the user's per-account .env (so they can use their own DeepSeek key
-    even if the server has none)."""
+    Security: we explicitly STRIP any LLM-provider env vars from the
+    host's shell so one user can't accidentally rack up cost on the host
+    operator's API key. The user's per-account .env is the only source
+    of LLM credentials for that session, UNLESS the host opts into
+    sharing via JOB_APPLY_SHARED_LLM=true (e.g. for friends-and-family
+    where the host pays the bill).
+    """
     env = os.environ.copy()
+    if env.get("JOB_APPLY_SHARED_LLM", "").lower() not in ("1", "true", "yes"):
+        for k in _LLM_SECRET_VARS:
+            env.pop(k, None)
     env["JOB_APPLY_ROOT"] = str(_user_root())
     user_env_file = _user_root() / ".env"
     if user_env_file.exists():
