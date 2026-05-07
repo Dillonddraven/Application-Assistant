@@ -9,13 +9,20 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
+# JOB_APPLY_ROOT env override lets the multi-user web UI scope each session
+# to users/<username>/. Falls back to the repo root so the CLI / single-user
+# path keeps working unchanged.
+_REPO_ROOT = Path(__file__).resolve().parents[2]
+ROOT = (Path(os.environ["JOB_APPLY_ROOT"]).resolve()
+        if os.environ.get("JOB_APPLY_ROOT") else _REPO_ROOT)
+
+# Samples are always sourced from the repo, regardless of ROOT override.
+SAMPLE_PROFILE_PATH = _REPO_ROOT / "profile" / "samples" / "master_profile.example.yaml"
+SAMPLE_SECRETS_PATH = _REPO_ROOT / "profile" / "samples" / "secrets.example.yaml"
 
 PROFILE_DIR = ROOT / "profile"
 PROFILE_PATH = PROFILE_DIR / "master_profile.yaml"
 SECRETS_PATH = PROFILE_DIR / "secrets.yaml"
-SAMPLE_PROFILE_PATH = PROFILE_DIR / "samples" / "master_profile.example.yaml"
-SAMPLE_SECRETS_PATH = PROFILE_DIR / "samples" / "secrets.example.yaml"
 
 JOBS_DIR = ROOT / "jobs"
 RAW_POSTS_DIR = JOBS_DIR / "raw_posts"
@@ -25,7 +32,7 @@ INPUT_URLS_FILE = JOBS_DIR / "input_urls.txt"
 OUTPUTS_DIR = ROOT / "outputs"
 
 OPENCLAW_ENV = Path.home() / ".openclaw" / ".env"
-LOCAL_ENV = ROOT / ".env"
+LOCAL_ENV = _REPO_ROOT / ".env"
 
 
 def _load_env_file(path: Path) -> None:

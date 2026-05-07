@@ -15,6 +15,9 @@ applications.xlsx
 MORNING_REVIEW.md
 RANKED_TODAY.md
 
+# Multi-user web app per-user data (passwords + each user's profile + outputs)
+users/
+
 # One-off driver scripts + run logs (often contain real URLs / data)
 runs/
 

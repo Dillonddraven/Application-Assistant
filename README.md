@@ -250,12 +250,41 @@ Render / a VPS for persistent storage.
 **Anywhere else (VPS, Render, Railway):** the Dockerfile is generic.
 Run with the volume mounted at `/app/profile`.
 
-### Multi-user warning
+### Multi-user mode (host it for friends)
 
-The current UI is **single-user.** It reads / writes one `profile/` and
-one `.env` file. If you want to host it for several friends, run a
-separate container per friend (each with its own volume + secrets), or
-fork the app to add per-user directories.
+The Streamlit app supports multi-user accounts out of the box. Each user
+signs up with username + password (bcrypt-hashed, stored locally), goes
+through a 5-step onboarding wizard that builds their profile +
+secrets.yaml from form input, and gets their own `users/<username>/`
+data dir. The `JOB_APPLY_ROOT` env var scopes every CLI command to the
+logged-in user's directory transparently.
+
+DeepSeek is the default LLM provider (cheapest mainstream option) so
+the per-user cost is small. Each user can paste their own API key in
+the Setup tab, or the host operator can set `DEEPSEEK_API_KEY` at the
+server level for everyone.
+
+**Expose to the internet via ngrok (one command):**
+
+```bash
+brew install ngrok                          # macOS
+ngrok config add-authtoken <your-token>     # free signup at https://ngrok.com
+./scripts/launch_ngrok.sh
+```
+
+The launcher starts Streamlit and ngrok, prints the public URL, and
+your friend can sign up at that URL. The `users/` directory is
+gitignored so per-user data never enters git.
+
+**Production hosting note:** ngrok is fine for "share with one or two
+friends." For more durable hosting, deploy via Fly.io / Render / a VPS
+and point a real domain at it. The Dockerfile + `fly.toml` in the repo
+both work for the multi-user app.
+
+**Threat model:** the auth layer is a thin slice -- bcrypt-hashed
+passwords stored in `users/_users.json` -- not enterprise auth. Don't
+expose this to the open internet long-term without adding rate
+limiting, MFA, or an OIDC layer in front. Fine for friends-and-family.
 
 ## Development
 
