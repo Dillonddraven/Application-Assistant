@@ -442,6 +442,144 @@ def _setup_tab() -> None:
                 st.error(f"YAML error: {e}")
 
 
+def _profile_chat_tab() -> None:
+    """Tell the system about new experience in plain English; it proposes
+    a YAML patch, you confirm it before save."""
+    import difflib
+    import yaml
+
+    st.subheader("Talk to your profile")
+    st.caption(
+        "Describe new experience, projects, certs, or skills you want "
+        "to add -- in plain English. The system will propose a YAML "
+        "patch, show you exactly what changes, and only save after "
+        "you click Apply. Truth-safe: it can't add anything you didn't "
+        "explicitly say (no invented percentages, dates, or employers)."
+    )
+
+    profile_path = _user_root() / "profile" / "master_profile.yaml"
+    if not profile_path.exists():
+        st.warning("No profile yet. Finish onboarding first.")
+        return
+
+    # Per-session chat history
+    if "chat_history" not in st.session_state:
+        st.session_state["chat_history"] = []
+
+    # Replay the chat
+    for msg in st.session_state["chat_history"]:
+        with st.chat_message(msg["role"]):
+            st.write(msg["content"])
+            if msg.get("diff"):
+                st.code(msg["diff"], language="diff")
+
+    user_msg = st.chat_input(
+        "e.g. 'I forgot a malware-analysis lab from CYBR 4123 last semester'"
+    )
+    if user_msg:
+        # Lazy import so the rest of the app doesn't pay for it
+        from job_apply import profile_chat
+        from job_apply.llm_client import LLMClient
+
+        st.session_state["chat_history"].append({
+            "role": "user", "content": user_msg,
+        })
+        with st.chat_message("user"):
+            st.write(user_msg)
+
+        profile_yaml = profile_path.read_text(encoding="utf-8")
+        profile_dict = yaml.safe_load(profile_yaml) or {}
+
+        # Run the LLM proposal in the user's own env (their key, not the host's)
+        env_backup = dict(os.environ)
+        try:
+            for k, v in _user_env().items():
+                os.environ[k] = v
+            try:
+                client = LLMClient()
+            except RuntimeError as e:
+                with st.chat_message("assistant"):
+                    st.error(
+                        "Need an LLM key first. Go to Setup -> LLM provider "
+                        f"and paste a key. ({e})"
+                    )
+                return
+            try:
+                patch = profile_chat.propose_patch(
+                    user_message=user_msg, profile_yaml=profile_yaml,
+                    client=client,
+                )
+            except Exception as e:
+                with st.chat_message("assistant"):
+                    st.error(f"LLM call failed: {e}")
+                return
+        finally:
+            os.environ.clear()
+            os.environ.update(env_backup)
+
+        # No-op fast path
+        if patch.is_no_op():
+            with st.chat_message("assistant"):
+                st.info(
+                    f"Nothing to add. ({patch.reasoning})" if patch.reasoning
+                    else "Nothing to add."
+                )
+            st.session_state["chat_history"].append({
+                "role": "assistant",
+                "content": f"_No change. {patch.reasoning}_",
+            })
+            return
+
+        errors = profile_chat.validate_patch(patch, user_msg, profile_dict)
+        if errors:
+            with st.chat_message("assistant"):
+                st.error("Patch rejected by truth-safe validator:")
+                for e in errors:
+                    st.write(f"- {e}")
+            st.session_state["chat_history"].append({
+                "role": "assistant",
+                "content": "Patch rejected:\n- " + "\n- ".join(errors),
+            })
+            return
+
+        # Build and show the diff
+        new_profile = profile_chat.apply_patch(profile_dict, patch)
+        new_yaml = yaml.dump(new_profile, sort_keys=False,
+                              default_flow_style=False)
+        diff = "".join(difflib.unified_diff(
+            profile_yaml.splitlines(keepends=True),
+            new_yaml.splitlines(keepends=True),
+            fromfile="profile.yaml (current)",
+            tofile="profile.yaml (proposed)",
+            n=3,
+        ))
+
+        with st.chat_message("assistant"):
+            st.write(f"**Proposed:** `{patch.action}`")
+            st.write(f"**Reason:** {patch.reasoning}")
+            st.write(f"**Verbatim quote:** *{patch.verbatim_quote!r}*")
+            st.code(diff, language="diff")
+            cols = st.columns(2)
+            apply_key = f"apply_{len(st.session_state['chat_history'])}"
+            skip_key = f"skip_{len(st.session_state['chat_history'])}"
+            if cols[0].button("Apply this change", key=apply_key,
+                                type="primary"):
+                profile_path.write_text(new_yaml, encoding="utf-8")
+                st.success("Saved.")
+                st.session_state["chat_history"].append({
+                    "role": "assistant",
+                    "content": f"Applied: {patch.action} ({patch.reasoning})",
+                    "diff": diff,
+                })
+                st.rerun()
+            if cols[1].button("Skip", key=skip_key):
+                st.session_state["chat_history"].append({
+                    "role": "assistant",
+                    "content": f"Skipped: {patch.action}",
+                })
+                st.rerun()
+
+
 def _add_job_tab() -> None:
     st.subheader("Add a job posting")
     url = st.text_input("Job URL")
@@ -574,14 +712,17 @@ def main() -> None:
         )
 
     st.title("job-apply-assistant")
-    tabs = st.tabs(["Setup", "Add a job", "Run pipeline", "Download artifacts"])
+    tabs = st.tabs(["Setup", "Talk to your profile", "Add a job",
+                     "Run pipeline", "Download artifacts"])
     with tabs[0]:
         _setup_tab()
     with tabs[1]:
-        _add_job_tab()
+        _profile_chat_tab()
     with tabs[2]:
-        _pipeline_tab()
+        _add_job_tab()
     with tabs[3]:
+        _pipeline_tab()
+    with tabs[4]:
         _artifacts_tab()
 
 
